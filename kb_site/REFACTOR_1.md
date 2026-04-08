@@ -26,9 +26,9 @@ The search bar on the All tab is well-placed
 
 What fails (fix in the new site)
 1. Auth is invisible and manual
-Users hit a "Request access" screen with no explanation of who approves them, how long it takes, or what they're joining. New users have no reason to wait. Fix: replace with a proper invite flow or open registration with email confirmation. Show a landing page that explains what NPE Study Club is before asking for login.
+Users hit a "Request access" screen with no explanation of who approves them, how long it takes, or what they're joining. New users have no reason to wait. Fix: keep request + approval, but make it explicit and trustworthy: users can request access, and only admin-approved members can enter the platform.
 2. No landing/about page
-The app loads directly into a dashboard. A new user who hasn't been invited sees a login wall with no context. Fix: add a public-facing landing page (pre-auth) that explains the platform.
+The app loads directly into a dashboard. A new user who has not been approved yet sees a login wall with no context. Fix: add a public-facing landing page (pre-auth) that explains the platform.
 3. "Add Resource" form is missing the tags field
 The upload form has title, file, category, and notes — but no tags input. Tags appear on cards and are used for filtering. Fix: add multi-select tag input to the upload form.
 4. Schedule tab is underexplained
@@ -39,9 +39,11 @@ When a tab has no content (e.g., a filter returns zero results), the page is bla
 Once logged in, there's no indication of who you are or how to log out. Fix: add a simple user menu in the header (avatar/initials + logout).
 7. No progress tracking UI
 The existing app has no way to mark resources as read or track what you've completed. The owner wants this in the new site. Fix: add a "Mark as done" toggle on each resource card, reflected in user progress.
+8. No shared noticeboard/forum area
+There is no central member discussion space for announcements, exam updates, and peer Q&A. Fix: add a dedicated Community page with noticeboard threads and replies visible to approved members.
 
 Tech Stack (non-negotiable, already decided)
-LayerToolNotesFrontendNext.js (App Router)Scaffold with npx create-next-app -e with-supabaseBackend / AuthSupabaseAlready initialisedFile storageSupabase StorageBucket: resourcesStylingTailwind CSSComes with the starterDeploymentVercelConnected to GitHub repo; free under GitHub EducationAuth methodSupabase Auth — Google OAuthOne checkbox in Supabase + Google Cloud credential
+LayerToolNotesFrontendNext.js (App Router)Scaffold with npx create-next-app -e with-supabaseBackend / AuthSupabaseAlready initialisedFile storageSupabase StorageBucket: resourcesStylingTailwind CSSComes with the starterDeploymentVercelConnected to GitHub repo; free under GitHub EducationAuth methodSupabase Auth (provider-agnostic)Use email magic link as baseline; Google OAuth optional
 
 Supabase Schema
 Run this in the Supabase SQL editor before building any UI.
@@ -101,6 +103,52 @@ CREATE TABLE comments (
   body text NOT NULL,
   created_at timestamptz DEFAULT now()
 );
+
+-- Access control: owner-approved membership
+CREATE TABLE approved_users (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  email text UNIQUE NOT NULL,
+  full_name text,
+  ahpra_registration text,
+  verification_notes text,
+  status text NOT NULL DEFAULT 'approved', -- 'approved', 'revoked'
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE access_requests (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  full_name text NOT NULL,
+  email text NOT NULL,
+  ahpra_registration text,
+  relationship_note text,                 -- how owner knows applicant / referral note
+  reason text,
+  status text NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'declined'
+  reviewed_by uuid REFERENCES auth.users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Community noticeboard/forum (site-wide)
+CREATE TABLE forum_threads (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  title text NOT NULL,
+  body text NOT NULL,
+  tag text,                               -- 'announcement', 'question', 'resource-request', 'general'
+  created_by uuid REFERENCES auth.users(id),
+  author_name text,
+  is_pinned boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE forum_replies (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  thread_id uuid REFERENCES forum_threads(id) ON DELETE CASCADE,
+  body text NOT NULL,
+  created_by uuid REFERENCES auth.users(id),
+  author_name text,
+  created_at timestamptz DEFAULT now()
+);
 Row Level Security — enable on every table with these policies:
 sql-- Resources: anyone authenticated can read; uploader can update/delete their own
 ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
@@ -129,6 +177,26 @@ CREATE POLICY "Authenticated users can read comments" ON comments FOR SELECT USI
 CREATE POLICY "Users can insert comments" ON comments FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete own comments" ON comments FOR DELETE USING (auth.uid() = user_id);
 
+-- approved_users: only authenticated users can read their own record
+ALTER TABLE approved_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can read own approved_users row" ON approved_users FOR SELECT USING (lower(email) = lower(auth.jwt()->>'email'));
+
+-- access_requests: anyone can create; only authenticated users read own submissions
+ALTER TABLE access_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can submit access request" ON access_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can read own access requests" ON access_requests FOR SELECT USING (lower(email) = lower(auth.jwt()->>'email'));
+
+-- Forum: approved members can read/insert/delete own
+ALTER TABLE forum_threads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can read forum_threads" ON forum_threads FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Users can insert forum_threads" ON forum_threads FOR INSERT WITH CHECK (auth.uid() = created_by);
+CREATE POLICY "Users can delete own forum_threads" ON forum_threads FOR DELETE USING (auth.uid() = created_by);
+
+ALTER TABLE forum_replies ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can read forum_replies" ON forum_replies FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Users can insert forum_replies" ON forum_replies FOR INSERT WITH CHECK (auth.uid() = created_by);
+CREATE POLICY "Users can delete own forum_replies" ON forum_replies FOR DELETE USING (auth.uid() = created_by);
+
 Supabase Storage
 Create one bucket in Supabase Storage dashboard:
 
@@ -141,13 +209,15 @@ Max file size: 50MB
 Site Structure & Page Specs
 Route map
 /                    → Public landing page (pre-auth)
-/auth/login          → Login with Google
+/auth/login          → Login (email magic link; Google optional)
+/auth/request        → Request access (for approval)
 /dashboard           → Home (post-auth, replaces GAS home tab)
 /resources           → All resources (replaces All tab)
 /resources/exam-prep → Exam Prep filtered view
 /resources/clinical  → Clinical Practice filtered view
 /schedule            → Calendar (replaces Schedule tab)
 /add                 → Add Resource form (auth-gated)
+/community           → Noticeboard / forum (new)
 /profile             → User profile + progress summary (new)
 
 Page 1: / — Public landing page
@@ -160,10 +230,11 @@ NPE countdown widget (publicly visible — no login needed to see the deadline)
 "Join the study club" CTA at the bottom
 
 Copy:
-ElementTextHeadlineNPE Study ClubSubheadlineShared resources, study sessions, and clinical tools for provisional psychologists preparing for the National Psychology Exam.CTA buttonSign in with GoogleFeature 1Resources — Curated PDFs, protocols, and exam prep materials, organised by topic.Feature 2Schedule — Shared study calendar with weekly sessions and the NPE exam window.Feature 3Community — Upload resources, leave notes, and track your progress.
+ElementTextHeadlineNPE Study ClubSubheadlineShared resources, study sessions, and clinical tools for provisional psychologists preparing for the National Psychology Exam.CTA buttonRequest accessFeature 1Resources — Curated PDFs, protocols, and exam prep materials, organised by topic.Feature 2Schedule — Shared study calendar with weekly sessions and the NPE exam window.Feature 3Community — A private noticeboard/forum for trusted member discussion.
 Notes:
 
-No sign-up form needed — just Google OAuth
+Show two clear actions: Request access and Member sign in
+Access is approved manually by the owner (known contacts or AHPRA-registered provisional psychologists)
 The countdown should show days until the NPE exam window opens (hardcode the May 2026 date as a constant; make it easy to update)
 
 
@@ -269,6 +340,34 @@ Progress summary: "X of Y resources completed" with a simple progress bar
 List of completed resources (from user_progress JOIN resources) with date completed and link to view
 
 
+Page 8: /community — Noticeboard / Forum (new)
+Purpose: Give approved members a central place for announcements, exam updates, and peer discussion.
+Layout:
+
+Top bar: search, tag filter, and "New post" button
+Pinned section first (is_pinned = true), then recent threads by updated_at DESC
+Thread card: title, tag, author, reply count, last activity time
+Thread view: original post + chronological replies
+
+Create thread form:
+
+Title (required)
+Tag (Announcement / Question / Resource Request / General)
+Body (required)
+Submit → inserts into forum_threads
+
+Reply form:
+
+Single textarea beneath thread
+Submit → inserts into forum_replies
+
+Moderation for v1:
+
+Author can delete their own thread/reply
+Pinned posts can be set directly in Supabase dashboard for now
+Empty state copy: "No posts yet. Start the conversation with a first update or question."
+
+
 Data Migration from GAS App
 The following steps migrate existing content from Google to Supabase. The owner performs these steps; the agent does not need to automate this.
 
@@ -286,7 +385,9 @@ Phase 1 — Foundation (do first, nothing works without this)
 Scaffold Next.js app: npx create-next-app -e with-supabase
 Connect to Supabase project (env vars: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
 Run the SQL schema above in Supabase SQL editor
-Enable Google OAuth in Supabase Auth dashboard
+Enable Supabase auth providers (email magic link required; Google optional)
+Implement approval gate (only users in approved_users can access member routes)
+Build access request flow (/auth/request → access_requests)
 Create Supabase Storage bucket resources
 Deploy to Vercel; confirm auth login/logout works end-to-end
 
@@ -314,26 +415,34 @@ Key Reference Documents section (read from key_references table)
 Recently Added section (last 5 from resources)
 Upcoming Sessions section (next 3 from sessions)
 
-Phase 5 — Schedule
+Phase 5 — Community noticeboard/forum
+
+Build /community list and thread views
+Implement create thread + reply flow
+Add tag filter and search
+Add meaningful empty states and confirmations
+
+Phase 6 — Schedule
 
 Install a calendar library (e.g. react-big-calendar or @fullcalendar/react)
 Fetch sessions from Supabase and render on calendar
 Colour-code by session_type
 Build "+ Add ad-hoc session" modal form
 
-Phase 6 — Landing page & auth gates
+Phase 7 — Landing page & auth gates
 
 Build / public landing page
-Add auth middleware: redirect unauthenticated users from /dashboard, /resources, /add, /schedule to /auth/login
+Add auth middleware: redirect unauthenticated users from /dashboard, /resources, /add, /schedule, /community to /auth/login
+Add membership middleware: redirect authenticated but non-approved users to /auth/request-status
 Build user menu in header (avatar, display name, logout)
 
-Phase 7 — Progress tracking & profile
+Phase 8 — Progress tracking & profile
 
 Add "Mark as done" toggle to resource cards (upsert to user_progress)
 Build /profile page
 Display progress count and completed resource list
 
-Phase 8 — Community / comments (defer until core is stable)
+Phase 9 — Resource comments (optional, after forum is stable)
 
 Add comment thread to resource cards (expandable)
 Build comment submit form (insert to comments)
@@ -347,10 +456,17 @@ Both fonts are available via Google Fonts.
 Open Questions for Owner Before Starting
 
 Domain name — What URL should the study club live at? (e.g. npestudyclub.com.au)
-Registration model — Should anyone with a Google account be able to join, or invite-only?
 Exam window date — The countdown shows "Until May 2026 opens". Confirm the exact date to hardcode.
 Admin access — Who can add/edit Key Reference Documents? (Currently admin-only via Supabase dashboard is fine for now)
-Existing members — How many users currently have access in the GAS app? They'll need to re-authenticate via the new Google OAuth flow.
+Member approval criteria — Confirm required checks for approval (known person, AHPRA provisional registration, or both).
+Existing members — How many users currently have access in the GAS app? They'll need to re-authenticate via the new flow.
+
+
+Decision log (confirmed)
+
+Access is closed: owner approves all users
+Auth provider is flexible: email magic link baseline, Google optional
+Noticeboard/forum is core scope (not a deferred add-on)
 
 
 End of handoff document.
