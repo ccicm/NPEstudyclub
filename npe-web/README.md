@@ -44,6 +44,11 @@ Open `http://localhost:3000`.
 - Connect the domain in Vercel and set it as the production domain.
 - Set `NEXT_PUBLIC_SITE_URL=https://npestudyclub.online` in Vercel project settings.
 - Point the Supabase auth Site URL and redirect URLs at the same domain.
+- If the domain is registered at Namecheap, set DNS to Namecheap default DNS and add Vercel's records:
+	- `A` record for `@` -> `76.76.21.21`
+	- `CNAME` record for `www` -> `cname.vercel-dns.com`
+	- Remove any conflicting `A`, `CNAME`, or URL redirect records for `@` and `www`
+- Set `npestudyclub.online` as the primary domain in Vercel and wait for HTTPS to finish provisioning.
 
 ## Main Routes
 

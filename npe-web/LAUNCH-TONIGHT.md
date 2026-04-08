@@ -29,6 +29,11 @@ NPE Study Club - Launch Tonight Checklist
 - Push npe-web to GitHub.
 - Import project into Vercel.
 - Add the same env vars in Vercel project settings, including `NEXT_PUBLIC_SITE_URL=https://npestudyclub.online`.
+- In Namecheap, keep DNS on the default DNS host and add these Vercel records:
+  - `A` record for `@` -> `76.76.21.21`
+  - `CNAME` record for `www` -> `cname.vercel-dns.com`
+  - Remove any conflicting `A`, `CNAME`, or URL redirect records for `@` and `www`
+- In Vercel, add `npestudyclub.online` as the primary domain and verify the SSL certificate after DNS propagates.
 - Deploy and repeat smoke test on production URL.
 
 6. Tonight Nice-to-have (if time remains)
