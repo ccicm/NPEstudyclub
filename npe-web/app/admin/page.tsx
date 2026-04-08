@@ -19,10 +19,11 @@ async function reviewRequest(formData: FormData) {
   "use server";
 
   const { user } = await requireAdmin();
+  const reviewerId = user?.id;
   const requestId = String(formData.get("request_id") || "").trim();
   const decision = String(formData.get("decision") || "").trim();
 
-  if (!requestId || !["approve", "decline"].includes(decision)) {
+  if (!reviewerId || !requestId || !["approve", "decline"].includes(decision)) {
     return;
   }
 
@@ -57,7 +58,7 @@ async function reviewRequest(formData: FormData) {
     .from("access_requests")
     .update({
       status: newStatus,
-      reviewed_by: user.id,
+      reviewed_by: reviewerId,
       reviewed_at: now,
     })
     .eq("id", requestId);
