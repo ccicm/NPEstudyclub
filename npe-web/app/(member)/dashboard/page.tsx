@@ -42,6 +42,16 @@ export default async function DashboardPage() {
     .order("display_order", { ascending: true })
     .limit(8);
 
+  // Debug: Check approval status
+  const authEmail = user?.email?.toLowerCase();
+  const { data: approvedRecord } = user
+    ? await supabase
+        .from("approved_users")
+        .select("email,status")
+        .eq("email", authEmail)
+        .maybeSingle()
+    : { data: null };
+
   const fileTypeColor = (fileType: string | null) => {
     const type = (fileType || "").toLowerCase();
     if (type === "pdf") return "bg-red-100 text-red-700";
@@ -61,6 +71,26 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {authEmail && (
+        <section className="rounded-2xl border-2 border-yellow-300 bg-yellow-50 p-6">
+          <h3 className="font-mono text-sm font-bold text-yellow-900">🔍 Email Debug Info</h3>
+          <div className="mt-3 space-y-2 text-sm font-mono text-yellow-900">
+            <p>
+              <strong>Auth Email:</strong> {authEmail}
+            </p>
+            <p>
+              <strong>In DB:</strong> {approvedRecord ? `Yes (status: ${approvedRecord.status})` : "❌ NOT FOUND"}
+            </p>
+            {!approvedRecord && (
+              <p className="mt-2 text-xs text-yellow-800">
+                ⚠️ Your auth session is looking for "{authEmail}" in the approved_users table, but it's not there. 
+                Check that you approved the correct email in the database!
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
