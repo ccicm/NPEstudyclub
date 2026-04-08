@@ -1,50 +1,147 @@
-NPE Study Club - Launch Tonight Checklist
+# Launch Checklist
 
-1. Environment
-- Copy .env.example to .env.local.
-- Set NEXT_PUBLIC_SUPABASE_URL.
-- Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
+Production deployment steps for NPE Study Club on Vercel + Supabase.
 
-2. Database
-- In Supabase SQL Editor, run supabase/001_npe_schema.sql.
-- In Supabase Storage, create private bucket resources.
-- Add at least one row to approved_users with your email and status='approved'.
+## 1. Local Development Setup
 
-3. Auth Settings
-- In Supabase Auth providers, enable Email (magic link).
-- Set Site URL to `https://npestudyclub.online`.
-- Add redirect URLs:
-  - http://localhost:3000
-  - https://npestudyclub.online
+```bash
+cd npe-web
+cp .env.example .env.local
+npm install
+npm run dev
+```
 
-4. Local Smoke Test
-- Start dev server: npm run dev
-- Test flow:
-  - /auth/request submits request and redirects to /auth/request-status
-  - /auth/login sends magic link
-  - Approved user can access /dashboard, /resources, /community
-  - Non-approved user is redirected to /auth/request-status
+In `.env.local`:
+- `NEXT_PUBLIC_SUPABASE_URL` — from Supabase Project Settings > API
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — from Supabase Project Settings > API
+- `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` for dev
 
-5. Deploy
-- Push npe-web to GitHub.
-- Import project into Vercel.
-- Add the same env vars in Vercel project settings, including `NEXT_PUBLIC_SITE_URL=https://npestudyclub.online`.
-- In Namecheap, keep DNS on the default DNS host and add these Vercel records:
-  - `A` record for `@` -> `76.76.21.21`
-  - `CNAME` record for `www` -> `cname.vercel-dns.com`
-  - Remove any conflicting `A`, `CNAME`, or URL redirect records for `@` and `www`
-- In Vercel, add `npestudyclub.online` as the primary domain and verify the SSL certificate after DNS propagates.
-- Deploy and repeat smoke test on production URL.
+## 2. Supabase Setup
 
-6. Tonight Nice-to-have (if time remains)
-- Wire /add to Supabase Storage upload and resources insert.
-- Add reply posting in /community via forum_replies.
-- Add signed URL View/Download actions for resource cards.
+**Database:**
+- Run `supabase/001_npe_schema.sql` in SQL Editor
+- Verify tables created: `approved_users`, `resources`, `forum_threads`, `forum_replies`, `sessions`, `user_progress`
 
-Emergency fallback if Supabase email rate limits block login
-- In Vercel env vars, set `ALLOW_MEMBER_BYPASS=true` and redeploy.
-- (Optional) Set `BYPASS_MEMBER_EMAIL` to your admin email for display in the header.
-- Use this only temporarily while unblocking launch tasks.
-- After auth is stable, set `ALLOW_MEMBER_BYPASS=false` and redeploy.
-- Fast one-click fallback: open `https://npestudyclub.online/dashboard?admin=1` once to set an 8-hour bypass cookie.
-- To disable that cookie fallback, open `https://npestudyclub.online/dashboard?admin=0`.
+**Storage:**
+- Create private bucket named `resources`
+
+**Auth:**
+- Enable Email provider (magic-link sign-in)
+- URL Configuration:
+  - **Site URL:** `https://npestudyclub.online`
+  - **Redirect URLs:**
+    - `http://localhost:3000/auth/confirm`
+    - `http://localhost:3000/auth/update-password`
+    - `https://npestudyclub.online/auth/confirm`
+    - `https://npestudyclub.online/auth/update-password`
+
+**Seed Data:**
+- Add your email to `approved_users` table with `status = 'approved'`
+
+## 3. Local Smoke Test
+
+```bash
+npm run dev
+```
+
+Test these flows:
+- [ ] `/auth/request` — submit request, redirected to `/auth/request-status`
+- [ ] `/auth/login` — request magic link, receive email (or use `?admin=1` bypass)
+- [ ] `/dashboard` — approved user can access
+- [ ] `/resources` — member-only page
+- [ ] `/community` — member-only page
+- [ ] Non-approved email redirects to `/auth/request-status`
+
+## 4. Vercel Deployment
+
+**Project Setup:**
+1. Push `npe-web/` to GitHub main branch
+2. Import repo into Vercel as new project
+3. Select root directory: `npe-web`
+4. Application preset: Next.js (auto-detect)
+
+**Environment Variables:**
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SITE_URL` = `https://npestudyclub.online`
+
+**Deploy** → Copy production URL
+
+## 5. Domain Setup (Namecheap → Vercel)
+
+1. **Namecheap DNS:**
+   - Go to Domain Management > Advanced DNS
+   - Add `A` record: Host `@`, Value `76.76.21.21`
+   - Add `CNAME` record: Host `www`, Value `cname.vercel-dns.com`
+   - Delete any old `A`, `CNAME`, or URL redirect records for `@` and `www`
+   - Save (propagation takes 5 min–48 hours)
+
+2. **Vercel Domain:**
+   - Go to project Settings > Domains
+   - Add domain: `npestudyclub.online`
+   - Set as primary domain
+   - Wait for SSL certificate to provision (usually 5–10 min after DNS propagates)
+
+## 6. Production Smoke Test
+
+Once DNS propagates and SSL is active:
+- [ ] Open https://npestudyclub.online
+- [ ] Landing page loads
+- [ ] Request access form works
+- [ ] Magic-link sign-in flow works
+- [ ] Approved user can access `/dashboard`
+
+## Emergency Bypass (if Email Rate-Limits)
+
+If Supabase email throttling blocks login:
+
+**Quick Fix (8-hour bypass):**
+1. Open `https://npestudyclub.online/dashboard?admin=1` once
+2. Go to `https://npestudyclub.online/dashboard`
+3. Works for 8 hours until cookie expires
+4. To disable: open `https://npestudyclub.online/dashboard?admin=0`
+
+**Full Fix (permanent):**
+1. In Vercel Environment Variables:
+   - Set `ALLOW_MEMBER_BYPASS=true`
+   - (Optional) Set `BYPASS_MEMBER_EMAIL=youremail@example.com`
+2. Redeploy
+3. When email is stable, set `ALLOW_MEMBER_BYPASS=false` and redeploy again
+
+## Post-Launch Tasks
+
+- [ ] Add at least one resource in `/add` to seed the library
+- [ ] Create a session in Supabase `sessions` table for schedule visibility
+- [ ] Test community posting in `/community`
+- [ ] Invite and approve core members
+- [ ] Monitor Vercel Analytics and Supabase logs
+
+## Troubleshooting
+
+**Magic link says "otp_expired":**
+- OTP tokens expire in ~15 min
+- Request a fresh link
+- Check that Supabase redirect URLs match production domain
+- If rate-limited, use emergency bypass above
+
+**Login redirects to `/auth/request-status` even after approval:**
+- Check `approved_users` table: email must match exactly and `status = 'approved'`
+- Emails are lowercase; verify no typos
+
+**Vercel shows 404:**
+- Wait for DNS propagation (check with `dig npestudyclub.online`)
+- Verify SSL certificate is active in Vercel Domains
+- Check that environment variables are set in Production
+
+**File uploads fail:**
+- Verify `resources` bucket exists and is private
+- Check Supabase API key has Storage permissions
+- Verify user is authenticated and approved
+
+## Storage
+
+- **App code:** Vercel (serverless)
+- **Database:** Supabase PostgreSQL (included)
+- **File uploads:** Supabase Storage — `resources` bucket (private, with signed URLs for members)
+
+Supabase Storage quota: sufficient for a study club (gigabytes). See pricing for additional capacity.
