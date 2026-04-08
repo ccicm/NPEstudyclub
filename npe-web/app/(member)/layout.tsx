@@ -6,9 +6,10 @@ import { isApprovedMember } from "@/lib/access";
 const links = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/resources", label: "Resources" },
+  { href: "/quizzes", label: "Quizzes" },
+  { href: "/study-plan", label: "Study Plan" },
   { href: "/schedule", label: "Schedule" },
   { href: "/community", label: "Community" },
-  { href: "/add", label: "Add resource" },
   { href: "/profile", label: "Profile" },
 ];
 
