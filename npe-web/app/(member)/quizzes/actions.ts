@@ -1,0 +1,132 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+type DraftQuestion = {
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c?: string;
+  option_d?: string;
+  correct_label: "A" | "B" | "C" | "D";
+  explanation?: string;
+};
+
+export async function saveQuizResultAction(input: {
+  quizId: string;
+  score: number;
+  totalQuestions: number;
+  answers: Array<{ question_id: string; selected: number; correct: number }>;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return;
+  }
+
+  await supabase.from("quiz_results").insert({
+    user_id: user.id,
+    quiz_id: input.quizId,
+    score: input.score,
+    total_questions: input.totalQuestions,
+    answers: input.answers,
+  });
+
+  revalidatePath("/quizzes");
+  revalidatePath("/quizzes/results");
+  revalidatePath("/profile");
+}
+
+export async function createQuizAction(formData: FormData) {
+  const title = String(formData.get("title") || "").trim();
+  const category = String(formData.get("category") || "").trim();
+  const domain = String(formData.get("domain") || "").trim();
+  const description = String(formData.get("description") || "").trim();
+  const questionsRaw = String(formData.get("questions") || "").trim();
+
+  if (!title || !category || !domain || !questionsRaw) {
+    redirect("/quizzes/add?error=missing_required");
+  }
+
+  let questions: DraftQuestion[] = [];
+
+  try {
+    questions = JSON.parse(questionsRaw) as DraftQuestion[];
+  } catch {
+    redirect("/quizzes/add?error=invalid_payload");
+  }
+
+  if (questions.length < 4) {
+    redirect("/quizzes/add?error=min_questions");
+  }
+
+  const normalized = questions.map((question, index) => {
+    const optionEntries = [
+      { label: "A", text: String(question.option_a || "").trim() },
+      { label: "B", text: String(question.option_b || "").trim() },
+      { label: "C", text: String(question.option_c || "").trim() },
+      { label: "D", text: String(question.option_d || "").trim() },
+    ].filter((entry) => entry.text);
+
+    const correctIndex = optionEntries.findIndex((entry) => entry.label === question.correct_label);
+
+    if (!question.question_text?.trim() || !question.option_a?.trim() || !question.option_b?.trim() || correctIndex < 0) {
+      redirect("/quizzes/add?error=invalid_question");
+    }
+
+    return {
+      question_text: question.question_text.trim(),
+      options: optionEntries,
+      correct_index: correctIndex,
+      explanation: question.explanation?.trim() || null,
+      display_order: index + 1,
+    };
+  });
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data: quiz, error: quizError } = await supabase
+    .from("quizzes")
+    .insert({
+      title,
+      category,
+      domain,
+      description: description || null,
+      created_by: user.id,
+      author_name: user.user_metadata?.full_name || user.email,
+      is_curated: false,
+    })
+    .select("id")
+    .single();
+
+  if (quizError || !quiz) {
+    redirect("/quizzes/add?error=save_quiz");
+  }
+
+  const { error: questionsError } = await supabase.from("quiz_questions").insert(
+    normalized.map((question) => ({
+      quiz_id: quiz.id,
+      ...question,
+    })),
+  );
+
+  if (questionsError) {
+    redirect("/quizzes/add?error=save_questions");
+  }
+
+  revalidatePath("/quizzes");
+  revalidatePath("/quizzes/add");
+  redirect("/quizzes?created=1");
+}
