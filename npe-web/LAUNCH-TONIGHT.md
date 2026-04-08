@@ -46,3 +46,5 @@ Emergency fallback if Supabase email rate limits block login
 - (Optional) Set `BYPASS_MEMBER_EMAIL` to your admin email for display in the header.
 - Use this only temporarily while unblocking launch tasks.
 - After auth is stable, set `ALLOW_MEMBER_BYPASS=false` and redeploy.
+- Fast one-click fallback: open `https://npestudyclub.online/dashboard?admin=1` once to set an 8-hour bypass cookie.
+- To disable that cookie fallback, open `https://npestudyclub.online/dashboard?admin=0`.
