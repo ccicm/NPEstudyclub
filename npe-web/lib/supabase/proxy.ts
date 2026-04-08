@@ -6,6 +6,9 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
+  const allowMemberBypass =
+    process.env.ALLOW_MEMBER_BYPASS === "true" ||
+    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true";
 
   // If the env vars are not set, skip proxy check. You can remove this
   // once you setup the project.
@@ -68,7 +71,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (needsAuth && !user) {
+  if (needsAuth && !user && !allowMemberBypass) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";

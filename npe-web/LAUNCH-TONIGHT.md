@@ -40,3 +40,9 @@ NPE Study Club - Launch Tonight Checklist
 - Wire /add to Supabase Storage upload and resources insert.
 - Add reply posting in /community via forum_replies.
 - Add signed URL View/Download actions for resource cards.
+
+Emergency fallback if Supabase email rate limits block login
+- In Vercel env vars, set `ALLOW_MEMBER_BYPASS=true` and redeploy.
+- (Optional) Set `BYPASS_MEMBER_EMAIL` to your admin email for display in the header.
+- Use this only temporarily while unblocking launch tasks.
+- After auth is stable, set `ALLOW_MEMBER_BYPASS=false` and redeploy.
