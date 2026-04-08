@@ -121,6 +121,18 @@ alter table public.access_requests enable row level security;
 alter table public.forum_threads enable row level security;
 alter table public.forum_replies enable row level security;
 
+create policy "Authenticated users can read resource objects"
+on storage.objects for select
+using (bucket_id = 'resources' and auth.role() = 'authenticated');
+
+create policy "Authenticated users can upload resource objects"
+on storage.objects for insert
+with check (bucket_id = 'resources' and auth.role() = 'authenticated');
+
+create policy "Authenticated users can delete resource objects"
+on storage.objects for delete
+using (bucket_id = 'resources' and auth.role() = 'authenticated');
+
 create policy "Authenticated users can read resources"
 on public.resources for select
 using (auth.role() = 'authenticated');

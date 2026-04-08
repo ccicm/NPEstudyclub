@@ -29,17 +29,17 @@ export default async function MemberLayout({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-5 py-6 md:px-8">
-      <header className="rounded-2xl border bg-card p-4">
+      <header className="rounded-3xl border bg-card p-4 shadow-sm md:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">NPE Study Club</p>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">NPE Study Club</p>
+            <p className="text-sm text-muted-foreground">Approved member area · {user.email}</p>
           </div>
           <LogoutButton />
         </div>
         <nav className="mt-4 flex flex-wrap gap-2">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted">
+            <Link key={link.href} href={link.href} className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-muted">
               {link.label}
             </Link>
           ))}
