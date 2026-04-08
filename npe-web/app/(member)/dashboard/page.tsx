@@ -4,13 +4,27 @@ import { ExamCountdown } from "@/components/member/exam-countdown";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: sessions } = await supabase
     .from("sessions")
-    .select("id,title,session_type,scheduled_at,description,meet_link")
+    .select("id,title,session_type,scheduled_at,description,video_link")
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true })
     .limit(4);
+
+  const { data: studyPlan } = user
+    ? await supabase
+        .from("study_plans")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle()
+    : { data: null };
+
+  const dismissedOnboarding = Boolean(user?.user_metadata?.onboarding_dismissed);
+  const showOnboarding = Boolean(user) && !studyPlan && !dismissedOnboarding;
 
   const { data: recentResources } = await supabase
     .from("resources")
@@ -43,6 +57,24 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {showOnboarding ? (
+        <section className="rounded-2xl border bg-card p-6">
+          <p className="text-2xl">Welcome to NPE Study Club</p>
+          <p className="mt-2 text-sm text-muted-foreground">You are in. Here is a simple way to get started.</p>
+          <ol className="mt-4 space-y-2 text-sm">
+            <li>1. Browse the resource library.</li>
+            <li>2. Set up your study plan.</li>
+            <li>3. Introduce yourself in Community.</li>
+          </ol>
+          <Link
+            href="/study-plan"
+            className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            Start plan
+          </Link>
+        </section>
+      ) : null}
+
       <ExamCountdown />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -68,8 +100,8 @@ export default async function DashboardPage() {
                         {new Date(session.scheduled_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                       </p>
                     </div>
-                    {session.meet_link ? (
-                      <Link href={session.meet_link} target="_blank" className="text-xs underline">
+                    {session.video_link ? (
+                      <Link href={session.video_link} target="_blank" className="text-xs underline">
                         Join
                       </Link>
                     ) : null}

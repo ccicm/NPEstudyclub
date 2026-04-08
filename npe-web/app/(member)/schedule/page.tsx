@@ -7,7 +7,7 @@ export default async function SchedulePage() {
 
   const { data: sessions } = await supabase
     .from("sessions")
-    .select("id,title,session_type,scheduled_at,description,meet_link")
+    .select("id,title,session_type,scheduled_at,description,video_link")
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true })
     .limit(50);

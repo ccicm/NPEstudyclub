@@ -10,7 +10,7 @@ type Session = {
   session_type: string;
   scheduled_at: string;
   description: string | null;
-  meet_link: string | null;
+  video_link: string | null;
 };
 
 type DayEvent =
@@ -21,7 +21,7 @@ type DayEvent =
       sessionType: string;
       at: Date;
       description: string | null;
-      meetLink: string | null;
+      videoLink: string | null;
     }
   | {
       kind: "window";
@@ -97,7 +97,7 @@ export function ScheduleCalendar({
         sessionType: session.session_type,
         at,
         description: session.description,
-        meetLink: session.meet_link,
+        videoLink: session.video_link,
       });
     });
 
@@ -228,9 +228,9 @@ export function ScheduleCalendar({
                       {event.at.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} · {event.sessionType}
                     </p>
                     {event.description ? <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{event.description}</p> : null}
-                    {event.meetLink ? (
-                      <a href={event.meetLink} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm underline">
-                        Join Google Meet
+                    {event.videoLink ? (
+                      <a href={event.videoLink} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm underline">
+                        Open video call link
                       </a>
                     ) : null}
                   </>
@@ -288,8 +288,13 @@ export function ScheduleCalendar({
               <textarea name="notes" className="min-h-24 rounded-md border bg-background px-3 py-2" />
             </label>
             <label className="grid gap-1 text-sm md:col-span-2">
-              <span>Google Meet link</span>
-              <input name="meet_link" type="url" className="h-10 rounded-md border bg-background px-3" />
+              <span>Video call link</span>
+              <input
+                name="video_link"
+                type="url"
+                placeholder="https://zoom.us/j/... or any video call link"
+                className="h-10 rounded-md border bg-background px-3"
+              />
             </label>
             <div className="md:col-span-2">
               <button type="submit" className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
@@ -299,24 +304,6 @@ export function ScheduleCalendar({
           </form>
         ) : null}
       </div>
-
-      <section className="rounded-2xl border bg-card p-4">
-        <h2 className="text-xl">Upcoming sessions list</h2>
-        <div className="mt-3 space-y-2">
-          {sessions.length ? (
-            sessions.map((session) => (
-              <div key={session.id} className="rounded-xl bg-muted/40 p-3 text-sm">
-                <p className="font-semibold">{session.title || "Session"}</p>
-                <p className="text-muted-foreground">
-                  {new Date(session.scheduled_at).toLocaleString()} · {session.session_type}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-muted-foreground">No upcoming sessions yet.</p>
-          )}
-        </div>
-      </section>
     </div>
   );
 }

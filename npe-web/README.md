@@ -21,6 +21,7 @@ Private study hub for approved provisional psychologists preparing for the Natio
 5. Run the schema in order:
 	- `supabase/001_npe_schema.sql`
 	- `supabase/002_feature_upgrade.sql`
+	- `supabase/003_p1_refactor.sql`
 6. Create a private Supabase Storage bucket named `resources`.
 7. Add your email to `approved_users` with `status = 'approved'`.
 
@@ -58,6 +59,7 @@ Open `http://localhost:3000`.
 
 - `/` public landing page
 - `/auth/request` access request form
+- `/privacy` privacy policy
 - `/auth/login` magic-link sign in
 - `/auth/request-status` pending approval notice
 - `/dashboard` member overview

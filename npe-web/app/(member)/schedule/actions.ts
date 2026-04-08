@@ -10,7 +10,7 @@ export async function addAdHocSession(formData: FormData) {
   const topic = String(formData.get("topic") || "").trim();
   const topicOther = String(formData.get("topic_other") || "").trim();
   const notes = String(formData.get("notes") || "").trim();
-  const meetLink = String(formData.get("meet_link") || "").trim();
+  const videoLink = String(formData.get("video_link") || "").trim();
 
   if (!hostName || !date) {
     return;
@@ -36,7 +36,7 @@ export async function addAdHocSession(formData: FormData) {
     session_type: "Ad-hoc",
     scheduled_at: scheduledAt.toISOString(),
     description: description || null,
-    meet_link: meetLink || null,
+    video_link: videoLink || null,
     created_by: user.id,
   });
 
