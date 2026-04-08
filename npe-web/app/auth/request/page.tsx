@@ -97,6 +97,10 @@ export default function RequestAccessPage() {
         <p className="mt-4 text-sm text-muted-foreground">
           Already approved? <Link className="text-primary underline" href="/auth/login">Use member sign in</Link>.
         </p>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Preview mode on? <Link className="text-primary underline" href="/dashboard?admin=1">Open app now</Link>.
+        </p>
       </div>
     </div>
   );

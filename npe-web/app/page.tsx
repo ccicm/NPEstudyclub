@@ -20,6 +20,9 @@ export default function Home() {
           <p className="text-sm text-muted-foreground">Private prep space for approved provisional psychologists.</p>
         </div>
         <div className="flex gap-2">
+          <Button asChild variant="secondary">
+            <Link href="/dashboard?admin=1">Open app now</Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="/auth/request">Request access</Link>
           </Button>
@@ -38,6 +41,9 @@ export default function Home() {
               Psychology Exam.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg" variant="secondary">
+                <Link href="/dashboard?admin=1">Open app now</Link>
+              </Button>
               <Button asChild size="lg">
                 <Link href="/auth/request">Apply for membership</Link>
               </Button>
@@ -91,6 +97,13 @@ export default function Home() {
             <p className="mt-3 text-sm font-semibold text-primary">Open request form -&gt;</p>
           </article>
         </Link>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+        <p className="font-semibold text-foreground">No-login preview mode</p>
+        <p className="mt-1">
+          If email sign-in is not working, use <Link href="/dashboard?admin=1" className="underline">Open app now</Link> to jump straight into the member area while preview mode is on.
+        </p>
       </section>
 
       <section className="mt-10 rounded-3xl border bg-card p-8">
