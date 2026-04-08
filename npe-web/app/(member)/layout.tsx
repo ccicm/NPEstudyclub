@@ -3,16 +3,6 @@ import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/logout-button";
 import { isApprovedMember } from "@/lib/access";
 
-const links = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/resources", label: "Resources" },
-  { href: "/quizzes", label: "Quizzes" },
-  { href: "/study-plan", label: "Study Plan" },
-  { href: "/schedule", label: "Schedule" },
-  { href: "/community", label: "Community" },
-  { href: "/profile", label: "Profile" },
-];
-
 export default async function MemberLayout({
   children,
 }: {
@@ -27,6 +17,25 @@ export default async function MemberLayout({
   if (!approved) {
     redirect("/auth/request-status");
   }
+
+  const baseLinks = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/resources", label: "Resources" },
+    { href: "/quizzes", label: "Quizzes" },
+    { href: "/study-plan", label: "Study Plan" },
+    { href: "/schedule", label: "Schedule" },
+    { href: "/community", label: "Community" },
+    { href: "/profile", label: "Profile" },
+  ];
+
+  const adminEmails = (process.env.ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const userEmail = user.email?.toLowerCase() || "";
+  const links = adminEmails.includes(userEmail)
+    ? [...baseLinks, { href: "/admin", label: "Admin" }]
+    : baseLinks;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-5 py-6 md:px-8">

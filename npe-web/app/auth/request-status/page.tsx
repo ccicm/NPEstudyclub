@@ -46,6 +46,10 @@ export default async function RequestStatusPage() {
             Try sign in
           </Link>
         </div>
+
+        <p className="mt-4 text-xs text-muted-foreground">
+          Organiser only: after signing in with the admin email, open <Link className="underline" href="/admin">/admin</Link> to approve requests.
+        </p>
       </div>
     </div>
   );

@@ -18,12 +18,13 @@ Private study hub for approved provisional psychologists preparing for the Natio
 2. Set `NEXT_PUBLIC_SUPABASE_URL`.
 3. Set `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 4. Set `NEXT_PUBLIC_SITE_URL` to your local or production URL.
-5. Run the schema in order:
+5. Set `ADMIN_EMAIL` to your email (the one you use to sign in).
+6. Set `SUPABASE_SERVICE_ROLE_KEY` from Supabase project settings (server-side only).
+7. Run the schema in order:
 	- `supabase/001_npe_schema.sql`
 	- `supabase/002_feature_upgrade.sql`
 	- `supabase/003_p1_refactor.sql`
-6. Create a private Supabase Storage bucket named `resources`.
-7. Add your email to `approved_users` with `status = 'approved'`.
+8. Create a private Supabase Storage bucket named `resources`.
 
 ## Run Locally
 
@@ -74,6 +75,16 @@ Open `http://localhost:3000`.
 - `/quizzes/results` member quiz history
 - `/study-plan` study plan onboarding + dashboard
 - `/profile` member progress view
+- `/admin` organiser-only user-management panel (approve/decline access requests)
+
+## Fast Login Recovery (Noob-Friendly)
+
+If you are locked out, use this sequence:
+
+1. Set `ADMIN_EMAIL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`.
+2. Run `npm run dev` and sign in from `/auth/login` with the `ADMIN_EMAIL` address.
+3. Open `/admin` and approve your own access request.
+4. If magic links are failing temporarily, set `ALLOW_MEMBER_BYPASS=true` to unblock yourself, then set it back to `false` once approvals are working.
 
 ## Notes
 

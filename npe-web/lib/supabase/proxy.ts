@@ -86,6 +86,7 @@ export async function updateSession(request: NextRequest) {
     "/add",
     "/community",
     "/profile",
+    "/admin",
   ];
   const needsAuth = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path),
