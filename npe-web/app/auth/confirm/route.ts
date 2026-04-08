@@ -60,5 +60,5 @@ export async function GET(request: NextRequest) {
     redirect(next);
   }
 
-  redirect(`/auth/error?error=${encodeURIComponent("No auth callback params found")}`);
+  redirect(`/auth/callback?next=${encodeURIComponent(next)}`);
 }
