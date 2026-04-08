@@ -29,6 +29,9 @@ export function LoginForm({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
+    const redirectBase =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+      window.location.origin;
     setIsLoading(true);
     setError(null);
     setNotice(null);
@@ -37,7 +40,7 @@ export function LoginForm({
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/dashboard`,
+          emailRedirectTo: `${redirectBase}/auth/confirm?next=/dashboard`,
         },
       });
       if (error) throw error;

@@ -30,6 +30,9 @@ export function SignUpForm({
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
+    const redirectBase =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+      window.location.origin;
     setIsLoading(true);
     setError(null);
 
@@ -44,7 +47,7 @@ export function SignUpForm({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/protected`,
+          emailRedirectTo: `${redirectBase}/auth/confirm?next=/protected`,
         },
       });
       if (error) throw error;
