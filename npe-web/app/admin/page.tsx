@@ -23,7 +23,7 @@ async function reviewRequest(formData: FormData) {
   const requestId = String(formData.get("request_id") || "").trim();
   const decision = String(formData.get("decision") || "").trim();
 
-  if (!reviewerId || !requestId || !["approve", "decline"].includes(decision)) {
+  if (!requestId || !["approve", "decline"].includes(decision)) {
     return;
   }
 
@@ -58,7 +58,7 @@ async function reviewRequest(formData: FormData) {
     .from("access_requests")
     .update({
       status: newStatus,
-      reviewed_by: reviewerId,
+      reviewed_by: reviewerId ?? null,
       reviewed_at: now,
     })
     .eq("id", requestId);
