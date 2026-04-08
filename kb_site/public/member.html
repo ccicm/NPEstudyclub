@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NPE Study Club Member Area</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="main">
+    <section class="card">
+      <h1>Member Area</h1>
+      <p class="lead">Sign in is required. Approved users can view resources and sessions.</p>
+      <div class="row">
+        <button id="btn-signin" class="btn primary">Email me a sign-in link</button>
+        <button id="btn-signout" class="btn">Sign out</button>
+      </div>
+      <p id="member-status" class="notice"></p>
+    </section>
+
+    <section class="grid" style="margin-top:1rem">
+      <section class="card">
+        <h2>Resources</h2>
+        <div id="resources-list"></div>
+      </section>
+      <section class="card">
+        <h2>Sessions</h2>
+        <div id="sessions-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
