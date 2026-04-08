@@ -15,9 +15,10 @@ Private study hub for approved provisional psychologists preparing for the Natio
 1. Copy `.env.example` to `.env.local`.
 2. Set `NEXT_PUBLIC_SUPABASE_URL`.
 3. Set `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-4. Run the schema in `supabase/001_npe_schema.sql`.
-5. Create a private Supabase Storage bucket named `resources`.
-6. Add your email to `approved_users` with `status = 'approved'`.
+4. Set `NEXT_PUBLIC_SITE_URL` to your local or production URL.
+5. Run the schema in `supabase/001_npe_schema.sql`.
+6. Create a private Supabase Storage bucket named `resources`.
+7. Add your email to `approved_users` with `status = 'approved'`.
 
 ## Run Locally
 
@@ -31,10 +32,18 @@ Open `http://localhost:3000`.
 ## Launch Checklist
 
 - Enable Supabase Email auth for magic links.
-- Set the Supabase Site URL to your deployed domain.
-- Add redirect URLs for local dev and production.
+- Set the Supabase Site URL to `https://npestudyclub.online`.
+- Add redirect URLs for local dev and production:
+	- `http://localhost:3000`
+	- `https://npestudyclub.online`
 - Add at least one approved user.
 - Upload at least one resource and create at least one session entry.
+
+## Domain Setup
+
+- Connect the domain in Vercel and set it as the production domain.
+- Set `NEXT_PUBLIC_SITE_URL=https://npestudyclub.online` in Vercel project settings.
+- Point the Supabase auth Site URL and redirect URLs at the same domain.
 
 ## Main Routes
 

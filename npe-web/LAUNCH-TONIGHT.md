@@ -12,10 +12,10 @@ NPE Study Club - Launch Tonight Checklist
 
 3. Auth Settings
 - In Supabase Auth providers, enable Email (magic link).
-- Set Site URL to your deployment URL.
+- Set Site URL to `https://npestudyclub.online`.
 - Add redirect URLs:
   - http://localhost:3000
-  - https://<your-vercel-domain>
+  - https://npestudyclub.online
 
 4. Local Smoke Test
 - Start dev server: npm run dev
@@ -28,7 +28,7 @@ NPE Study Club - Launch Tonight Checklist
 5. Deploy
 - Push npe-web to GitHub.
 - Import project into Vercel.
-- Add the same env vars in Vercel project settings.
+- Add the same env vars in Vercel project settings, including `NEXT_PUBLIC_SITE_URL=https://npestudyclub.online`.
 - Deploy and repeat smoke test on production URL.
 
 6. Tonight Nice-to-have (if time remains)
