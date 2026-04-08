@@ -7,6 +7,10 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const bypassEnabled =
+    process.env.ALLOW_ADMIN_BYPASS === "true" ||
+    process.env.ALLOW_MEMBER_BYPASS === "true" ||
+    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true";
 
   const { data: sessions } = await supabase
     .from("sessions")
@@ -57,6 +61,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl">User management</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Approve access requests and review members from here.
+            </p>
+          </div>
+          <Link
+            href="/admin"
+            className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            Open user management
+          </Link>
+        </div>
+        {bypassEnabled ? (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Preview mode is on, so this link should open without email sign-in.
+          </p>
+        ) : null}
+      </section>
+
       {showOnboarding ? (
         <section className="rounded-2xl border bg-card p-6">
           <p className="text-2xl">Welcome to NPE Study Club</p>
