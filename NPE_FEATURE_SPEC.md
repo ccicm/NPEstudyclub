@@ -1,768 +1,982 @@
-# NPE Study Club — Full Feature & UX Specification
-**For:** Downstream implementation agent (Next.js / Supabase / Tailwind)
+# NPE Study Club — UX Refactor Spec v2
+**Target user:** Provisional psychologist from Connor's cohort — already knows what this is, already anxious about the NPE, needs tools not marketing.
+**Prepared for:** Implementation agent (Next.js / Supabase / Tailwind / Cloudflare R2)
 **Date:** April 2026
-**Status:** Ready for implementation
 
 ---
 
 ## Guiding Principle
 
-The target user is a time-poor provisional psychologist who is anxious about the NPE, wants community
-support, and needs structure. Every screen should reduce cognitive load, make progress feel visible,
-and make finding the right thing (resource, quiz, session) one click away. The app must feel more
-like a study companion than a file repository.
+Every member of this cohort already knows what NPE Study Club is and why they're here. The interface should feel like a well-organised study companion built *by* a peer *for* peers — not a SaaS product trying to sell them on signing up. Reduce noise, surface what matters, and let them get to work.
 
 ---
 
-## 1. Information Architecture
+## Issue 1 — Landing Page (`/`) — Tone & Content
 
-### Current nav
-`Dashboard` · `Resources` · `Add` · `Schedule` · `Community` · `Profile`
+### What works
+- Clean layout, sensible two-column split, countdown widget is genuinely useful.
+- The three feature cards (Resources, Schedule, Community) correctly name the core value.
 
-### Proposed nav
-`Dashboard` · `Resources` · `Quizzes` · `Study Plan` · `Schedule` · `Community` · `Profile`
+### What fails
 
-**Changes:**
-- `/add` is no longer a top-level nav item — it becomes a button within `/resources`
-- `Quizzes` is a new top-level section
-- `Study Plan` is a new top-level section
-- `Community` replaces the current forum and becomes a full channel-based hub
+**Tone is wrong for the audience.**
+These are colleagues who have been personally invited. The current h1 — *"The club is live. The exam prep can be too."* — reads like a product launch tweet. It implies the user needs to be sold on the idea, which they don't. A provisional psychologist who just got a link from a peer doesn't need sass; they need immediate orientation.
 
----
+**Developer jargon leaks into the public page.**
+Step 2 of the "how it works" section reads: *"Add the email to approved_users."* This is an admin database instruction. A prospective member seeing this will be confused or alarmed. It should never appear in a user-facing surface.
 
-## 2. Existing Features — Fixes & Upgrades
+**The "Launch tonight" badge.**
+The section heading "Launch tonight" (`text-primary font-semibold uppercase`) is a dev-facing note that got promoted to UI copy. It means nothing to a member.
 
-### 2.1 Resources Page (`/resources`)
+**Feature cards are dead ends.**
+The three cards describe features but are not links. A logged-out visitor (or someone deciding whether to request access) cannot preview what they're walking into.
 
-**What's wrong now:** No search, no filtering, no category separation, flat list of cards with no
-way to narrow down. Add resource is a top-level nav item creating confusion.
+**Missing: quick-access links and resource calendar.**
+Connor's brief references useful links, embedded calendars, and resources that existed in the previous version of the app. The current page has none. For members who are already approved and return to the landing page before signing in, there's no way to reach anything useful.
 
-**Target experience:** Member arrives and immediately sees resources grouped by category, can search
-by keyword, and can filter by domain/modality/population depending on which category tab they're on.
-Clicking a tag on a card applies that filter instantly.
+### Proposed fixes
 
-#### Layout
+**Rewrite the hero copy — strip the sass:**
 ```
-[Search bar — full width]
-[Category tabs: All | Exam Prep | Clinical Practice]
-[Filter row — shown conditionally based on active tab]
-[Resource count: "24 resources"] [Grid of cards]
+h1: "NPE prep, in one place."
+sub: "Private resources, study sessions, and community for provisional psychologists sitting the National Psychology Exam."
 ```
+This is factual, calm, and peer-voiced. It does not need to be clever.
 
-#### Category tabs
-- **All** — no extra filters shown
-- **Exam Prep** — shows Domain dropdown filter
-- **Clinical Practice** — shows Modality + Population dropdown filters
-- All tabs show: Content Type dropdown + search bar
-
-#### Filter dropdowns (match original app values)
-- **Domain (Exam Prep only):**
-  Assessment · Intervention · Formulation · Ethics & law · Psychopathology ·
-  Lifespan development · Research & stats · Professional practice · Other
-- **Modality (Clinical only):**
-  CBT · ACT · DBT · Schema therapy · Motivational interviewing ·
-  Psychodynamic · Integrative / eclectic · Other
-- **Population (Clinical only):**
-  Adults · Children · Adolescents · Older adults · Couples/families ·
-  Mixed / not specified
-- **Content Type (all tabs):**
-  Case study · Worksheet / tool · Summary / notes · Guideline / framework ·
-  Research article · Textbook chapter · Practice exam · Other
-
-#### Resource card design
-Each card shows:
-- File type badge (colour-coded: PDF=red, DOCX=blue, PPTX=orange, XLSX=green, other=slate)
-- Domain pill (teal for Exam Prep, navy for Clinical Practice)
-- Title (large)
-- Subtopic / domain (small, muted)
-- Tags (clickable — clicking applies that filter to current view)
-- Notes (if present, truncated to 2 lines)
-- Footer: `Open file` button (signed URL) + `Uploaded by [name prefix]`
-
-#### Search behaviour
-- Client-side filter against: title, notes, domain, tags, file type, category, uploader name
-- Debounced 200ms
-- Resource count updates as filters apply
-- Empty state: "No resources match — try clearing a filter." with a Clear filters button
-
-#### `+ Add Resource` placement
-- Prominent button in the top-right of the resources page header
-- NOT in the main nav
-
----
-
-### 2.2 Add Resource Form (`/add`)
-
-**What's wrong now:** Flat form — same fields regardless of category. Missing domain, modality,
-population, source fields. The original app had smart conditional field reveal.
-
-#### Form structure
+**Fix the how-it-works steps — remove jargon:**
 ```
-Title *
-Category * [Exam Prep | Clinical Practice]  ← selecting this reveals section below
-
-── IF Exam Prep ──────────────────────────────────
-Domain / Subtopic    [dropdown + "Other" free text]
-Content Type         [dropdown + "Other" free text]
-Source               [text input: e.g. APS, textbook, own notes]
-
-── IF Clinical Practice ─────────────────────────
-Modality             [dropdown + "Other" free text]
-Population           [dropdown + "Other" free text]
-Content Type         [dropdown + "Other" free text]
-Source               [text input]
-
-── Always shown ─────────────────────────────────
-Notes / description  [textarea, optional]
-File upload *        [drag-and-drop zone + browse]
+1. Request    → Submit a short access request via the button below.
+2. Approval   → Your request is reviewed and approved by the group organiser.
+3. Access     → Once approved, you'll get an email with a sign-in link.
 ```
 
-#### Conditional reveal
-- On category change, animate in the relevant section and hide the other
-- "Other" on any dropdown reveals a free-text input inline beneath it
-- File drag-and-drop shows filename + size on selection
-- Upload button disabled until title, category, and file are filled
+**Remove the "Launch tonight" badge entirely.** Replace with nothing, or if a badge is needed: `"Private · Invite only"`
 
-#### On success
-- Toast: "Resource uploaded — it will appear in the library shortly."
-- Form resets
-- Option to "Upload another" or "View in Resources"
+**Make feature cards navigable.**
+For logged-out users, clicking a card should navigate to `/auth/request` or `/auth/login`. Add a subtle `→` affordance to each card.
 
----
+**Add a "Quick links" section below the feature cards.**
+This replaces the useful-links panel from the original app. Suggested implementation:
 
-### 2.3 Dashboard (`/dashboard`)
-
-**What's wrong now:** Missing NPE exam countdown (most motivating element), missing key references
-section, sessions list is very plain.
-
-#### Layout
-```
-[NPE Countdown widget — full width top banner]
-[Two-column below:]
-  Left col:   Upcoming Sessions (next 4)
-  Right col:  Recently Added Resources (last 5)
-[Key References section — full width bottom]
-```
-
-#### NPE Exam Countdown widget
-- Shows days / hours / minutes until next NPE window opens
-- If exam window is currently open: "NPE window is open now!" with days until close
-- If no upcoming windows: "No upcoming exam windows scheduled"
-- Data: hardcode `exam_windows` array in a config file (same structure as original app):
-
-```ts
-// lib/exam-windows.ts
-export const EXAM_WINDOWS = [
-  { label: "Cohort 19", start: [2025, 10, 1], end: [2025, 10, 31], reg: "Registration closes Sep 2025" },
-  // ... add current/upcoming windows
+```tsx
+// Seed this in lib/quick-links.ts or pull from a `quick_links` Supabase table for admin control
+const QUICK_LINKS = [
+  { label: "AHPRA NPE info", url: "https://www.ahpra.gov.au/..." },
+  { label: "APS exam resources", url: "https://..." },
+  { label: "Registration checklist", url: "https://..." },
+  // add more
 ];
 ```
 
-- Countdown renders client-side (useEffect + setInterval every 60s)
-- Teal background with white text, pill badge for window name
+Rendered as a simple card row with icon + label + external link icon. Keep it compact — one row, scroll on mobile.
 
-#### Upcoming Sessions (left col)
-- Shows next 4 sessions from DB
-- Each row: date block (day number + month abbreviation) | session title | time | Join button (if meet link)
-- "No upcoming sessions" empty state with link to Schedule
-
-#### Recently Added Resources (right col)
-- Last 5 resources added
-- Each row: file type coloured badge | title | category
-- Click navigates to `/resources`
-
-#### Key References section
-- Populated from `key_references` Supabase table
-- Each card: title, source/author, description, external link button
-- `is_new` flag shows a "New" badge
-- Admin seeds this table; members read-only
+**Add an embedded calendar section (logged-in only, or public).**
+If group sessions are publicly visible (they probably should be to help people decide to join), show a read-only list of upcoming sessions pulled from Supabase (no auth required for read). No external calendar embed needed.
 
 ---
 
-### 2.4 Schedule Page (`/schedule`)
+## Issue 2 — Schedule (`/schedule`) — Filters, Study Plan Integration & Calendar Export
 
-**What's wrong now:** Plain chronological list. No calendar, no NPE window visibility, no way to
-add ad-hoc sessions.
+### What works
+- Calendar grid is functional, month navigation works, NPE window pills render correctly.
+- Day detail panel is clear.
+- Ad-hoc session form works.
 
-#### Layout
+### What fails
+
+**No way to distinguish session types visually or filter by them.**
+The current calendar shows all sessions with the same two pill styles (navy = any session, teal = ad-hoc). A member who wants to find only group study calls, or only sessions they personally added, has no way to do that. The `session_type` field exists in the DB but is not exposed as a filter control.
+
+**"Upcoming sessions list" below the calendar duplicates the calendar.**
+The section at the bottom (`<section className="rounded-2xl border bg-card p-4">`) lists every upcoming session again in plain text. This is redundant — the calendar already shows this. It adds cognitive load without adding information.
+
+**Study plan weeks are invisible on the schedule.**
+A member's personal study plan (weekly domain focus, preferred study days) has no representation on the schedule. Members have to switch between `/study-plan` and `/schedule` with no connection between them.
+
+**No way to export the schedule to a personal calendar app.**
+Members can't get group sessions or their study plan into Apple Calendar, Outlook, etc. without Google Calendar.
+
+### Proposed fixes
+
+**Add a filter bar above the calendar:**
+
 ```
-[Month navigation: ← [Month Year] →  [Today button]]
-[Weekday headers: Mon Tue Wed Thu Fri Sat Sun]
-[Calendar grid — 5-6 rows of day cells]
-[Event detail panel — slides in below calendar on day click]
-[Add ad-hoc session form — collapsible, below detail panel]
-[Upcoming sessions list — below calendar, for accessibility]
+[All]  [Group]  [Ad-hoc]  [My study plan]  [My sessions]
 ```
 
-#### Calendar cell design
-- Day number top-left
-- Today highlighted with teal ring
-- Other-month days: muted opacity
-- Events shown as small pills inside cell:
-  - Study session: navy pill
-  - Ad-hoc session: teal pill
-  - NPE exam window day: amber/gold pill (spans all days in window)
-- Cells with events: subtle background tint
+Implementation: add a `filter` state in `ScheduleCalendar` → `useState<'all' | 'group' | 'adhoc' | 'studyplan' | 'mine'>('all')`. Filter the combined events array before rendering. Pass `userId` and `studyPlanWeeks` as props from the server component.
 
-#### Day detail panel
-Clicking a cell with events opens a detail card below the calendar:
-- Date heading (e.g. "Tuesday 15 April 2026")
-- For each event:
-  - Session: topic, time (12h format), session number, notes, Join Google Meet button
-  - NPE window: "NPE [Label] window open" + registration note + link to APS/AHPRA exam page
+**Colour-code event pills by type:**
 
-#### Add ad-hoc session form
-- Collapsible section: "+ Add session" toggle
-- Fields: Your name, Date (date picker), Time (default 19:00), Topic (dropdown + Other),
-  Notes (optional), Google Meet link (optional)
-- On submit: session added with `session_type = 'Ad-hoc'`, calendar re-renders
-- Validation: name and date required
-
----
-
-## 3. Forum Upgrade (`/community`)
-
-**What's wrong now:** Threads are a flat list with no channels. No upvoting. Replies are not
-nested. No way to navigate by topic area. For AHPRA/exam questions this is especially limiting
-since those topics need dedicated spaces.
-
-**Target experience:** Feels like a proper community — members browse channels, upvote useful
-threads, reply in context, and can find AHPRA navigation help in a dedicated channel without
-it drowning in general chatter.
-
-### 3.1 Channels
-
-Replace single thread list with a channel sidebar (or top-tabs on mobile):
-
-| Channel | Purpose |
+| Type | Pill style |
 |---|---|
-| 📢 Announcements | Admin-only posting; everyone can comment. Pinned at top. |
-| 🧠 Exam Prep | NPE domains, practice strategy, content questions |
-| 🏥 Clinical Practice | Case discussions, intervention questions, supervision |
-| 📋 AHPRA & Registration | Navigating registration, endorsement pathways, documents |
-| 📚 Resource Requests | Ask the group for specific materials |
-| 💬 General | Off-topic, introductions, check-ins |
+| Group session | `bg-slate-800 text-slate-100` (existing navy) |
+| Ad-hoc session | `bg-primary/15 text-primary` (existing teal) |
+| My study block | `bg-violet-100 text-violet-700` (purple — personal, private) |
+| NPE exam window | `bg-amber-100 text-amber-700` (existing amber — keep) |
 
-- Default channel on load: `Announcements`
-- Active channel highlighted in sidebar
-- Unread indicator (dot) on channels with new posts since last visit — use `last_seen_at` stored
-  client-side in localStorage or a `channel_reads` Supabase table
+Add a legend row below the month navigation — four small pills with labels.
 
-### 3.2 Thread list view (within a channel)
-```
-[Channel name + description]
-[+ New Post button — top right]
-[Pinned threads — if any, shown first with pin icon]
-[Thread list — sorted by last reply date desc]
-```
+**Study plan weeks on the calendar (private to each member).**
+Each member's study plan has weeks with a `week_start` date and `preferred_days`. Render these as personal study blocks on the calendar — visible only to the logged-in member, not to other cohort members. Each block pill shows the domain focus (e.g. "Ethics & law"). Clicking a study block in the day detail panel shows the week's suggested resource and quiz with direct links.
 
-Each thread row:
-- Tag badge (Announcement / Question / Resource request / General)
-- Title
-- Author + relative time ("2 days ago")
-- Reply count + upvote count
-- Preview of first line of body
+Implementation: the server component fetches the member's `study_plan_weeks` alongside sessions and passes both to `ScheduleCalendar`. Study blocks are generated client-side from `week_start + preferred_days` — no extra DB table needed.
 
-### 3.3 Thread detail view
-
-Clicking a thread opens a detail view (either page route `/community/[threadId]` or slide-in panel):
-
-```
-[Back to channel]
-[Thread title + tag]
-[Author + date]
-[Body — markdown rendered]
-[Upvote button + count]
-[─── Replies ───]
-[Top-level replies, each with:]
-  - Author, time
-  - Body
-  - Upvote button
-  - Reply button (opens nested reply input inline)
-  - Nested replies (indented, max 2 levels)
-[Reply input at bottom]
+```ts
+// Generate study block dates from plan weeks + preferred days
+function studyBlockDates(weeks: StudyPlanWeek[], preferredDays: string[]): DayEvent[] {
+  return weeks.flatMap(week => {
+    const days = eachDayOfWeek(new Date(week.week_start), preferredDays);
+    return days.map(day => ({
+      kind: 'studyblock',
+      id: `${week.id}-${dateKey(day)}`,
+      domain: week.domain_focus,
+      weekId: week.id,
+      at: day,
+    }));
+  });
+}
 ```
 
-### 3.4 Upvoting
+**Remove the redundant "Upcoming sessions list" section.**
+Delete the `<section>` at the bottom of `schedule-calendar.tsx` (lines 303–319). The calendar already shows everything.
 
-- `forum_upvotes` table: `(user_id, thread_id, reply_id)` — one of thread_id or reply_id is set
-- Upvote button toggles (upvote/un-upvote)
-- Count shown inline
-- No downvoting
-
-### 3.5 Nested replies
-
-- `forum_replies` gets a `parent_reply_id uuid references forum_replies(id)` column
-- Max nesting depth: 2 levels (reply to a reply, but not reply to a reply to a reply)
-- Visually: indent 1rem + left border accent per level
-
-### 3.6 New post form
-
-Modal or inline form:
+**Add `session_type` field to the add-session form.**
+Currently the form defaults to `Ad-hoc`. Add a visible selector:
 ```
-Channel [pre-filled from current channel, changeable]
-Tag     [Announcement (admin only) | Question | Resource request | General]
-Title   [text input]
-Body    [textarea, basic markdown supported]
+Session type: [Group | Ad-hoc | Personal]
+```
+Any member can add any type — no approval flow.
+
+**`.ics` export — study plan download.**
+A "Download study plan" button on both `/study-plan` and `/schedule` generates an iCal (`.ics`) file containing:
+- One event per study block (domain focus as title, notes with suggested resource/quiz links)
+- All upcoming group sessions from the DB
+- NPE exam window events (from `EXAM_WINDOWS` config)
+
+Format: standard RFC 5545 iCal. Works with Apple Calendar, Outlook, any calendar app. Zero Google dependency — this is an open standard.
+
+```ts
+// lib/ical.ts — server-side generation
+import ical from 'ical-generator';
+
+export function generateStudyPlanIcal(weeks: StudyPlanWeek[], sessions: Session[]) {
+  const cal = ical({ name: 'NPE Study Club' });
+  weeks.forEach(week => { /* add events per preferred day */ });
+  sessions.forEach(session => { /* add group sessions */ });
+  EXAM_WINDOWS.forEach(window => { /* add exam window events */ });
+  return cal.toString(); // returns .ics string
+}
 ```
 
-### 3.7 Schema additions needed
+Server action streams the `.ics` string as a file download with `Content-Type: text/calendar`.
 
-```sql
--- Add channel to threads
-alter table public.forum_threads add column channel text not null default 'general';
-
--- Add nested reply support
-alter table public.forum_replies add column parent_reply_id uuid references public.forum_replies(id);
-
--- Upvotes
-create table public.forum_upvotes (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id),
-  thread_id uuid references public.forum_threads(id),
-  reply_id uuid references public.forum_replies(id),
-  created_at timestamptz default now(),
-  constraint chk_one_target check (
-    (thread_id is not null and reply_id is null) or
-    (thread_id is null and reply_id is not null)
-  ),
-  unique(user_id, thread_id),
-  unique(user_id, reply_id)
-);
-```
+Package required: `ical-generator` (lightweight, no Google dependency).
 
 ---
 
-## 4. Quizzes (`/quizzes`)
+## Issue 3 — Profile (`/profile`) — Empty state & missing features
 
-### 4.1 Purpose
+### What works
+- Data fetches for `user_progress`, `quiz_results`, and `study_plans` are already in the server component.
+- The DB schema supports everything needed.
 
-Short practice question sets mapped to NPE domains. Member-uploaded to start, with admin curation.
-Integrates with the Study Plan to serve relevant quizzes based on what a member is focusing on.
+### What fails
 
-### 4.2 Information architecture
+**The render layer is underdeveloped.**
+The server component fetches data but the UI does not display it meaningfully. From Connor's report, the page appears essentially blank. The data is there — it's just not rendered.
+
+**No starred/saved resources.**
+There is no `saved_resources` or `bookmarks` table or UI. Members cannot flag resources to return to later.
+
+**No post following or comment activity.**
+There is no concept of "threads I've replied to" or "threads I'm watching". A member who commented in a forum thread has no way to find that thread again without browsing the community.
+
+**No account settings.**
+Members cannot change their display name, update their password, or manage their email. There is no settings UI at all. `supabase.auth.updateUser()` supports all of this but it hasn't been surfaced.
+
+**Quiz progress is not visualised by domain.**
+Quiz results exist in the DB but the profile only shows totals. A member cannot see "I'm scoring 85% in Ethics but 40% in Psychopathology" — which is exactly the insight they need with the exam coming.
+
+### Proposed layout
 
 ```
-/quizzes            — Browse quiz sets
-/quizzes/[id]       — Take a quiz
-/quizzes/add        — Upload quiz questions (members)
-/quizzes/results    — Your quiz history
+─────────────────────────────────────────────
+  [Avatar initials]  connor@email.com
+                     Member since: March 2026
+─────────────────────────────────────────────
+
+[Study Plan]                    [Quiz Performance]
+Exam: May 2026                  12 quizzes taken
+Plan: 60% complete    →         Avg score: 74%
+                                Best: Ethics & law
+                                Needs work: Formulation
+
+─────────────────────────────────────────────
+[Resource Progress]
+34 of 67 resources completed  ████████░░░░  51%
+Recent: Cognitive Assessment Summary, CBT for Anxiety...
+[View all completed →]
+
+─────────────────────────────────────────────
+[Saved Resources]  (bookmarks)
+[Resource card] [Resource card] [Resource card]
+Empty state: "Bookmark resources from the library to find them here."
+
+─────────────────────────────────────────────
+[My Community Activity]
+Threads I started: 3
+Threads I've replied to: 7
+[View my posts →]  (links to /community filtered to user's posts)
+
+─────────────────────────────────────────────
+[Account Settings]  (collapsible section)
+  Display name:  [Connor M.]    [Save]
+  Email:         connor@...     (read-only, auth email)
+  Password:      [Change password →]  (routes to /auth/update-password)
+─────────────────────────────────────────────
 ```
 
-### 4.3 Browse view (`/quizzes`)
+### Required new pieces
 
-```
-[Filter tabs: All | Exam Prep | Clinical Practice]
-[Domain filter dropdown (same values as resources)]
-[Grid of quiz set cards]
-```
+**1. Saved resources / bookmarks**
 
-Each quiz set card:
-- Title
-- Domain badge
-- Number of questions
-- Avg score (if you've attempted it)
-- Created by (name prefix) + "Admin curated" badge if `is_curated = true`
-- `Start quiz` button
-
-### 4.4 Quiz taking view (`/quizzes/[id]`)
-
-**Flow:**
-1. Quiz intro screen: title, domain, question count, estimated time (1 min/question), Start button
-2. Question screen (one question at a time):
-   ```
-   [Progress: Q3 of 12]
-   [Question text]
-   [Option A]  [Option B]
-   [Option C]  [Option D]
-   [Next — disabled until option selected]
-   ```
-3. Answer reveal (after selecting):
-   - Selected option highlighted green (correct) or red (wrong)
-   - Correct answer shown if wrong
-   - Explanation text (if provided)
-   - `Next question` button
-4. Results screen:
-   - Score: X / Y (large)
-   - Percentage + pass/fail indicator (pass = 70%)
-   - Domain this quiz covers
-   - Per-question breakdown (expandable)
-   - `Retake` | `Browse more quizzes` | `View related resources` (links to `/resources` filtered
-     to same domain)
-   - Result saved to `quiz_results` table
-
-### 4.5 Add quiz form (`/quizzes/add`)
-
-Two-step form:
-
-**Step 1 — Quiz details:**
-```
-Title *
-Category *     [Exam Prep | Clinical Practice]
-Domain *       [dropdown]
-Description    [textarea, optional]
-```
-
-**Step 2 — Add questions (repeating):**
-```
-Question text *
-Option A *   Option B *
-Option C     Option D
-Correct answer *  [A / B / C / D selector]
-Explanation   [textarea — shown to user after answering]
-[+ Add another question]
-[Submit quiz for review]
-```
-
-- Minimum 4 questions to submit
-- Submitted quizzes have `is_curated = false` and are visible to all members immediately
-- Admin can mark `is_curated = true` via Supabase dashboard (no admin UI needed for v1)
-
-### 4.6 Quiz history (`/quizzes/results`)
-
-Table showing:
-- Quiz title, domain, date taken, score (X/Y + %)
-- Link to retake
-- Aggregate: total quizzes taken, average score across domains, strongest/weakest domain
-
-### 4.7 Schema
-
+New Supabase table:
 ```sql
-create table public.quizzes (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  category text not null,  -- 'Exam Prep' | 'Clinical Practice'
-  domain text,
-  description text,
-  created_by uuid references auth.users(id),
-  author_name text,
-  is_curated boolean default false,
-  created_at timestamptz default now()
-);
-
-create table public.quiz_questions (
-  id uuid primary key default gen_random_uuid(),
-  quiz_id uuid references public.quizzes(id) on delete cascade,
-  question_text text not null,
-  options jsonb not null,  -- [{ "label": "A", "text": "..." }, ...]
-  correct_index int not null,  -- 0-based index into options array
-  explanation text,
-  display_order int,
-  created_at timestamptz default now()
-);
-
-create table public.quiz_results (
+create table public.saved_resources (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id),
-  quiz_id uuid references public.quizzes(id),
-  score int not null,
-  total_questions int not null,
-  answers jsonb,  -- [{ "question_id": "...", "selected": 1, "correct": 0 }, ...]
-  completed_at timestamptz default now()
+  resource_id uuid references public.resources(id) on delete cascade,
+  saved_at timestamptz default now(),
+  unique(user_id, resource_id)
 );
-
--- RLS
-alter table public.quizzes enable row level security;
-alter table public.quiz_questions enable row level security;
-alter table public.quiz_results enable row level security;
-
-create policy "Authenticated users can read quizzes" on public.quizzes
-  for select using (auth.role() = 'authenticated');
-
-create policy "Users can insert quizzes" on public.quizzes
-  for insert with check (auth.uid() = created_by);
-
-create policy "Authenticated users can read quiz_questions" on public.quiz_questions
-  for select using (auth.role() = 'authenticated');
-
-create policy "Users can insert quiz_questions" on public.quiz_questions
-  for insert with check (
-    auth.uid() = (select created_by from public.quizzes where id = quiz_id)
-  );
-
-create policy "Users can read own quiz_results" on public.quiz_results
-  for select using (auth.uid() = user_id);
-
-create policy "Users can insert own quiz_results" on public.quiz_results
-  for insert with check (auth.uid() = user_id);
+alter table public.saved_resources enable row level security;
+create policy "Users manage own saved_resources" on public.saved_resources
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 ```
+
+On resource cards (`/resources`): add a bookmark icon button (outline → filled on save). Optimistic UI toggle. Saved resources appear in the profile Saved section.
+
+**2. Community activity summary**
+
+Query `forum_threads` and `forum_replies` filtered by `user_id`:
+```ts
+const { count: threadsStarted } = await supabase
+  .from('forum_threads')
+  .select('id', { count: 'exact', head: true })
+  .eq('author_id', user.id);
+
+const { count: repliesCount } = await supabase
+  .from('forum_replies')
+  .select('id', { count: 'exact', head: true })
+  .eq('author_id', user.id);
+```
+
+"View my posts →" links to `/community?author=me` (requires a filter param in the community page — simple string match against `author_id`).
+
+**3. Quiz performance by domain**
+
+Query `quiz_results` joined to `quizzes` to get domain-level breakdown:
+```ts
+const { data: quizResults } = await supabase
+  .from('quiz_results')
+  .select('score, total_questions, quizzes(domain)')
+  .eq('user_id', user.id);
+```
+
+Group by domain client-side → compute average score per domain → render as a small grid of domain pills with colour-coded score badges (green ≥70%, amber 50–69%, red <50%).
+
+**4. Account settings**
+
+Use `supabase.auth.updateUser()`:
+```ts
+// Server action
+'use server'
+await supabase.auth.updateUser({ data: { display_name: formData.get('display_name') } });
+// Password change
+await supabase.auth.updateUser({ password: formData.get('new_password') });
+```
+
+Alternatively, route "Change password" to the existing `/auth/update-password` page — it's already built.
+
+Display name is stored in `user_metadata.display_name`. Surface it wherever the member's name appears (session host name, forum posts, etc.).
+
+**5. Empty states — all sections need them**
+
+| Section | Empty state copy |
+|---|---|
+| Saved resources | "Bookmark resources from the library to save them here." |
+| Quiz performance | "Take a quiz to see your performance by domain." |
+| Community activity | "You haven't posted yet — join a thread in Community." |
+| Resource progress | "Open resources from the library to track your progress." |
 
 ---
 
-## 5. Study Plan (`/study-plan`)
+## Priority-Ordered Refactor Plan
 
-### 5.1 Purpose
+These are ordered by user-visible impact vs implementation effort.
 
-An interactive personal study planner. The member enters their exam date, weekly study hours, and
-priority domains. The app generates a structured week-by-week plan, serves relevant quizzes and
-resources for each focus area, and tracks progress against the plan.
+### P1 — Quick wins, high impact
 
-### 5.2 Onboarding flow (first visit, no plan exists)
+1. **Rewrite landing page hero copy and fix step 2 jargon.** 15 min change to `app/page.tsx`. No schema changes. Immediate improvement for every new member.
 
-Full-page onboarding wizard, 3 steps:
+2. **Remove "Launch tonight" badge from landing page.** One-line delete.
 
-**Step 1 — Exam date**
-```
-When is your NPE exam? (or expected window)
-[Date picker — shows upcoming exam windows as quick-select chips]
-```
+3. **Remove redundant "Upcoming sessions list" from schedule.** Delete ~20 lines from `schedule-calendar.tsx`. Reduces noise immediately.
 
-**Step 2 — Study capacity**
-```
-How many hours per week can you study?
-[Slider: 1 – 20 hrs/week, default 5]
+4. **Render the existing profile data properly.** The fetches in `profile/page.tsx` already pull `user_progress`, `quiz_results`, and `study_plans`. The render layer just needs to be built out. No new DB work required for the basics.
 
-Which days work best?
-[Day-of-week multi-select checkboxes]
-```
+5. **Add account settings (display name + password change link) to profile.** Small form + one server action. Routes password change to existing `/auth/update-password`.
 
-**Step 3 — Domain priorities**
-```
-Which NPE domains do you want to focus on?
-Rate each from 1 (confident) to 3 (need work):
+### P2 — Medium effort, clear user need
 
-Assessment            [1] [2] [3]
-Intervention          [1] [2] [3]
-Formulation           [1] [2] [3]
-Ethics & law          [1] [2] [3]
-Psychopathology       [1] [2] [3]
-Lifespan development  [1] [2] [3]
-Research & stats      [1] [2] [3]
-Professional practice [1] [2] [3]
-```
+6. **Add session type filter bar to schedule.** State-only change in `ScheduleCalendar`, no DB changes. Requires passing `userId` from the server page component.
 
-On completing onboarding → save to `study_plans` table → redirect to plan dashboard.
+7. **Add colour-coded legend to calendar.** Purely presentational — add a legend row to `schedule-calendar.tsx`.
 
-### 5.3 Plan dashboard (`/study-plan`)
+8. **Add `session_type` selector to the add-session form.** One new `<select>` field, update the server action to use it.
 
-Once a plan exists:
+9. **`meet_link` → `video_link` rename.** DB column rename + update all TypeScript types, queries, and UI labels. "Video call link" accepts any URL — Zoom, Teams, existing Meet links all continue to work.
 
-```
-[Top banner: X weeks until exam · Y hrs planned this week · Z% plan complete]
+10. **Add quiz performance by domain to profile.** Requires join query + client-side grouping. No schema changes.
 
-[This week's focus — card]
-  Domain: Intervention
-  Suggested resources: [2 resource cards linked to this domain]
-  Suggested quiz:      [1 quiz card for this domain]
-  Hours logged this week: [progress bar against weekly target]
+### P3 — Requires new schema / more build time
 
-[Plan timeline — accordion or scrollable week-by-week]
-  Week 1: [domain] [status: done/in-progress/upcoming]
-  Week 2: ...
+11. **Add "Saved resources" (bookmarks).** New `saved_resources` table + bookmark button on resource cards + saved section on profile.
 
-[Domain progress — mini grid]
-  Each domain: label + progress bar (% of plan time allocated + completed)
-```
+12. **Add quick links section to landing page.** Either hardcode in `lib/quick-links.ts` or add a `quick_links` Supabase table if admin control is needed.
 
-### 5.4 Plan generation logic (server-side)
+13. **Add community activity summary to profile.** Requires `author_id` to be consistently set on `forum_threads` and `forum_replies`. Check existing schema — if it's `user_id` not `author_id`, adjust queries accordingly.
 
-When the plan is first created:
-1. Calculate total weeks from today to exam date
-2. Assign domains to weeks in priority order (domains rated 3 get more weeks than those rated 1)
-3. Each week gets: a domain focus, a resource suggestion (from `resources` filtered to that domain),
-   a quiz suggestion (from `quizzes` filtered to that domain)
-4. Store generated weeks in `study_plan_weeks` table
+14. **"View my posts" filter in `/community`.** Add `?author=me` query param support to `community-hub.tsx`.
 
-Resource and quiz suggestions are drawn from existing content at plan creation time. If no matching
-content exists for a domain, show: "No resources yet for this domain —
-[Upload one →](/add) or [Request in Community →](/community)"
+---
 
-### 5.5 Logging study time
+## Issue 4 — User Self-Management (`/profile/settings`)
 
-Each week card has a `Log time` button:
-```
-This session: [input: hours, default 1] [Save]
-```
-Saves to `study_log` table. Progress bar on the weekly focus card updates.
+### What's needed
 
-### 5.6 Weekly tip & nudge (passive, no emails in v1)
+Members must be able to manage their own accounts without involving Connor. Four capabilities confirmed:
 
-On the plan dashboard, a "This week's tip" card:
-- Rotates through a small array of hardcoded study tips (one per domain)
-- Selected based on the current week's domain focus
-- No external scheduling needed — purely derived from current week's plan entry
+**1. Display name**
+Stored in Supabase `user_metadata.display_name`. Surfaces in: forum posts, session host field, resource uploader name, profile header. Single text input + save button. Server Action calls `supabase.auth.updateUser({ data: { display_name } })`.
 
-### 5.7 Edit plan
+**2. Email + password change**
+- Email: `supabase.auth.updateUser({ email: newEmail })` — Supabase sends a confirmation link to the new address before switching. Show a banner: "Check your new email to confirm the change."
+- Password: route to existing `/auth/update-password` page (already built). Surface as a simple "Change password →" link in settings — no duplication needed.
 
-A settings button on the plan dashboard opens a slide-over panel to:
-- Change exam date
-- Adjust weekly hours
-- Re-rate domains (regenerates remaining weeks)
+**3. Notification preferences**
+Members control two channels — in-app and email — independently per notification type.
 
-### 5.8 Schema
+Notification types for v1:
+| Event | In-app | Email |
+|---|---|---|
+| Someone replies to my thread | ✓ | ✓ |
+| Someone replies to a thread I commented on | ✓ | ✓ |
+| New post in a channel I follow | ✓ | ✓ |
+| New resource added | ✓ | opt-in |
+| Admin announcement | ✓ | ✓ (always on) |
 
+Store preferences in a `notification_preferences` table:
 ```sql
-create table public.study_plans (
+create table public.notification_preferences (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) unique,
-  exam_date date not null,
-  hours_per_week int not null default 5,
-  preferred_days text[],  -- ['Monday','Wednesday','Saturday']
-  domain_priorities jsonb not null,
-  -- { "Assessment": 2, "Intervention": 3, "Ethics & law": 1, ... }
-  created_at timestamptz default now(),
+  reply_to_my_thread_inapp boolean default true,
+  reply_to_my_thread_email boolean default true,
+  reply_to_followed_inapp boolean default true,
+  reply_to_followed_email boolean default true,
+  new_post_in_channel_inapp boolean default true,
+  new_post_in_channel_email boolean default false,
+  new_resource_inapp boolean default true,
+  new_resource_email boolean default false,
   updated_at timestamptz default now()
 );
+alter table public.notification_preferences enable row level security;
+create policy "Users manage own preferences" on public.notification_preferences
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
 
-create table public.study_plan_weeks (
-  id uuid primary key default gen_random_uuid(),
-  plan_id uuid references public.study_plans(id) on delete cascade,
-  week_number int not null,
-  week_start date not null,
-  domain_focus text not null,
-  suggested_resource_id uuid references public.resources(id),
-  suggested_quiz_id uuid references public.quizzes(id),
-  status text not null default 'upcoming'
-    check (status in ('upcoming', 'in_progress', 'complete')),
-  created_at timestamptz default now()
-);
+UI: a clean two-column toggle table (In-app | Email) for each event type. Auto-saves on toggle (no submit button needed — each toggle fires a server action).
 
-create table public.study_log (
+**In-app notifications** — new `notifications` table:
+```sql
+create table public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id),
-  plan_week_id uuid references public.study_plan_weeks(id),
-  hours_logged numeric(4,1) not null,
-  logged_at timestamptz default now()
+  type text not null,  -- 'thread_reply' | 'followed_reply' | 'channel_post' | 'new_resource' | 'announcement'
+  title text not null,
+  body text,
+  link text,          -- e.g. '/community/[threadId]'
+  is_read boolean default false,
+  created_at timestamptz default now()
 );
-
--- RLS (all user-scoped)
-alter table public.study_plans enable row level security;
-alter table public.study_plan_weeks enable row level security;
-alter table public.study_log enable row level security;
-
-create policy "Users manage own study_plan" on public.study_plans
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-create policy "Users manage own study_plan_weeks" on public.study_plan_weeks
-  for all using (
-    auth.uid() = (select user_id from public.study_plans where id = plan_id)
-  );
-
-create policy "Users manage own study_log" on public.study_log
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+alter table public.notifications enable row level security;
+create policy "Users read own notifications" on public.notifications
+  for select using (auth.uid() = user_id);
+create policy "Users update own notifications" on public.notifications
+  for update using (auth.uid() = user_id);
 ```
+
+Notification bell in the nav header: shows unread count badge. Clicking opens a dropdown list of recent notifications. Clicking a notification marks it read and navigates to `link`.
+
+**Email notifications** — use Supabase Edge Functions triggered by DB inserts (via `pg_net` or Supabase webhooks). For v1, trigger on `forum_replies` insert: look up thread author and commenters, check their `notification_preferences`, send via Supabase Auth email (or Resend if more control is needed).
+
+**4. Delete my account**
+
+A destructive action — requires an explicit confirmation step.
+
+Flow:
+1. Settings page: "Delete my account" button (red, at the bottom, below a horizontal rule)
+2. Clicking opens a modal: "This will permanently delete your account, posts, and progress. This cannot be undone. Type DELETE to confirm."
+3. On confirm: server action runs in order:
+   - Anonymise forum posts (`author_id = null`, name replaced with "Deleted member") rather than hard-deleting — preserves thread integrity
+   - Delete `user_progress`, `quiz_results`, `study_log`, `saved_resources`, `notification_preferences`, `study_plans` rows for this user
+   - Call `supabase.auth.admin.deleteUser(userId)` (requires service role key — run server-side only)
+   - Redirect to `/` with a query param `?deleted=1` that shows a brief confirmation message
 
 ---
 
-## 6. Profile Page Upgrade (`/profile`)
+## Issue 5 — Google Migration Plan
 
-**What's wrong now:** Shows completion count but no way to mark resources complete, no quiz stats,
-no link to study plan.
+All Google dependencies are being replaced. The app's own infrastructure handles everything previously delegated to Google.
 
-### Target layout
+### What's being replaced
 
-```
-[User email + member since date]
-
-[Study Plan summary card]  — links to /study-plan
-  Exam date: X · Plan: Y% complete
-
-[Resource progress]
-  X of Y resources completed
-  [Progress bar]
-  Recent completions: last 3 resource titles
-
-[Quiz performance]
-  X quizzes taken · Average score: Y%
-  Best domain: Z · Needs work: W
-
-[Completed resources list — expandable]
-```
-
-### Mark as complete
-
-On resource cards (on `/resources`), add a small checkbox or tick icon:
-- If `user_progress` row exists for this resource+user: ticked (green)
-- Clicking unticked: inserts row to `user_progress`
-- Clicking ticked: deletes row (toggle)
-- Optimistic UI update
-
----
-
-## 7. Implementation Priority Order
-
-This is the recommended build sequence — each tier is a shippable increment.
-
-### Tier 1 — Core fixes (do first, highest user value)
-1. Resources page: search + filter + category tabs + clickable tag filtering
-2. Add resource form: conditional fields (Exam Prep vs Clinical Practice)
-3. Dashboard: NPE exam countdown widget + key references section
-4. Schedule: interactive calendar + NPE window highlighting + day detail panel + add session form
-5. Profile: mark-as-complete toggle on resource cards
-
-### Tier 2 — Forum upgrade
-6. Add `channel` to `forum_threads` + channel sidebar/tabs
-7. Add `parent_reply_id` to `forum_replies` + nested reply rendering (max 2 levels)
-8. Upvoting on threads and replies (`forum_upvotes` table)
-9. Thread detail as dedicated route `/community/[threadId]`
-10. Unread indicator per channel
-
-### Tier 3 — Quizzes
-11. Quiz schema migration + RLS
-12. Browse quizzes page with filter/search
-13. Quiz taking flow (one question at a time, reveal, results)
-14. Add quiz form (2-step: details + questions)
-15. Quiz history page + domain performance summary
-
-### Tier 4 — Study Plan (most complex, build last)
-16. Onboarding wizard (3 steps: exam date, hours, domain priorities)
-17. Plan generation logic (server action: allocate domains to weeks, attach suggestions)
-18. Plan dashboard (this week's focus, timeline accordion, domain progress grid)
-19. Study time logging
-20. Edit plan (change exam date / hours / re-rate domains)
-21. Cross-link: Study Plan → Quizzes (serve suggested quiz for current week's domain)
-22. Cross-link: Study Plan → Resources (serve suggested resource for current week's domain)
-
----
-
-## 8. Cross-feature Integration Points
-
-| From | To | How |
+| Google product | Replaced by | Action required |
 |---|---|---|
-| Study Plan week | Quiz | `suggested_quiz_id` FK + "Take quiz" button on week card |
-| Study Plan week | Resource | `suggested_resource_id` FK + resource card on week card |
-| Quiz results | Resources | "View related resources" button filtered by quiz domain |
-| Resource card | Community | "Discuss in community" link opens `/community` filtered to relevant channel |
-| Dashboard countdown | Schedule | Clicking countdown navigates to `/schedule` with NPE window highlighted |
-| Profile | Study Plan | "View your plan" card links to `/study-plan` |
+| Google Calendar | App's `/schedule` page + `.ics` export | None — app IS the calendar. Members export via `.ics`. |
+| Google Drive (resources) | DigitalOcean Spaces | Bulk upload script (see Issue 6) |
+| Google Meet links | Any video URL (flexible) | Rename field + update label in UI |
 
----
+### meet_link → video_link rename
 
-## 9. Design Tokens (preserve from existing)
+Replace everywhere:
+- DB column: `alter table public.sessions rename column meet_link to video_link;`
+- All TypeScript types and queries referencing `meet_link`
+- UI label: "Google Meet link" → "Video call link"
+- Placeholder: `https://meet.google.com/...` → `https://zoom.us/j/... or any video call link`
+- Existing Meet URLs in the DB continue to work — the field is just a URL, the name change is cosmetic
 
-All new screens should use the existing token set. No new colours introduced.
+### Access request form — PSY number field
 
-```css
---navy:   #0f2340   /* headings, nav active */
---teal:   #0d7377   /* primary actions, active states */
---teal2:  #14a085   /* hover on teal */
---cream:  #f7f4ef   /* card backgrounds, filter panels */
---warm:   #efe9e0   /* subtle section backgrounds */
---text:   #1a1a2e   /* body copy */
---muted:  #64748b   /* secondary text, metadata */
---border: #ddd6c8   /* card and input borders */
+AHPRA automated lookup is deferred. However, add a PSY number field to the access request form now so the data is captured for future use:
+
+```tsx
+// app/auth/request/page.tsx — add to form
+<label>
+  <span>AHPRA registration number (PSY...)</span>
+  <input name="psy_number" placeholder="PSY0001234567" pattern="PSY\d{10}" />
+  <p>Optional — helps us verify your provisional registration status.</p>
+</label>
 ```
 
-Typography: `DM Serif Display` for headings, `DM Sans` for body (already loaded via Google Fonts).
-
-Border radius convention: `24px` for major cards, `12px` for inner panels, `8px` for inputs,
-`999px` for pills and badges.
+Store in the `access_requests` table (add `psy_number text` column). When AHPRA lookup is implemented later, this field is already populated.
 
 ---
 
-## 10. Notes for the Implementation Agent
+## Issue 6 — File Storage: DigitalOcean Spaces
 
-- All data fetching uses Supabase server client (`createClient()` from `@/lib/supabase/server`)
-- Client-side interactivity (countdown, calendar, quiz flow) uses React client components
-  with `'use client'` directive
-- Form submissions use Next.js Server Actions (`'use server'`)
-- File uploads go to the existing `resources` Supabase Storage bucket
-- No email sending needed for v1 (all nudges are in-app)
-- The `exam_windows` config should live in `lib/exam-windows.ts` as a static array —
-  do not store in DB for v1 (admin updates by editing the file and redeploying)
-- Shadcn/ui components are already installed (`components.json` present) — use them
-- Tailwind config and global CSS are already set up — no new config needed
-- For the quiz question `options` field, use a JSONB array:
-  `[{ "label": "A", "text": "The answer option text" }, ...]`
-- Study plan week allocation algorithm: sort domains by priority descending, then round-robin
-  assign to weeks. Domains rated 3 get 2× the weeks of domains rated 1.
+### Why DigitalOcean Spaces instead of Supabase storage
+
+Supabase storage free tier is 1GB — not enough for hundreds of member-uploaded PDFs. The GitHub Student Developer Pack includes **$200 in DigitalOcean credit**. DigitalOcean Spaces (their object storage product) costs $5/month for 250GB + 1TB outbound transfer. $200 credit = **~40 months free at 250GB capacity**. That covers well over 3 years of file storage at no cost.
+
+Spaces is fully S3-compatible — the integration code is identical to Cloudflare R2, just with a different endpoint. All other Supabase services (auth, DB, Edge Functions) remain unchanged.
+
+**Storage recommendation summary:**
+| Option | Capacity | Cost | Notes |
+|---|---|---|---|
+| Supabase (current) | 1GB | Free | Too small |
+| Cloudflare R2 | 10GB free, then $0.015/GB | Free to start | Good but 10GB fills fast with active uploads |
+| **DigitalOcean Spaces** | **250GB** | **~40 months free via student credit** | **Best option — use this** |
+
+### Integration approach
+
+DigitalOcean Spaces is fully S3-compatible. The integration uses the AWS SDK v3 with a custom endpoint — identical approach to Cloudflare R2, just different environment variables. The app needs two changes:
+
+**1. Upload path** — replace `supabase.storage.from('resources').upload(...)` with a signed URL upload to Spaces:
+
+```ts
+// lib/storage.ts
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+export const spaces = new S3Client({
+  region: process.env.DO_SPACES_REGION!,  // e.g. 'syd1' (Sydney)
+  endpoint: `https://${process.env.DO_SPACES_REGION}.digitaloceanspaces.com`,
+  credentials: {
+    accessKeyId: process.env.DO_SPACES_KEY!,
+    secretAccessKey: process.env.DO_SPACES_SECRET!,
+  },
+});
+
+export async function getUploadUrl(key: string, contentType: string) {
+  return getSignedUrl(spaces, new PutObjectCommand({
+    Bucket: process.env.DO_SPACES_BUCKET!,
+    Key: key,
+    ContentType: contentType,
+  }), { expiresIn: 300 });
+}
+
+export async function getDownloadUrl(key: string) {
+  return getSignedUrl(spaces, new GetObjectCommand({
+    Bucket: process.env.DO_SPACES_BUCKET!,
+    Key: key,
+  }), { expiresIn: 3600 });
+}
+```
+
+New env vars (add to `.env.example`):
+```
+DO_SPACES_KEY=
+DO_SPACES_SECRET=
+DO_SPACES_REGION=syd1
+DO_SPACES_BUCKET=npe-resources
+```
+
+Choose region `syd1` (Sydney) for lowest latency to Australian members.
+
+**2. Download path** — replace Supabase signed URL generation with `getDownloadUrl(resource.file_path)` wherever the "Open file" button appears. File path stored in DB remains the same format (`resources/{uuid}/{filename}`), just the storage backend changes.
+
+### Bulk resource upload script
+
+Connor's files are in OneDrive/Dropbox. Workflow:
+1. Download everything to a local folder, organised however (flat or nested by category)
+2. Run `node scripts/bulk-upload.mjs ./resources-folder/`
+
+Script behaviour:
+- Walks the folder recursively
+- For each file: uploads to Spaces at `resources/{uuid}/{filename}`
+- Inserts a row to Supabase `resources` table with:
+  - `title`: filename without extension (can edit in UI afterwards)
+  - `file_type`: extension (pdf, docx, pptx, etc.)
+  - `file_path`: the R2 key
+  - `category`: inferred from subfolder name if structure is `ExamPrep/`, `ClinicalPractice/` — otherwise left blank for manual assignment
+  - `uploaded_by`: Connor's user ID (passed as argument or from env)
+- Prints progress: `[12/47] Uploading formulation-template.pdf...`
+- Skips files already in the DB (by filename match) — safe to re-run
+
+---
+
+## Updated Priority-Ordered Refactor Plan
+
+### P1 — Quick wins, no schema changes
+
+1. Rewrite landing page hero copy, fix step 2 jargon, remove "Launch tonight" badge
+2. Remove redundant "Upcoming sessions list" from schedule
+3. Rename `meet_link` → `video_link` in DB + codebase + UI label
+4. Add PSY number field to access request form (+ `psy_number` column in `access_requests`)
+5. Render existing profile data properly (fetches already written, render layer needs building)
+6. Add account settings: display name, email change, link to `/auth/update-password`
+
+### P2 — Medium effort, clear user need
+
+7. Add session type filter bar + colour legend to schedule
+8. Add `session_type` selector to add-session form
+9. Run Google Sheets → Supabase import (provide script, Connor runs once)
+10. Add quiz performance by domain to profile
+11. Add community activity summary to profile (threads started, replies)
+12. Add quick links section to landing page
+
+### P3 — New schema required
+
+13. Set up DigitalOcean Spaces integration (`lib/storage.ts` + env vars)
+14. Swap resource upload/download to use DigitalOcean Spaces instead of Supabase storage
+15. Run bulk resource upload script (Connor downloads from OneDrive/Dropbox first)
+16. Add saved resources / bookmarks (`saved_resources` table + bookmark toggle on cards + profile section)
+17. Add "Delete my account" flow (anonymise posts + delete user)
+
+### P4 — Notifications infrastructure
+
+18. Create `notifications` table + in-app notification bell in nav
+19. Create `notification_preferences` table + settings UI (toggle table)
+20. Add email notifications via Supabase Edge Function on `forum_replies` insert
+21. Wire remaining notification triggers (channel posts, new resources, announcements)
+
+### Deferred (revisit post-launch)
+
+- AHPRA automated PSY number verification (PSY number is now captured at sign-up — data is ready when this gets built)
+- Push notifications (mobile PWA)
+- Admin dashboard for managing `key_references`, `quick_links`, and `approved_users` without Supabase dashboard access
+
+---
+
+## Privacy & Data Collection — PSY Number (and general)
+
+> ⚠️ This is not legal advice. Connor should review with a privacy professional if uncertain.
+
+### What triggers this
+
+Collecting a PSY number (AHPRA registration number) is collecting **personal information** under the *Privacy Act 1988* (Cth) and the **Australian Privacy Principles (APPs)**. More specifically, it may also constitute **sensitive information** if it reveals a person's health practitioner status or professional standing — which attracts stricter handling obligations.
+
+The app also collects: email address, display name, forum posts, quiz results, study progress. All personal information under the Act.
+
+### Small business exemption
+
+The Privacy Act's small business exemption (turnover < $3M/year) may apply to a non-commercial private study club. However, the exemption does **not** apply if the entity collects sensitive information about individuals. If PSY numbers are deemed sensitive information, the exemption is unavailable regardless of scale.
+
+**Practical recommendation:** treat this as Privacy Act-subject regardless — the compliance burden for a small app is low and the risk of being caught out matters more as the cohort grows.
+
+### What's required — minimum viable compliance
+
+**1. Collection notice on the access request form**
+
+At the point of collecting the PSY number (and email), APP 5 requires a notice covering:
+- Who is collecting the data (the site operator — Connor, or a nominated entity)
+- Why it's being collected (membership verification, study planning, community features)
+- Whether it will be disclosed to third parties (currently: no)
+- How to access or correct it
+- That it is stored securely (Supabase with row-level security)
+
+This does not need to be a full legal document — a short paragraph above the form field is sufficient:
+
+```
+"Your AHPRA registration number is collected to verify your provisional
+psychologist status. It is stored securely and not shared with third parties.
+You may request correction or deletion of your data by contacting [email]."
+```
+
+**2. Privacy Policy page**
+
+A publicly accessible `/privacy` page (or linked from the footer of `app/page.tsx`) should cover:
+- What personal information is collected and why
+- How it is stored (Supabase, Australia/US data centres — disclose location)
+- Retention period (e.g. "until you delete your account, or the site is closed")
+- How to request access, correction, or deletion (the account deletion flow handles deletion)
+- Contact for privacy queries
+
+This can be a simple static page — a few hundred words. Does not need to be drafted by a lawyer for a private cohort tool of this size.
+
+**3. Consent**
+
+Including a checkbox on the sign-up form is clean practice:
+```
+☐ I agree to the Privacy Policy and consent to my personal information
+  (including my AHPRA registration number) being stored for the purpose
+  of membership verification and participation in NPE Study Club.
+```
+
+**4. Secure storage**
+
+Already handled by the existing architecture:
+- Supabase with Row Level Security — users can only read their own sensitive data
+- PSY number stored in `access_requests` table, accessible only to the admin and the user themselves
+- All data in transit encrypted (HTTPS / Supabase TLS)
+
+### Implementation tasks
+
+Add to P1:
+- Write `/privacy` page (static, ~400 words)
+- Add collection notice text above PSY number field on `/auth/request`
+- Add consent checkbox to `/auth/request` form (store `consented_at` timestamp in `access_requests`)
+
+Add to P3 (existing delete account flow):
+- Ensure account deletion removes PSY number from `access_requests` table as well
+
+---
+
+## Issue 7 — AI Question Generation Pipeline
+
+### Purpose
+
+Supplement the member-uploaded quiz bank with LLM-generated question variants. Built as a parallel track — does not block other features shipping. Questions go through a moderation queue before members can attempt them.
+
+### Copyright-safe approach
+
+Official APS sample questions may be copyright-protected. Generated questions must be seeded by **topic and domain**, not by copying verbatim question text. The correct prompt pattern is:
+
+```
+Generate a 4-option multiple-choice question for the National Psychology Exam.
+Domain: Ethics & Law
+Topic: Dual relationships in a supervisory context
+Difficulty: Application-level (not just recall)
+Format: Question stem, options A–D, correct answer, 150-word explanation.
+Do not reproduce any published exam questions.
+```
+
+Own-authored questions from the cohort can be fed in more directly — these are clean copyright.
+
+### Generation flow
+
+```
+[Topic input: domain + subtopic + difficulty]
+         ↓
+[Server Action → Claude API (claude-sonnet-4-6)]
+         ↓
+[N variants returned as structured JSON]
+         ↓
+[Inserted to quiz_questions with status = 'pending_review']
+         ↓
+[Appears in /admin moderation queue]
+         ↓
+[Admin approves / edits / rejects]
+         ↓
+[status = 'active' → live in quiz bank]
+```
+
+### Schema additions
+
+```sql
+-- Add status and generation metadata to quiz_questions
+alter table public.quiz_questions
+  add column status text not null default 'active'
+    check (status in ('active', 'pending_review', 'under_review', 'rejected')),
+  add column is_ai_generated boolean default false,
+  add column generation_prompt text;  -- for audit trail
+
+-- Question flags (peer review)
+create table public.quiz_question_flags (
+  id uuid primary key default gen_random_uuid(),
+  question_id uuid references public.quiz_questions(id) on delete cascade,
+  user_id uuid references auth.users(id),
+  reason text,
+  flagged_at timestamptz default now(),
+  unique(question_id, user_id)
+);
+alter table public.quiz_question_flags enable row level security;
+create policy "Members can flag questions" on public.quiz_question_flags
+  for insert with check (auth.uid() = user_id);
+create policy "Members can read own flags" on public.quiz_question_flags
+  for select using (auth.uid() = user_id);
+```
+
+### Generation UI
+
+A simple generation panel in `/admin` (or accessible to all members as a "Suggest questions" form):
+
+```
+Domain *        [dropdown]
+Subtopic        [text input — e.g. "Section 3.4 Code of Ethics"]
+Difficulty      [Recall | Application | Analysis]
+Number to generate [1 | 5 | 10]
+[Generate →]
+```
+
+On submit: server action calls Claude API, returns structured questions, inserts with `status = 'pending_review'` and `is_ai_generated = true`. Admin sees them in the moderation queue.
+
+### Env var required
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Add to `.env.example`.
+
+---
+
+## Issue 8 — Question Flagging → Auto Community Thread
+
+### Flow
+
+When a quiz question is flagged by 2 or more members:
+
+1. Question `status` changes to `'under_review'` — excluded from active quiz attempts
+2. A `forum_thread` is automatically created:
+   - `channel`: `'exam-prep'`
+   - `title`: `"Question needs review: [first 80 chars of question_text]"`
+   - `body`: includes question text, all options, the keyed answer, and: *"This question has been flagged by members as potentially incorrect. Please discuss the correct answer below."*
+   - `tag`: `'Question'`
+   - `is_auto_generated`: `true` (add this column to `forum_threads`)
+   - `linked_question_id`: FK to the flagged question (add this column)
+3. Members discuss in the thread — they can upvote replies supporting a particular answer
+4. Admin resolves by either:
+   - Editing the question (`correct_index` or option text) → status back to `'active'`
+   - Rejecting the question → status `'rejected'`, thread pinned with resolution note
+
+### Schema additions
+
+```sql
+alter table public.forum_threads
+  add column is_auto_generated boolean default false,
+  add column linked_question_id uuid references public.quiz_questions(id);
+```
+
+### Trigger logic (server-side)
+
+Add to the flag insertion server action:
+
+```ts
+const { count } = await supabase
+  .from('quiz_question_flags')
+  .select('id', { count: 'exact', head: true })
+  .eq('question_id', questionId);
+
+if (count >= 2) {
+  // Set question under_review
+  await supabase.from('quiz_questions')
+    .update({ status: 'under_review' })
+    .eq('id', questionId);
+
+  // Auto-create community thread
+  await supabase.from('forum_threads').insert({
+    channel: 'exam-prep',
+    title: `Question needs review: ${question.question_text.slice(0, 80)}...`,
+    body: formatReviewThreadBody(question),
+    tag: 'Question',
+    is_auto_generated: true,
+    linked_question_id: questionId,
+  });
+}
+```
+
+---
+
+## Issue 9 — Admin UI (`/admin`)
+
+### Access control
+
+Route is protected to Connor's account only. Check against a hardcoded admin email in middleware, or add an `is_admin` boolean to `approved_users` table.
+
+```ts
+// middleware.ts addition
+if (pathname.startsWith('/admin') && user.email !== process.env.ADMIN_EMAIL) {
+  redirect('/dashboard');
+}
+```
+
+### Admin sections
+
+**Access requests**
+- List of pending requests: name, email, PSY number, submitted date, message
+- Approve button → inserts to `approved_users`, sends Supabase auth invite email
+- Reject button → optional rejection note, flags request as rejected
+- Approved/rejected history tab
+
+**Key references**
+- Table of existing `key_references` rows: title, source, URL, `is_new` toggle, display order
+- Edit in-place or via slide-over form
+- Add new reference
+- Drag to reorder (or numeric display_order input)
+
+**Quick links**
+- Same pattern as key references — manage the links shown on the landing page
+
+**Question moderation queue**
+- All questions with `status = 'pending_review'` or `'under_review'`
+- Shows: question text, options, keyed answer, explanation, AI-generated flag, flag count
+- Actions: Approve → `status = 'active'` | Edit (inline) | Reject → `status = 'rejected'`
+- For `'under_review'` questions: link to the auto-generated community thread
+
+**Member list**
+- Read-only table of `approved_users`: email, display name, joined date
+- Remove member button (sets `is_approved = false` in `approved_users`)
+
+---
+
+## Issue 10 — Resource Editing & First-Time Onboarding
+
+### Resource editing
+
+Members who uploaded a resource should be able to edit its metadata (title, category, domain, notes) and delete their own uploads.
+
+On each resource card, show an edit icon (pencil) if `uploaded_by = current_user`. Clicking opens a slide-over form pre-filled with current metadata — same fields as the Add Resource form. Save calls a server action to update the `resources` row. No file re-upload needed (just metadata).
+
+Delete: confirmation dialog → deletes the Spaces object and the Supabase row. Warn: "This will remove the file permanently for all members."
+
+### First-time member onboarding
+
+When a member logs in for the first time (no `study_plans` row exists for them), the dashboard shows an onboarding banner instead of empty cards:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  👋 Welcome to NPE Study Club                        │
+│  You're in. Here's how to get started:              │
+│                                                      │
+│  1. Browse the resource library →                   │
+│  2. Set up your study plan →          [Start plan]  │
+│  3. Introduce yourself in Community →               │
+└─────────────────────────────────────────────────────┘
+```
+
+- "Start plan" is a prominent CTA → navigates to `/study-plan` (triggers the onboarding wizard)
+- Banner dismisses once the study plan exists OR the member dismisses it manually (store `onboarding_dismissed` in `user_metadata`)
+- This banner only shows on the dashboard, not every page
+
+### Session permissions (confirmed)
+
+Any member can add any session type (Group, Ad-hoc, Personal). No approval flow needed. The session type filter on the calendar lets members manage what they see.
+
+---
+
+## Final Consolidated Priority Order
+
+### P1 — Ship first (no schema changes beyond column renames)
+
+1. Landing page copy rewrite + jargon fix + "Launch tonight" removal
+2. Remove redundant sessions list from schedule page
+3. Rename `meet_link` → `video_link` in DB + codebase + UI
+4. Add PSY number field to access request form + `psy_number` column in `access_requests`
+5. Add consent checkbox to `/auth/request` + `consented_at` column
+6. Write `/privacy` page (static)
+7. Render existing profile data (progress, quiz totals, study plan link) — no new DB queries
+8. Add account settings to profile: display name, email change, link to password change
+9. First-time member onboarding banner on dashboard
+
+### P2 — Medium effort, clear user need
+
+10. Schedule: session type filter bar + colour legend + `session_type` selector in add-session form
+11. Study plan blocks on schedule (private per member, generated from `study_plan_weeks` + `preferred_days`)
+12. `.ics` export button on `/schedule` and `/study-plan` (`ical-generator` package)
+13. Quiz performance by domain on profile
+14. Community activity summary on profile
+15. Quick links section on landing page
+16. Resource edit / delete by uploader
+
+### P3 — New schema required
+
+17. Set up DigitalOcean Spaces integration (`lib/storage.ts` + env vars)
+18. Swap resource upload/download to DigitalOcean Spaces
+19. Bulk upload script (`scripts/bulk-upload.mjs`)
+20. Saved resources / bookmarks
+21. Delete my account flow
+
+### P4 — Admin UI
+
+22. `/admin` route with access control
+23. Access request approval/rejection UI
+24. Key references + quick links management UI
+25. Member list
+
+### P5 — Notifications
+
+26. `notifications` table + in-app notification bell
+27. `notification_preferences` table + settings UI
+28. Email notifications via Edge Function on forum reply insert
+29. Remaining notification triggers
+
+### P6 — AI question generation (parallel track)
+
+30. `ANTHROPIC_API_KEY` env var + `lib/ai.ts` wrapper
+31. Add `status`, `is_ai_generated`, `generation_prompt` columns to `quiz_questions`
+32. Question generation form in `/admin` (or member-facing "Suggest questions")
+33. Generation server action (Claude API call → structured JSON → insert with `status = 'pending_review'`)
+34. Moderation queue in `/admin`
+35. Question flag mechanism + `quiz_question_flags` table
+36. Auto community thread on 2+ flags (`is_auto_generated`, `linked_question_id` columns)
+37. Admin resolution flow (edit / approve / reject flagged questions)
+
+### Deferred
+
+- AHPRA automated PSY number verification (PSY number captured at sign-up — data ready)
+- Push notifications
+- Admin UI beyond P4 scope
+
+---
+
+## Notes for the Implementation Agent
+
+- All copy changes to `app/page.tsx` are purely text replacements — no component changes needed.
+- `session_type` field already exists in `sessions` — schedule filter is client-side state only, no new DB queries.
+- For profile: build sections in order. Start with what's already fetched (progress, quiz totals, study plan link). Add bookmarks last as it needs schema migration.
+- `supabase.auth.updateUser()` works from a Server Action with the server Supabase client.
+- Display name in `user_metadata.display_name` — no separate `profiles` table needed for v1.
+- `supabase.auth.admin.deleteUser()` requires service role key — server action only, never client-side.
+- DigitalOcean Spaces uses AWS SDK v3 (`@aws-sdk/client-s3` + `@aws-sdk/s3-request-presigner`) — install these. Use region `syd1` for Sydney proximity.
+- AI generation uses `@anthropic-ai/sdk` — request structured output via tool use or a JSON-mode prompt.
+- Question generation prompt must explicitly instruct the model not to reproduce published exam questions.
+- Auto community thread creation runs as part of the flag insertion server action — no separate Edge Function needed for v1.
+- All one-off migration scripts go in `/scripts/` with README documentation.
+- The `ADMIN_EMAIL` env var gates the `/admin` route — add to `.env.example`.
+- `.ics` export uses `ical-generator` npm package — install it. The server action returns the calendar string with `Content-Type: text/calendar` and `Content-Disposition: attachment; filename="npe-study-plan.ics"`.
+- Study plan blocks on the schedule are generated entirely client-side from already-fetched `study_plan_weeks` data — no additional DB queries or API routes needed.
+- `bulk-upload.mjs` is a one-off migration tool in `/scripts/` — it does not need to be part of the Next.js app build.
