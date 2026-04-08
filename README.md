@@ -23,12 +23,13 @@ See [npe-web/README.md](npe-web/README.md) for local setup and contribution guid
 
 ## Features
 
-- Requests an access form with manual approval workflow
-- Magic-link sign in for approved members
-- Private resource library with file uploads to Supabase Storage
-- Community discussion board
-- Session schedule and progress tracking
-- Theme switcher (light/dark mode)
+- Access request form with manual approval workflow
+- Auth flows for approved members
+- Private resource library with advanced filtering and completion tracking
+- Community channels with thread detail, nested replies, and upvotes
+- Quiz browser, quiz-taking flow, quiz uploads, and quiz history
+- Study plan onboarding, generated weekly timeline, and study-time logging
+- Schedule calendar with NPE exam windows and ad-hoc sessions
 
 ## Architecture
 

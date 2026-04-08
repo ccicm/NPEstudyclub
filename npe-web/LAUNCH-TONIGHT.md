@@ -20,7 +20,14 @@ In `.env.local`:
 
 **Database:**
 - Run `supabase/001_npe_schema.sql` in SQL Editor
-- Verify tables created: `approved_users`, `resources`, `forum_threads`, `forum_replies`, `sessions`, `user_progress`
+- Run `supabase/002_feature_upgrade.sql` in SQL Editor
+- Verify core tables created:
+   - Membership/auth flow: `approved_users`, `access_requests`
+   - Resources: `resources`, `user_progress`, `comments`
+   - Community: `forum_threads`, `forum_replies`, `forum_upvotes`
+   - Sessions: `sessions`, `key_references`
+   - Quizzes: `quizzes`, `quiz_questions`, `quiz_results`
+   - Study plan: `study_plans`, `study_plan_weeks`, `study_log`
 
 **Storage:**
 - Create private bucket named `resources`
@@ -50,6 +57,12 @@ Test these flows:
 - [ ] `/dashboard` — approved user can access
 - [ ] `/resources` — member-only page
 - [ ] `/community` — member-only page
+- [ ] `/community/[threadId]` — thread detail opens with replies
+- [ ] `/schedule` — calendar view loads and allows ad-hoc session submission
+- [ ] `/quizzes` — browse list loads
+- [ ] `/quizzes/add` — quiz submission works with at least 4 questions
+- [ ] `/quizzes/results` — results table loads after one attempt
+- [ ] `/study-plan` — onboarding saves and creates weekly plan
 - [ ] Non-approved email redirects to `/auth/request-status`
 
 ## 4. Vercel Deployment
@@ -90,6 +103,10 @@ Once DNS propagates and SSL is active:
 - [ ] Request access form works
 - [ ] Magic-link sign-in flow works
 - [ ] Approved user can access `/dashboard`
+- [ ] Resource upload works and file opens via signed URL
+- [ ] Community posting, replies, and upvotes work
+- [ ] Quiz attempt saves to history
+- [ ] Study plan onboarding and log-time flow work
 
 ## Emergency Bypass (if Email Rate-Limits)
 
@@ -112,6 +129,8 @@ If Supabase email throttling blocks login:
 
 - [ ] Add at least one resource in `/add` to seed the library
 - [ ] Create a session in Supabase `sessions` table for schedule visibility
+- [ ] Seed at least 2 key references in `key_references`
+- [ ] Seed at least 1 quiz set for first-time members
 - [ ] Test community posting in `/community`
 - [ ] Invite and approve core members
 - [ ] Monitor Vercel Analytics and Supabase logs

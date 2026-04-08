@@ -6,9 +6,11 @@ Private study hub for approved provisional psychologists preparing for the Natio
 
 - Requests access through a manual approval flow.
 - Sends approved members to the private app.
-- Lists private resources from Supabase Storage.
-- Lets approved members add resources and post community replies.
-- Shows upcoming sessions and the latest uploads on the dashboard.
+- Provides filtered resources with completion tracking and signed-file access.
+- Provides channel-based community discussion with thread detail, nested replies, and upvotes.
+- Provides quiz browsing, quiz-taking flow, quiz uploads, and personal quiz history.
+- Provides study plan onboarding, generated weekly focus, study-time logging, and plan regeneration.
+- Shows schedule calendar with NPE window highlights and ad-hoc session creation.
 
 ## Local Setup
 
@@ -16,7 +18,9 @@ Private study hub for approved provisional psychologists preparing for the Natio
 2. Set `NEXT_PUBLIC_SUPABASE_URL`.
 3. Set `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 4. Set `NEXT_PUBLIC_SITE_URL` to your local or production URL.
-5. Run the schema in `supabase/001_npe_schema.sql`.
+5. Run the schema in order:
+	- `supabase/001_npe_schema.sql`
+	- `supabase/002_feature_upgrade.sql`
 6. Create a private Supabase Storage bucket named `resources`.
 7. Add your email to `approved_users` with `status = 'approved'`.
 
@@ -60,7 +64,13 @@ Open `http://localhost:3000`.
 - `/resources` resource library
 - `/add` resource upload form
 - `/community` private discussion board
+- `/community/[threadId]` thread detail view
 - `/schedule` session list
+- `/quizzes` quiz browser
+- `/quizzes/[id]` quiz-taking route
+- `/quizzes/add` add quiz form
+- `/quizzes/results` member quiz history
+- `/study-plan` study plan onboarding + dashboard
 - `/profile` member progress view
 
 ## Notes
