@@ -99,54 +99,56 @@ alter table public.study_log enable row level security;
 
 create policy "Authenticated users can read forum_upvotes"
 on public.forum_upvotes for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert forum_upvotes"
 on public.forum_upvotes for insert
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can delete own forum_upvotes"
 on public.forum_upvotes for delete
-using (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Authenticated users can read quizzes"
 on public.quizzes for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert quizzes"
 on public.quizzes for insert
-with check (auth.uid() = created_by);
+with check (auth.uid() = created_by and public.is_approved_member());
 
 create policy "Authenticated users can read quiz_questions"
 on public.quiz_questions for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert quiz_questions"
 on public.quiz_questions for insert
 with check (
   auth.uid() = (select created_by from public.quizzes where id = quiz_id)
+  and public.is_approved_member()
 );
 
 create policy "Users can read own quiz_results"
 on public.quiz_results for select
-using (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can insert own quiz_results"
 on public.quiz_results for insert
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users manage own study_plan"
 on public.study_plans for all
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member())
+with check (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users manage own study_plan_weeks"
 on public.study_plan_weeks for all
 using (
   auth.uid() = (select user_id from public.study_plans where id = plan_id)
+  and public.is_approved_member()
 );
 
 create policy "Users manage own study_log"
 on public.study_log for all
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member())
+with check (auth.uid() = user_id and public.is_approved_member());

@@ -106,6 +106,19 @@ begin
 end;
 $$;
 
+create or replace function public.is_approved_member()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.approved_users
+    where lower(email) = lower(coalesce(auth.jwt()->>'email', ''))
+      and status = 'approved'
+  );
+$$;
+
 drop trigger if exists trg_forum_threads_updated_at on public.forum_threads;
 create trigger trg_forum_threads_updated_at
 before update on public.forum_threads
@@ -123,63 +136,63 @@ alter table public.forum_replies enable row level security;
 
 create policy "Authenticated users can read resource objects"
 on storage.objects for select
-using (bucket_id = 'resources' and auth.role() = 'authenticated');
+using (bucket_id = 'resources' and public.is_approved_member());
 
 create policy "Authenticated users can upload resource objects"
 on storage.objects for insert
-with check (bucket_id = 'resources' and auth.role() = 'authenticated');
+with check (bucket_id = 'resources' and public.is_approved_member());
 
 create policy "Authenticated users can delete resource objects"
 on storage.objects for delete
-using (bucket_id = 'resources' and auth.role() = 'authenticated');
+using (bucket_id = 'resources' and public.is_approved_member());
 
 create policy "Authenticated users can read resources"
 on public.resources for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert resources"
 on public.resources for insert
-with check (auth.uid() = uploaded_by);
+with check (auth.uid() = uploaded_by and public.is_approved_member());
 
 create policy "Users can delete own resources"
 on public.resources for delete
-using (auth.uid() = uploaded_by);
+using (auth.uid() = uploaded_by and public.is_approved_member());
 
 create policy "Authenticated users can read key_references"
 on public.key_references for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Authenticated users can read sessions"
 on public.sessions for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert sessions"
 on public.sessions for insert
-with check (auth.uid() = created_by);
+with check (auth.uid() = created_by and public.is_approved_member());
 
 create policy "Users can read own progress"
 on public.user_progress for select
-using (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can insert own progress"
 on public.user_progress for insert
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can delete own progress"
 on public.user_progress for delete
-using (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Authenticated users can read comments"
 on public.comments for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert comments"
 on public.comments for insert
-with check (auth.uid() = user_id);
+with check (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can delete own comments"
 on public.comments for delete
-using (auth.uid() = user_id);
+using (auth.uid() = user_id and public.is_approved_member());
 
 create policy "Users can read own approved_users row"
 on public.approved_users for select
@@ -196,24 +209,24 @@ using (lower(email) = lower(auth.jwt()->>'email'));
 
 create policy "Authenticated users can read forum_threads"
 on public.forum_threads for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert forum_threads"
 on public.forum_threads for insert
-with check (auth.uid() = created_by);
+with check (auth.uid() = created_by and public.is_approved_member());
 
 create policy "Users can delete own forum_threads"
 on public.forum_threads for delete
-using (auth.uid() = created_by);
+using (auth.uid() = created_by and public.is_approved_member());
 
 create policy "Authenticated users can read forum_replies"
 on public.forum_replies for select
-using (auth.role() = 'authenticated');
+using (public.is_approved_member());
 
 create policy "Users can insert forum_replies"
 on public.forum_replies for insert
-with check (auth.uid() = created_by);
+with check (auth.uid() = created_by and public.is_approved_member());
 
 create policy "Users can delete own forum_replies"
 on public.forum_replies for delete
-using (auth.uid() = created_by);
+using (auth.uid() = created_by and public.is_approved_member());
