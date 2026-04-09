@@ -134,7 +134,7 @@ User's rolling performance profile (by domain, subdomain, difficulty) feeds dash
 ## Content pipeline
 
 ### Generation
-- Claude generates questions in JSON format matching schema above
+- A local deterministic generator creates questions in JSON format matching schema above
 - Each question is anchored to specific clauses of Australian professional/ethical documents
 - Primary sources: APS Code of Ethics (2007, amended 2023), Psychology Board of Australia Code of Conduct (2020), AHPRA guidelines, relevant legislation (e.g. Privacy Act, Health Practitioner Regulation National Law)
 - Vignettes are Australian context, applied/clinical register, 5th–6th year training level
@@ -142,6 +142,7 @@ User's rolling performance profile (by domain, subdomain, difficulty) feeds dash
 ### Review
 - Connor reviews generated JSON before committing to Git
 - Flagging system (>1% of quiz takers) routes contested questions to community discussion board post-launch
+- Because generation is seeded locally by date/domain, daily and fortnightly runs stay varied without API token spend
 
 ### Seed file structure (suggested)
 ```

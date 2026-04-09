@@ -10,7 +10,6 @@
     "generate:fortnightly:dry": "GENERATION_MODE=fortnightly DRY_RUN=true node generate-questions.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
     "@supabase/supabase-js": "^2.49.4"
   }
 }
