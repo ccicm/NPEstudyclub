@@ -29,3 +29,13 @@ The current question generator is stable and token-free, but it still leans on a
 ## Working rule
 
 If a change improves variety but weakens traceability to the source registry, it should be rejected.
+
+## Tomorrow handoff for the next agent
+
+Pick this up with a fresh agent and finish the polish pass only after reviewing the current generator outputs end to end.
+
+1. Run the generator against a few adjacent days and compare stems, distractors, and answer positions.
+2. Add more domain-specific scenario blueprints where repetition is still obvious.
+3. Keep the source registry checks intact while widening template variety.
+4. Update the plan if any new repetition patterns show up during review.
+5. Stop short of any paid API integration unless the local bank work clearly stalls.

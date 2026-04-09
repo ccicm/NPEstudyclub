@@ -33,6 +33,20 @@ This file tracks current state only (not historical debugging notes).
 - Improve the question generator so daily sets stop repeating the same hardcoded stems and distractors.
 - Track that work in [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md).
 
+## Deferred To Tomorrow
+
+- Finish the generator polish pass with a fresh agent after reviewing real output.
+- Keep the work documentation-led for now; do not add more implementation changes before that review.
+- Use [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md) as the starting point for the handoff.
+
+## Ready To Test
+
+- Quiz upload and CSV template now expect five options (`A-E`) instead of four.
+- Study-plan saving should preserve the existing plan if regeneration fails, instead of dropping the current weeks first.
+- Study-plan logging now accepts topics covered, quiz insight, and notes in addition to hours.
+- Resource progress now appears on the dashboard instead of the profile page.
+- Profile now links back to the dashboard progress overview.
+
 ## Still Not Started
 
 - Saved resources/bookmarks
