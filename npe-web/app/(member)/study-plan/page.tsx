@@ -37,8 +37,13 @@ export default async function StudyPlanPage({
   const weekIds = (weeks ?? []).map((week) => week.id);
 
   const { data: logs } = weekIds.length
-    ? await supabase.from("study_log").select("plan_week_id,hours_logged").eq("user_id", user.id).in("plan_week_id", weekIds)
-    : { data: [] as Array<{ plan_week_id: string; hours_logged: number }> };
+    ? await supabase
+        .from("study_log")
+        .select("id,plan_week_id,hours_logged,topics_covered,quiz_insight,notes,created_at")
+        .eq("user_id", user.id)
+        .in("plan_week_id", weekIds)
+        .order("created_at", { ascending: false })
+    : { data: [] as Array<{ id: string; plan_week_id: string; hours_logged: number; topics_covered: string | null; quiz_insight: string | null; notes: string | null; created_at: string | null }> };
 
   const hoursByWeek = (logs ?? []).reduce<Record<string, number>>((accumulator, log) => {
     accumulator[log.plan_week_id] = (accumulator[log.plan_week_id] ?? 0) + Number(log.hours_logged || 0);
@@ -78,6 +83,7 @@ export default async function StudyPlanPage({
         status: "upcoming" | "in_progress" | "complete";
       }>}
       hoursByWeek={hoursByWeek}
+      recentLogs={(logs ?? []).slice(0, 5)}
       resources={resources ?? []}
       quizzes={quizzes ?? []}
       logStudyTimeAction={logStudyTimeAction}

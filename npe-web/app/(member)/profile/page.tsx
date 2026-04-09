@@ -67,31 +67,11 @@ export default async function ProfilePage() {
   const displayName = String(user.user_metadata?.display_name || "").trim();
   const adminNote = String(user.user_metadata?.admin_note || "").trim();
 
-  const { count: completedCount } = await supabase
-    .from("user_progress")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id);
-
-  const { count: totalCount } = await supabase
-    .from("resources")
-    .select("id", { count: "exact", head: true });
-
-  const { data: recentCompletions } = await supabase
-    .from("user_progress")
-    .select("completed_at,resources(title)")
-    .eq("user_id", user.id)
-    .order("completed_at", { ascending: false })
-    .limit(3);
-
   const { data: plan } = await supabase
     .from("study_plans")
     .select("exam_date")
     .eq("user_id", user.id)
     .maybeSingle();
-
-  const done = completedCount || 0;
-  const total = totalCount || 0;
-  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
     <div className="space-y-4">
@@ -117,30 +97,17 @@ export default async function ProfilePage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border bg-card p-6">
-          <h2 className="text-2xl">Resource progress</h2>
-          <p className="mt-2 text-sm">
-            {done} of {total} resources completed
-          </p>
-          <div className="mt-2 h-2 w-full rounded bg-muted">
-            <div className="h-2 rounded bg-primary" style={{ width: `${percent}%` }} />
-          </div>
-
-          <div className="mt-4">
-            <p className="text-sm font-semibold">Recent completions</p>
-            {!recentCompletions?.length ? (
-              <p className="mt-1 text-sm text-muted-foreground">Open resources from the library to track your progress.</p>
-            ) : (
-              <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                {recentCompletions.map((entry, index) => (
-                  <li key={index}>• {(entry.resources as { title?: string } | null)?.title || "Resource"}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
-
       </div>
+
+        <section className="rounded-2xl border bg-card p-4">
+          <h2 className="text-2xl">Progress Overview</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Resource completion now lives on the dashboard so this page can stay focused on account settings.
+          </p>
+          <Link href="/dashboard" className="mt-3 inline-block text-sm underline">
+            Open dashboard overview
+          </Link>
+        </section>
 
       <section className="rounded-2xl border bg-card p-4">
         <h2 className="text-2xl">Account settings</h2>

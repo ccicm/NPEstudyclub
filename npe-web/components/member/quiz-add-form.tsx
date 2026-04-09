@@ -9,7 +9,8 @@ type DraftQuestion = {
   option_b: string;
   option_c: string;
   option_d: string;
-  correct_label: "A" | "B" | "C" | "D";
+  option_e: string;
+  correct_label: "A" | "B" | "C" | "D" | "E";
   explanation: string;
 };
 
@@ -19,6 +20,7 @@ const blankQuestion = (): DraftQuestion => ({
   option_b: "",
   option_c: "",
   option_d: "",
+  option_e: "",
   correct_label: "A",
   explanation: "",
 });
@@ -177,6 +179,7 @@ export function QuizAddForm({
                           "option_b",
                           "option_c",
                           "option_d",
+                          "option_e",
                           "correct_label",
                           "explanation",
                         ];
@@ -194,13 +197,14 @@ export function QuizAddForm({
                             option_b,
                             option_c,
                             option_d,
+                            option_e,
                             correct_label,
                             explanation,
                           ] = parseCsvLine(line);
 
                           const label = (correct_label || "A").toUpperCase();
-                          if (!["A", "B", "C", "D"].includes(label)) {
-                            throw new Error("Invalid correct_label value. Use A, B, C, or D.");
+                          if (!["A", "B", "C", "D", "E"].includes(label)) {
+                            throw new Error("Invalid correct_label value. Use A, B, C, D, or E.");
                           }
 
                           return {
@@ -209,7 +213,8 @@ export function QuizAddForm({
                             option_b: option_b || "",
                             option_c: option_c || "",
                             option_d: option_d || "",
-                            correct_label: label as "A" | "B" | "C" | "D",
+                            option_e: option_e || "",
+                            correct_label: label as "A" | "B" | "C" | "D" | "E",
                             explanation: explanation || "",
                           };
                         });
@@ -246,61 +251,41 @@ export function QuizAddForm({
               <div key={index} className="rounded-xl border bg-background p-4">
                 <p className="text-sm font-semibold">Question {index + 1}</p>
                 <div className="mt-2 grid gap-2">
-                  <input
-                    placeholder="Question text *"
-                    value={question.question_text}
-                    onChange={(event) => {
-                      const next = [...questions];
-                      next[index].question_text = event.target.value;
-                      setQuestions(next);
-                    }}
-                    className="h-10 rounded-md border bg-card px-3 text-sm"
-                  />
-                  <input
-                    placeholder="Option A *"
-                    value={question.option_a}
-                    onChange={(event) => {
-                      const next = [...questions];
-                      next[index].option_a = event.target.value;
-                      setQuestions(next);
-                    }}
-                    className="h-10 rounded-md border bg-card px-3 text-sm"
-                  />
-                  <input
-                    placeholder="Option B *"
-                    value={question.option_b}
-                    onChange={(event) => {
-                      const next = [...questions];
-                      next[index].option_b = event.target.value;
-                      setQuestions(next);
-                    }}
-                    className="h-10 rounded-md border bg-card px-3 text-sm"
-                  />
-                  <input
-                    placeholder="Option C"
-                    value={question.option_c}
-                    onChange={(event) => {
-                      const next = [...questions];
-                      next[index].option_c = event.target.value;
-                      setQuestions(next);
-                    }}
-                    className="h-10 rounded-md border bg-card px-3 text-sm"
-                  />
-                  <input
-                    placeholder="Option D"
-                    value={question.option_d}
-                    onChange={(event) => {
-                      const next = [...questions];
-                      next[index].option_d = event.target.value;
-                      setQuestions(next);
-                    }}
-                    className="h-10 rounded-md border bg-card px-3 text-sm"
-                  />
+                  <input placeholder="Question text *" value={question.question_text} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].question_text = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
+                  <input placeholder="Option A *" value={question.option_a} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].option_a = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
+                  <input placeholder="Option B *" value={question.option_b} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].option_b = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
+                  <input placeholder="Option C *" value={question.option_c} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].option_c = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
+                  <input placeholder="Option D *" value={question.option_d} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].option_d = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
+                  <input placeholder="Option E *" value={question.option_e} onChange={(event) => {
+                    const next = [...questions];
+                    next[index].option_e = event.target.value;
+                    setQuestions(next);
+                  }} className="h-10 rounded-md border bg-card px-3 text-sm" />
                   <select
                     value={question.correct_label}
                     onChange={(event) => {
                       const next = [...questions];
-                      next[index].correct_label = event.target.value as "A" | "B" | "C" | "D";
+                      next[index].correct_label = event.target.value as "A" | "B" | "C" | "D" | "E";
                       setQuestions(next);
                     }}
                     className="h-10 rounded-md border bg-card px-3 text-sm"
@@ -309,6 +294,7 @@ export function QuizAddForm({
                     <option value="B">Correct answer: B</option>
                     <option value="C">Correct answer: C</option>
                     <option value="D">Correct answer: D</option>
+                    <option value="E">Correct answer: E</option>
                   </select>
                   <textarea
                     placeholder="Explanation"
@@ -325,11 +311,7 @@ export function QuizAddForm({
             ))}
 
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setQuestions((prev) => [...prev, blankQuestion()])}
-                className="rounded-md border px-3 py-2 text-sm"
-              >
+              <button type="button" onClick={() => setQuestions((prev) => [...prev, blankQuestion()])} className="rounded-md border px-3 py-2 text-sm">
                 + Add another question
               </button>
               <button type="button" onClick={() => setStep(1)} className="rounded-md border px-3 py-2 text-sm">
@@ -343,11 +325,7 @@ export function QuizAddForm({
             <input type="hidden" name="description" value={description} />
             <input type="hidden" name="questions" value={JSON.stringify(questions)} />
 
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
-            >
+            <button type="submit" disabled={!canSubmit} className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50">
               Submit quiz for review
             </button>
           </div>

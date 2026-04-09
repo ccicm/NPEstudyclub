@@ -30,6 +30,8 @@ This file tracks current state only (not historical debugging notes).
 - Confirm study-plan onboarding/save works for approved non-admin users.
 - Tighten copy consistency across app screens (public vs member wording).
 - Reduce stale docs/spec overlap in root-level markdown files.
+- Improve the question generator so daily sets stop repeating the same hardcoded stems and distractors.
+- Track that work in [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md).
 
 ## Still Not Started
 

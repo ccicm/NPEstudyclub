@@ -254,6 +254,12 @@ To fully match this brief, frontend quiz flow should be updated to:
 - support `A-E`
 - defer all correctness/explanations until end-of-set submission
 
+## Generator limitations and next steps
+
+The current generator is deterministic and cheap to run, but the question bank is still too small and some stems repeat too closely between runs. The next iteration should add more scenario blueprints, rotate distractor logic, and balance the same ethical/clinical themes across daily sets.
+
+The working improvement plan is documented in [QUESTION_GENERATOR_PLAN.md](../QUESTION_GENERATOR_PLAN.md).
+
 ---
 
 ## Out of scope for this brief

@@ -16,10 +16,21 @@ type ResourceItem = { id: string; title: string };
 
 type QuizItem = { id: string; title: string };
 
+type StudyLogItem = {
+  id: string;
+  plan_week_id: string;
+  hours_logged: number;
+  topics_covered: string | null;
+  quiz_insight: string | null;
+  notes: string | null;
+  created_at: string | null;
+};
+
 export function StudyPlanDashboard({
   plan,
   weeks,
   hoursByWeek,
+  recentLogs,
   resources,
   quizzes,
   logStudyTimeAction,
@@ -32,6 +43,7 @@ export function StudyPlanDashboard({
   };
   weeks: WeekItem[];
   hoursByWeek: Record<string, number>;
+  recentLogs: StudyLogItem[];
   resources: ResourceItem[];
   quizzes: QuizItem[];
   logStudyTimeAction: (formData: FormData) => Promise<void>;
@@ -124,16 +136,42 @@ export function StudyPlanDashboard({
                 style={{ width: `${Math.min(100, (currentHours / plan.hours_per_week) * 100)}%` }}
               />
             </div>
-            <form action={logStudyTimeAction} className="mt-3 flex items-center gap-2">
+            <form action={logStudyTimeAction} className="mt-3 grid gap-2 md:grid-cols-2">
               <input type="hidden" name="plan_week_id" value={currentWeek.id} />
-              <input name="hours" type="number" min="0.1" max="20" step="0.5" defaultValue="1" className="h-9 w-28 rounded-md border bg-background px-3 text-sm" />
-              <button type="submit" className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
-                Log time
+              <input name="hours" type="number" min="0.1" max="20" step="0.5" defaultValue="1" className="h-9 rounded-md border bg-background px-3 text-sm" />
+              <input name="topics_covered" placeholder="Topics covered" className="h-9 rounded-md border bg-background px-3 text-sm" />
+              <input name="quiz_insight" placeholder="Quiz insight" className="h-9 rounded-md border bg-background px-3 text-sm md:col-span-2" />
+              <textarea name="notes" placeholder="Notes" className="min-h-20 rounded-md border bg-background px-3 py-2 text-sm md:col-span-2" />
+              <button type="submit" className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground md:col-span-2">
+                Log study session
               </button>
             </form>
           </div>
         </section>
       ) : null}
+
+      <section className="rounded-2xl border bg-card p-5">
+        <h2 className="text-2xl">Recent Study Logs</h2>
+        {recentLogs.length ? (
+          <div className="mt-3 space-y-3">
+            {recentLogs.map((log) => (
+              <article key={log.id} className="rounded-xl border bg-background p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-semibold">{log.hours_logged.toFixed(1)} hrs</p>
+                  <p className="text-xs text-muted-foreground">
+                    {log.created_at ? new Date(log.created_at).toLocaleString() : "Recently"}
+                  </p>
+                </div>
+                {log.topics_covered ? <p className="mt-2 text-muted-foreground">Topics: {log.topics_covered}</p> : null}
+                {log.quiz_insight ? <p className="mt-1 text-muted-foreground">Quiz insight: {log.quiz_insight}</p> : null}
+                {log.notes ? <p className="mt-1 text-muted-foreground">Notes: {log.notes}</p> : null}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-muted-foreground">Your study log will appear here once you start logging sessions.</p>
+        )}
+      </section>
 
       <section className="rounded-2xl border bg-card p-5">
         <h2 className="text-2xl">Plan Timeline</h2>

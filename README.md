@@ -29,6 +29,7 @@ See [npe-web/README.md](npe-web/README.md) for local setup and contribution guid
 * Community channels with thread detail, nested replies, and upvotes
 * Quiz browser, quiz-taking flow, quiz uploads, and quiz history
 * NPE quiz pipeline with seeded JSON question sets, weekday commute-friendly daily availability, result explanations, explanation voting, and delayed moderator review threads
+* Question generator improvement plan for reducing repetitive templated content: [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md)
 * Study plan onboarding, generated weekly timeline, and study-time logging
 * Insights from quizzes, logged study hours, etc., to inform targeted insights and user suggestions
 * Schedule calendar with NPE exam windows and ad-hoc sessions

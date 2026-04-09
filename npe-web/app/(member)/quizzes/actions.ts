@@ -10,7 +10,8 @@ type DraftQuestion = {
   option_b: string;
   option_c?: string;
   option_d?: string;
-  correct_label: "A" | "B" | "C" | "D";
+  option_e?: string;
+  correct_label: "A" | "B" | "C" | "D" | "E";
   explanation?: string;
 };
 
@@ -120,11 +121,20 @@ export async function createQuizAction(formData: FormData) {
       { label: "B", text: String(question.option_b || "").trim() },
       { label: "C", text: String(question.option_c || "").trim() },
       { label: "D", text: String(question.option_d || "").trim() },
-    ].filter((entry) => entry.text);
+      { label: "E", text: String(question.option_e || "").trim() },
+    ];
 
     const correctIndex = optionEntries.findIndex((entry) => entry.label === question.correct_label);
 
-    if (!question.question_text?.trim() || !question.option_a?.trim() || !question.option_b?.trim() || correctIndex < 0) {
+    if (
+      !question.question_text?.trim() ||
+      !question.option_a?.trim() ||
+      !question.option_b?.trim() ||
+      !question.option_c?.trim() ||
+      !question.option_d?.trim() ||
+      !question.option_e?.trim() ||
+      correctIndex < 0
+    ) {
       redirect("/quizzes/add?error=invalid_question");
     }
 

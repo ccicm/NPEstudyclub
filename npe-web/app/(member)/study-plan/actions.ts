@@ -149,33 +149,31 @@ export async function createStudyPlanAction(formData: FormData) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (existingPlan) {
-    const { data: existingWeeks } = await supabase
-      .from("study_plan_weeks")
-      .select("id")
-      .eq("plan_id", existingPlan.id);
+  const planPayload = {
+    exam_date: examDate.toISOString().slice(0, 10),
+    hours_per_week: hoursPerWeek,
+    preferred_days: preferredDays,
+    domain_priorities: domainPriorities,
+  };
 
-    const weekIds = (existingWeeks ?? []).map((week) => week.id);
-
-    if (weekIds.length) {
-      await supabase.from("study_log").delete().in("plan_week_id", weekIds);
-      await supabase.from("study_plan_weeks").delete().in("id", weekIds);
-    }
-
-    await supabase.from("study_plans").delete().eq("id", existingPlan.id);
-  }
-
-  const { data: plan, error: planError } = await supabase
-    .from("study_plans")
-    .insert({
-      user_id: user.id,
-      exam_date: examDate.toISOString().slice(0, 10),
-      hours_per_week: hoursPerWeek,
-      preferred_days: preferredDays,
-      domain_priorities: domainPriorities,
-    })
-    .select("id")
-    .single();
+  const { data: plan, error: planError } = existingPlan
+    ? await supabase
+        .from("study_plans")
+        .update({
+          ...planPayload,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingPlan.id)
+        .select("id")
+        .single()
+    : await supabase
+        .from("study_plans")
+        .insert({
+          user_id: user.id,
+          ...planPayload,
+        })
+        .select("id")
+        .single();
 
   if (planError || !plan) {
     const message = String(planError?.message || "").toLowerCase();
@@ -190,6 +188,20 @@ export async function createStudyPlanAction(formData: FormData) {
       redirect("/study-plan?error=not_authorized");
     }
     redirect("/study-plan?error=create_failed");
+  }
+
+  if (existingPlan) {
+    const { data: existingWeeks } = await supabase
+      .from("study_plan_weeks")
+      .select("id")
+      .eq("plan_id", existingPlan.id);
+
+    const weekIds = (existingWeeks ?? []).map((week) => week.id);
+
+    if (weekIds.length) {
+      await supabase.from("study_log").delete().in("plan_week_id", weekIds);
+      await supabase.from("study_plan_weeks").delete().in("id", weekIds);
+    }
   }
 
   const weeks = generateWeeks({
@@ -231,6 +243,9 @@ export async function createStudyPlanAction(formData: FormData) {
 export async function logStudyTimeAction(formData: FormData) {
   const planWeekId = String(formData.get("plan_week_id") || "").trim();
   const hoursRaw = String(formData.get("hours") || "1").trim();
+  const topicsCovered = String(formData.get("topics_covered") || "").trim();
+  const quizInsight = String(formData.get("quiz_insight") || "").trim();
+  const notes = String(formData.get("notes") || "").trim();
   const hours = Math.max(0.1, Math.min(20, Number(hoursRaw) || 1));
 
   if (!planWeekId) {
@@ -250,6 +265,9 @@ export async function logStudyTimeAction(formData: FormData) {
     user_id: user.id,
     plan_week_id: planWeekId,
     hours_logged: hours,
+    topics_covered: topicsCovered || null,
+    quiz_insight: quizInsight || null,
+    notes: notes || null,
   });
 
   const { data: week } = await supabase
@@ -261,7 +279,7 @@ export async function logStudyTimeAction(formData: FormData) {
   if (week) {
     const [{ data: plan }, { data: logs }] = await Promise.all([
       supabase.from("study_plans").select("hours_per_week").eq("id", week.plan_id).maybeSingle(),
-      supabase.from("study_log").select("hours_logged").eq("plan_week_id", week.id),
+      supabase.from("study_log").select("hours_logged,topics_covered,quiz_insight,notes").eq("plan_week_id", week.id),
     ]);
 
     const totalLogged = (logs ?? []).reduce((sum, row) => sum + Number(row.hours_logged || 0), 0);
@@ -342,16 +360,6 @@ export async function updateStudyPlanAction(formData: FormData) {
   const completedWeeks = (existingWeeks ?? []).filter((week) => week.status === "complete");
   const removableWeeks = (existingWeeks ?? []).filter((week) => week.status !== "complete");
 
-  if (removableWeeks.length) {
-    await supabase
-      .from("study_plan_weeks")
-      .delete()
-      .in(
-        "id",
-        removableWeeks.map((week) => week.id),
-      );
-  }
-
   const suggestionMaps = await loadSuggestionMaps(supabase);
 
   const newWeeks = generateWeeks({
@@ -364,12 +372,26 @@ export async function updateStudyPlanAction(formData: FormData) {
   });
 
   if (newWeeks.length) {
-    await supabase.from("study_plan_weeks").insert(
+    const { error: insertError } = await supabase.from("study_plan_weeks").insert(
       newWeeks.map((week) => ({
         plan_id: plan.id,
         ...week,
       })),
     );
+
+    if (insertError) {
+      return;
+    }
+
+    if (removableWeeks.length) {
+      await supabase
+        .from("study_plan_weeks")
+        .delete()
+        .in(
+          "id",
+          removableWeeks.map((week) => week.id),
+        );
+    }
   }
 
   revalidatePath("/study-plan");

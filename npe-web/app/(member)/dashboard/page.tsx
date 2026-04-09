@@ -42,6 +42,17 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(5);
 
+  const { count: completedResources } = user
+    ? await supabase
+        .from("user_progress")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+    : { count: 0 };
+
+  const { count: totalResources } = await supabase.from("resources").select("id", { count: "exact", head: true });
+
+  const resourcePercent = totalResources ? Math.round(((completedResources || 0) / totalResources) * 100) : 0;
+
   const { data: keyReferences } = await supabase
     .from("key_references")
     .select("id,title,source,description,url,is_new")
@@ -194,6 +205,22 @@ export default async function DashboardPage() {
       <ExamCountdown />
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border bg-card p-6">
+          <h2 className="text-2xl">Resource Progress</h2>
+          <p className="mt-2 text-sm">
+            {(completedResources || 0)} of {totalResources || 0} resources completed
+          </p>
+          <div className="mt-2 h-2 w-full rounded bg-muted">
+            <div className="h-2 rounded bg-primary" style={{ width: `${resourcePercent}%` }} />
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Use the resource library to mark completed items and keep this overview current.
+          </p>
+          <Link href="/resources" className="mt-3 inline-block text-sm underline">
+            Open Resources
+          </Link>
+        </section>
+
         <section className="rounded-2xl border bg-card p-6">
           <h2 className="text-2xl">Upcoming Sessions</h2>
           {!sessions?.length ? (

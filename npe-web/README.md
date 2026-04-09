@@ -87,6 +87,13 @@ Open `http://localhost:3000`.
 - Daily quizzes open Monday to Friday from 6:00am AEST.
 - Quiz-related notice-board items are held back until later that day, or until the member completes the linked quiz.
 
+## Question Generator Notes
+
+- The generator is currently deterministic and token-free.
+- It relies on a small bank of hardcoded scenario templates, which is why some sets can feel repetitive.
+- The improvement plan lives in [QUESTION_GENERATOR_PLAN.md](../QUESTION_GENERATOR_PLAN.md).
+- Priority work is expanding variety while keeping source registry validation intact.
+
 ## Fast Login Recovery (Noob-Friendly)
 
 If you are locked out, use this sequence:
