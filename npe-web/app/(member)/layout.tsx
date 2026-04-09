@@ -8,7 +8,7 @@ export default async function MemberLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { approved, user } = await isApprovedMember();
+  const { approved, user, bypassed } = await isApprovedMember();
 
   if (!user) {
     redirect("/auth/login");
@@ -54,6 +54,11 @@ export default async function MemberLayout({
             </Link>
           ))}
         </nav>
+        {bypassed ? (
+          <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            Preview mode is active. Some actions (like saving a study plan) require a real email sign-in session.
+          </p>
+        ) : null}
       </header>
       <div className="mt-6">{children}</div>
     </main>

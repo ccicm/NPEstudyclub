@@ -11,7 +11,7 @@ export async function isApprovedMember() {
 
   if (allowMemberBypass) {
     const bypassEmail = process.env.BYPASS_MEMBER_EMAIL || "admin@npestudyclub.online";
-    return { approved: true, user: { email: bypassEmail } as { email: string } };
+    return { approved: true, user: { email: bypassEmail } as { email: string }, bypassed: true };
   }
 
   const supabase = await createClient();
@@ -20,7 +20,7 @@ export async function isApprovedMember() {
   } = await supabase.auth.getUser();
 
   if (!user?.email) {
-    return { approved: false, user: null };
+    return { approved: false, user: null, bypassed: false };
   }
 
   const { data, error } = await supabase
@@ -31,8 +31,8 @@ export async function isApprovedMember() {
     .limit(1);
 
   if (error) {
-    return { approved: false, user };
+    return { approved: false, user, bypassed: false };
   }
 
-  return { approved: Boolean(data?.length), user };
+  return { approved: Boolean(data?.length), user, bypassed: false };
 }

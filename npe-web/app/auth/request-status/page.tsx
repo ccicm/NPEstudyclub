@@ -45,6 +45,11 @@ export default async function RequestStatusPage() {
           <Link className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" href="/auth/login">
             Try sign in
           </Link>
+          {user && isApproved ? (
+            <Link className="rounded-md border px-4 py-2 text-sm font-semibold" href="/dashboard">
+              Go to member dashboard
+            </Link>
+          ) : null}
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground">

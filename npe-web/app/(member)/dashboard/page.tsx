@@ -12,6 +12,13 @@ export default async function DashboardPage() {
     process.env.ALLOW_MEMBER_BYPASS === "true" ||
     process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true";
 
+  const adminEmails = (process.env.ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const authEmail = user?.email?.toLowerCase() || "";
+  const isAdmin = Boolean(authEmail && adminEmails.includes(authEmail));
+
   const { data: sessions } = await supabase
     .from("sessions")
     .select("id,title,session_type,scheduled_at,description,video_link")
@@ -42,16 +49,6 @@ export default async function DashboardPage() {
     .order("display_order", { ascending: true })
     .limit(8);
 
-  // Debug: Check approval status
-  const authEmail = user?.email?.toLowerCase();
-  const { data: approvedRecord } = user
-    ? await supabase
-        .from("approved_users")
-        .select("email,status")
-        .eq("email", authEmail)
-        .maybeSingle()
-    : { data: null };
-
   const fileTypeColor = (fileType: string | null) => {
     const type = (fileType || "").toLowerCase();
     if (type === "pdf") return "bg-red-100 text-red-700";
@@ -71,47 +68,29 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {authEmail && (
-        <section className="rounded-2xl border-2 border-yellow-300 bg-yellow-50 p-6">
-          <h3 className="font-mono text-sm font-bold text-yellow-900">🔍 Email Debug Info</h3>
-          <div className="mt-3 space-y-2 text-sm font-mono text-yellow-900">
-            <p>
-              <strong>Auth Email:</strong> {authEmail}
-            </p>
-            <p>
-              <strong>In DB:</strong> {approvedRecord ? `Yes (status: ${approvedRecord.status})` : "❌ NOT FOUND"}
-            </p>
-            {!approvedRecord && (
-              <p className="mt-2 text-xs text-yellow-800">
-                ⚠️ Your auth session is looking for "{authEmail}" in the approved_users table, but it's not there. 
-                Check that you approved the correct email in the database!
+      {isAdmin ? (
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-2xl">User management</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Approve access requests and review members from here.
               </p>
-            )}
+            </div>
+            <Link
+              href="/admin"
+              className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+            >
+              Open user management
+            </Link>
           </div>
-        </section>
-      )}
-
-      <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-2xl">User management</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Approve access requests and review members from here.
+          {bypassEnabled ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Preview mode is on. For normal member behavior, turn bypass off once sign-in is stable.
             </p>
-          </div>
-          <Link
-            href="/admin"
-            className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-          >
-            Open user management
-          </Link>
-        </div>
-        {bypassEnabled ? (
-          <p className="mt-3 text-xs text-muted-foreground">
-            Preview mode is on, so this link should open without email sign-in.
-          </p>
-        ) : null}
-      </section>
+          ) : null}
+        </section>
+      ) : null}
 
       {showOnboarding ? (
         <section className="rounded-2xl border bg-card p-6">
