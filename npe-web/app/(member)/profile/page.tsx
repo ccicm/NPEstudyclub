@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/admin-access";
 
 async function updateDisplayName(formData: FormData) {
   "use server";
@@ -34,17 +35,37 @@ async function updateEmail(formData: FormData) {
   revalidatePath("/profile");
 }
 
-export default async function ProfilePage() {
+async function updateAdminNote(formData: FormData) {
+  "use server";
+
+  const note = String(formData.get("admin_note") || "").trim();
+  const { isAdmin } = await getAdminSession();
+
+  if (!isAdmin) {
+    return;
+  }
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  await supabase.auth.updateUser({
+    data: {
+      admin_note: note,
+    },
+  });
+
+  revalidatePath("/profile");
+}
+
+export default async function ProfilePage() {
+  const { user, isAdmin } = await getAdminSession();
+
+  const supabase = await createClient();
 
   if (!user) {
     return null;
   }
 
   const displayName = String(user.user_metadata?.display_name || "").trim();
+  const adminNote = String(user.user_metadata?.admin_note || "").trim();
 
   const { count: completedCount } = await supabase
     .from("user_progress")
@@ -246,6 +267,31 @@ export default async function ProfilePage() {
           </Link>
         </div>
       </section>
+
+      {isAdmin ? (
+        <section className="rounded-2xl border border-primary/25 bg-primary/5 p-4">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl">Admin controls</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              This section is only visible to your configured admin account. Use it for internal notes or site-specific
+              reminders while you are in the app.
+            </p>
+
+            <form action={updateAdminNote} className="mt-4 space-y-2 rounded-xl border bg-card p-4">
+              <p className="text-sm font-semibold">Internal admin note</p>
+              <textarea
+                name="admin_note"
+                defaultValue={adminNote}
+                placeholder="Add an internal note for yourself"
+                className="min-h-28 w-full rounded-md border bg-background px-3 py-2 text-sm"
+              />
+              <button type="submit" className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
+                Save admin note
+              </button>
+            </form>
+          </div>
+        </section>
+      ) : null}
 
       <section className="rounded-2xl border bg-card p-4">
         <h2 className="text-2xl">My Community Activity</h2>
