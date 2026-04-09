@@ -1,0 +1,16 @@
+{
+  "name": "npe-quiz-pipeline",
+  "version": "1.0.0",
+  "description": "Automated question generation pipeline for NPE quiz platform",
+  "main": "generate-questions.js",
+  "scripts": {
+    "generate:daily": "GENERATION_MODE=daily node generate-questions.js",
+    "generate:fortnightly": "GENERATION_MODE=fortnightly node generate-questions.js",
+    "generate:daily:dry": "GENERATION_MODE=daily DRY_RUN=true node generate-questions.js",
+    "generate:fortnightly:dry": "GENERATION_MODE=fortnightly DRY_RUN=true node generate-questions.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@supabase/supabase-js": "^2.49.4"
+  }
+}

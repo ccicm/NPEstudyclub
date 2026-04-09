@@ -1,0 +1,77 @@
+name: Generate Fortnightly NPE Exam
+
+on:
+  schedule:
+    # Midnight Friday AEDT (UTC+11) = 13:00 UTC Thursday
+    # Midnight Friday AEST (UTC+10) = 14:00 UTC Thursday
+    # Runs every Friday at 13:00 UTC - fortnightly gating handled in script
+    # via LAST_RUN_DATE stored in repo (see scripts/check-fortnightly.js)
+    - cron: '0 13 * * 4'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run - generate but do not insert into Supabase'
+        required: false
+        default: 'false'
+      force_run:
+        description: 'Force run even if not a fortnightly Friday'
+        required: false
+        default: 'false'
+
+jobs:
+  check-fortnightly:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check if fortnightly run is due
+        id: check
+        env:
+          FORCE_RUN: ${{ github.event.inputs.force_run || 'false' }}
+        run: |
+          node scripts/check-fortnightly.js
+          echo "should_run=$(cat /tmp/should_run)" >> $GITHUB_OUTPUT
+
+  generate-fortnightly:
+    needs: check-fortnightly
+    if: needs.check-fortnightly.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./scripts
+
+      - name: Generate fortnightly exam
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          GENERATION_MODE: 'fortnightly'
+        run: node scripts/generate-questions.js
+
+      - name: Update last run date
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          echo "$(date +'%Y-%m-%d')" > scripts/.last-fortnightly-run
+          git config --global user.name 'NPE Quiz Bot'
+          git config --global user.email 'npe-bot@users.noreply.github.com'
+          git add scripts/.last-fortnightly-run seed/staging/
+          git diff --staged --quiet || git commit -m "chore: fortnightly exam $(date +'%Y-%m-%d')"
+          git push
