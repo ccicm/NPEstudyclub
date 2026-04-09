@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { QUICK_LINKS } from "@/lib/quick-links";
 
 const EXAM_WINDOW_OPEN = new Date("2026-05-04T00:00:00+10:00");
 
@@ -97,6 +98,27 @@ export default function Home() {
             <p className="mt-3 text-sm font-semibold text-primary">Open request form -&gt;</p>
           </article>
         </Link>
+      </section>
+
+      <section className="mt-6 rounded-2xl border bg-card p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Quick links</h2>
+          <p className="text-xs text-muted-foreground">External resources</p>
+        </div>
+        <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+          {QUICK_LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              className="min-w-56 rounded-xl border bg-background px-3 py-2 text-sm transition hover:bg-muted/40"
+            >
+              <p className="font-medium">{link.label}</p>
+              <p className="mt-1 text-xs text-primary">Open link -&gt;</p>
+            </a>
+          ))}
+        </div>
       </section>
 
       <section className="mt-6 rounded-2xl border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">

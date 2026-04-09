@@ -3,7 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeChannel } from "@/lib/community";
 import { createThreadAction } from "./actions";
 
-export default async function CommunityPage() {
+export default async function CommunityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ author?: string }>;
+}) {
+  const params = await searchParams;
+  const mineOnly = params.author === "me";
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,7 +18,7 @@ export default async function CommunityPage() {
 
   const { data: threads } = await supabase
     .from("forum_threads")
-    .select("id,title,body,tag,channel,author_name,is_pinned,updated_at,created_at")
+    .select("id,title,body,tag,channel,author_name,is_pinned,updated_at,created_at,created_by")
     .order("updated_at", { ascending: false })
     .limit(200);
 
@@ -55,5 +62,9 @@ export default async function CommunityPage() {
     upvoted_by_me: upvotedByMe.has(thread.id),
   }));
 
-  return <CommunityHub threads={preparedThreads} createThreadAction={createThreadAction} />;
+  const visibleThreads = mineOnly && user
+    ? preparedThreads.filter((thread) => thread.created_by === user.id)
+    : preparedThreads;
+
+  return <CommunityHub threads={visibleThreads} createThreadAction={createThreadAction} showingMine={mineOnly} />;
 }

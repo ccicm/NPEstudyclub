@@ -37,9 +37,11 @@ function relativeTime(dateInput: string) {
 export function CommunityHub({
   threads,
   createThreadAction,
+  showingMine = false,
 }: {
   threads: ThreadSummary[];
   createThreadAction: (formData: FormData) => Promise<void>;
+  showingMine?: boolean;
 }) {
   const [activeChannel, setActiveChannel] = useState<CommunityChannelKey>("announcements");
   const [showComposer, setShowComposer] = useState(false);
@@ -116,6 +118,11 @@ export function CommunityHub({
               <p className="mt-1 text-sm text-muted-foreground">
                 {COMMUNITY_CHANNELS.find((channel) => channel.key === activeChannel)?.description}
               </p>
+              {showingMine ? (
+                <p className="mt-2 text-xs text-primary">
+                  Showing your posts only. <Link href="/community" className="underline">Clear filter</Link>
+                </p>
+              ) : null}
             </div>
             <button
               type="button"

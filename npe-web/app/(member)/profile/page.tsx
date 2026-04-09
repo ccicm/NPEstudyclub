@@ -68,6 +68,11 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
+  const [{ count: threadsStarted }, { count: repliesCount }] = await Promise.all([
+    supabase.from("forum_threads").select("id", { count: "exact", head: true }).eq("created_by", user.id),
+    supabase.from("forum_replies").select("id", { count: "exact", head: true }).eq("created_by", user.id),
+  ]);
+
   const { data: quizResultsRaw, error: quizError } = await supabase
     .from("quiz_results")
     .select("score, total_questions, completed_at, quizzes(domain)")
@@ -240,6 +245,22 @@ export default async function ProfilePage() {
             Change password
           </Link>
         </div>
+      </section>
+
+      <section className="rounded-2xl border bg-card p-4">
+        <h2 className="text-2xl">My Community Activity</h2>
+        <p className="mt-2 text-sm">
+          Threads I started: {threadsStarted || 0}
+        </p>
+        <p className="mt-1 text-sm">
+          Threads I replied to: {repliesCount || 0}
+        </p>
+        {!(threadsStarted || 0) && !(repliesCount || 0) ? (
+          <p className="mt-2 text-sm text-muted-foreground">You have not posted yet - join a thread in Community.</p>
+        ) : null}
+        <Link href="/community?author=me" className="mt-3 inline-block text-sm underline">
+          View my posts
+        </Link>
       </section>
 
       <div className="rounded-2xl border bg-card p-4">
