@@ -54,6 +54,7 @@ This brief covers schema design, seed data format, and the initial question gene
    - Distractor explanations (why each incorrect option is wrong)
    - Seeded difficulty label per question
 4. Flagging: users can flag any question post-submission as contested. Once flagged by >1% of quiz takers, question is pushed to a community discussion board for review.
+5. Explanation quality verification: users can thumbs up/down each post-submission explanation. If downvotes exceed the configured threshold (currently 20%), the question is automatically pushed to the community board for review.
 
 **Nothing is revealed mid-quiz.**
 
@@ -219,6 +220,13 @@ difficulty_score = correct_count::numeric / attempts_count::numeric
 The following migration was added to implement the above:
 
 - `supabase/004_quiz_pipeline_upgrade.sql`
+
+Explanation verification pipeline:
+
+- `supabase/005_explanation_feedback.sql`
+- Adds `explanation_feedback` votes (`up`/`down`) with one vote per user per question
+- Maintains question-level vote counters on `quiz_questions`
+- Auto-escalates to `forum_threads` when explanation downvote ratio exceeds threshold (20%)
 
 It extends existing quiz tables (non-breaking), adds response/flag tables, adds trigger functions, and creates a `user_performance` view.
 
