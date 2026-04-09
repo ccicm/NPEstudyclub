@@ -34,10 +34,11 @@ jobs:
 
       - name: Check if fortnightly run is due
         id: check
+        working-directory: ./scripts
         env:
           FORCE_RUN: ${{ github.event.inputs.force_run || 'false' }}
         run: |
-          node scripts/check-fortnightly.js
+          node check-fortnightly.js
           echo "should_run=$(cat /tmp/should_run)" >> $GITHUB_OUTPUT
 
   generate-fortnightly:
@@ -54,17 +55,18 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         working-directory: ./scripts
 
       - name: Generate fortnightly exam
+        working-directory: ./scripts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           GENERATION_MODE: 'fortnightly'
-        run: node scripts/generate-questions.js
+        run: node generate-questions.js
 
       - name: Update last run date
         if: ${{ github.event.inputs.dry_run != 'true' }}
