@@ -228,6 +228,15 @@ Explanation verification pipeline:
 - Maintains question-level vote counters on `quiz_questions`
 - Auto-escalates to `forum_threads` when explanation downvote ratio exceeds threshold (20%)
 
+Config + moderation enhancements:
+
+- `supabase/006_explanation_feedback_settings.sql`
+- Adds `quiz_settings` table with configurable `explanation_downvote_threshold`
+- Escalation and contested-state functions read threshold from settings (default 20%)
+- Admin page now includes:
+  - threshold editor (% input)
+  - contested explanation queue (downvote ratio + direct community thread link)
+
 It extends existing quiz tables (non-breaking), adds response/flag tables, adds trigger functions, and creates a `user_performance` view.
 
 ## Important current app gap to schedule next
