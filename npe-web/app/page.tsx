@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QUICK_LINKS } from "@/lib/quick-links";
+import { createClient } from "@/lib/supabase/server";
 
 const EXAM_WINDOW_OPEN = new Date("2026-05-04T00:00:00+10:00");
 
@@ -10,8 +12,25 @@ function getDaysRemaining() {
   return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
 }
 
-export default function Home() {
+export default async function Home() {
   const daysRemaining = getDaysRemaining();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.email) {
+    const { data } = await supabase
+      .from("approved_users")
+      .select("email")
+      .eq("email", user.email.toLowerCase())
+      .eq("status", "approved")
+      .limit(1);
+
+    if (data?.length) {
+      redirect("/dashboard");
+    }
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-8">
@@ -131,7 +150,7 @@ export default function Home() {
             </div>
             <div className="rounded-2xl bg-muted p-4">
               <p className="font-semibold text-foreground">3. Access</p>
-              <p className="mt-1">Once approved, you will get an email with a sign-in link.</p>
+              <p className="mt-1">Once approved, create a password and sign in to the member app.</p>
             </div>
           </div>
         </div>

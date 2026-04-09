@@ -32,7 +32,7 @@ export function StudyPlanOnboarding({
       {errorCode ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {errorCode === "auth_required"
-            ? "This action needs a real signed-in session. If preview mode is active, sign in via email link, then try again."
+            ? "This action needs a real signed-in session. If preview mode is active, sign in with your email and password, then try again."
             : "Could not save your plan. Please check all fields and try again."}
         </p>
       ) : null}

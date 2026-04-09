@@ -10,12 +10,7 @@ function parseAdminEmails() {
 }
 
 export async function getAdminSession() {
-  const cookieStore = await cookies();
-  const cookieBypass = cookieStore.get("member_bypass")?.value === "1";
-  const allowAdminBypass =
-    process.env.ALLOW_ADMIN_BYPASS === "true" ||
-    process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    cookieBypass;
+  const allowAdminBypass = process.env.ALLOW_ADMIN_BYPASS === "true";
 
   const supabase = await createClient();
   const {

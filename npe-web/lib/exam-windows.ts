@@ -7,22 +7,22 @@ export type ExamWindow = {
 
 export const EXAM_WINDOWS: ExamWindow[] = [
   {
-    label: "Cohort 20",
+    label: "May 2026 Window",
     start: [2026, 5, 1],
     end: [2026, 5, 31],
-    reg: "Registration closes April 2026",
+    reg: "Registration usually closes in April 2026",
   },
   {
-    label: "Cohort 21",
+    label: "October 2026 Window",
     start: [2026, 10, 1],
     end: [2026, 10, 31],
-    reg: "Registration closes September 2026",
+    reg: "Registration usually closes in September 2026",
   },
   {
-    label: "Cohort 22",
+    label: "March 2027 Window",
     start: [2027, 3, 1],
     end: [2027, 3, 31],
-    reg: "Registration closes February 2027",
+    reg: "Registration usually closes in February 2027",
   },
 ];
 
