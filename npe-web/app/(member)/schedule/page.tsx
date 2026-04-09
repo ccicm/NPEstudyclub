@@ -10,7 +10,7 @@ export default async function SchedulePage() {
 
   const { data: sessions } = await supabase
     .from("sessions")
-    .select("id,title,session_type,scheduled_at,description,video_link")
+    .select("id,title,session_type,scheduled_at,description,video_link,created_by")
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true })
     .limit(50);
@@ -28,6 +28,11 @@ export default async function SchedulePage() {
     : { data: null };
 
   return (
-    <ScheduleCalendar sessions={sessions ?? []} studyPlanWeeks={studyPlanWeeks ?? []} addSessionAction={addAdHocSession} />
+    <ScheduleCalendar
+      sessions={sessions ?? []}
+      studyPlanWeeks={studyPlanWeeks ?? []}
+      userId={user?.id ?? null}
+      addSessionAction={addAdHocSession}
+    />
   );
 }

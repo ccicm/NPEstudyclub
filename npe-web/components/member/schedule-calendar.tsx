@@ -11,6 +11,7 @@ type Session = {
   scheduled_at: string;
   description: string | null;
   video_link: string | null;
+  created_by?: string | null;
 };
 
 type StudyPlanWeek = {
@@ -29,6 +30,7 @@ type DayEvent =
       at: Date;
       description: string | null;
       videoLink: string | null;
+      createdBy: string | null;
     }
   | {
       kind: "studyBlock";
@@ -86,14 +88,16 @@ const TOPICS = [
 export function ScheduleCalendar({
   sessions,
   studyPlanWeeks = [],
+  userId = null,
   addSessionAction,
 }: {
   sessions: Session[];
   studyPlanWeeks?: StudyPlanWeek[];
+  userId?: string | null;
   addSessionAction: (formData: FormData) => Promise<void>;
 }) {
   const [viewDate, setViewDate] = useState(() => new Date());
-  const [filter, setFilter] = useState<"all" | "group" | "adhoc" | "mine">("all");
+  const [filter, setFilter] = useState<"all" | "group" | "adhoc" | "studyplan" | "mine">("all");
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [showForm, setShowForm] = useState(false);
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -117,6 +121,7 @@ export function ScheduleCalendar({
         at,
         description: session.description,
         videoLink: session.video_link,
+        createdBy: session.created_by ?? null,
       });
     });
 
@@ -174,7 +179,8 @@ export function ScheduleCalendar({
         if (filter === "all") return true;
         if (filter === "group") return event.kind === "session" && event.sessionType !== "Ad-hoc";
         if (filter === "adhoc") return event.kind === "session" && event.sessionType === "Ad-hoc";
-        if (filter === "mine") return event.kind === "session" && event.sessionType === "Personal";
+        if (filter === "studyplan") return event.kind === "studyBlock";
+        if (filter === "mine") return event.kind === "session" && event.createdBy === userId;
         return false;
       });
 
@@ -184,7 +190,7 @@ export function ScheduleCalendar({
     }
 
     return result;
-  }, [allEvents, filter]);
+  }, [allEvents, filter, userId]);
 
   const visibleDays = useMemo(() => monthMatrix(viewDate), [viewDate]);
   const selectedEvents = selectedDate ? filteredEvents.get(dateKey(selectedDate)) ?? [] : [];
@@ -194,7 +200,7 @@ export function ScheduleCalendar({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl">Schedule</h1>
         <div className="flex gap-2 flex-wrap">
-          {(["all", "group", "adhoc", "mine"] as const).map((value) => (
+          {(["all", "group", "adhoc", "studyplan", "mine"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -203,7 +209,15 @@ export function ScheduleCalendar({
                 filter === value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
-              {value === "all" ? "All" : value === "group" ? "Group" : value === "adhoc" ? "Ad-hoc" : "My sessions"}
+              {value === "all"
+                ? "All"
+                : value === "group"
+                  ? "Group"
+                  : value === "adhoc"
+                    ? "Ad-hoc"
+                    : value === "studyplan"
+                      ? "My study plan"
+                      : "My sessions"}
             </button>
           ))}
         </div>
