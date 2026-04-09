@@ -102,6 +102,53 @@ function validateQuestion(q, index) {
   return q;
 }
 
+function toLegacyQuestionRow(question, quizId, displayOrder) {
+  const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+  const options = optionLabels.map((label) => ({
+    label,
+    text: String(question.options?.[label] || '').trim(),
+  }));
+
+  const correctIndex = optionLabels.indexOf(question.correct_answer);
+
+  if (correctIndex < 0) {
+    throw new Error(`Question has invalid correct_answer value: ${question.correct_answer}`);
+  }
+
+  return {
+    quiz_id: quizId,
+    question_text: String(question.question || '').trim(),
+    options,
+    correct_index: correctIndex,
+    explanation: String(question.correct_explanation || '').trim(),
+    display_order: displayOrder,
+  };
+}
+
+async function createQuizRecord(setId, mode, generatedAt) {
+  const title = mode === 'daily' ? `Daily NPE Set ${generatedAt}` : `Fortnightly NPE Exam ${generatedAt}`;
+
+  const { data: quiz, error } = await supabase
+    .from('quizzes')
+    .insert({
+      title,
+      category: 'Exam Prep',
+      domain: 'Mixed',
+      description: `Auto-generated ${mode} NPE set created from ${setId}`,
+      created_by: null,
+      author_name: 'NPE Quiz Bot',
+      is_curated: true,
+    })
+    .select('id')
+    .single();
+
+  if (error || !quiz) {
+    throw new Error(`Quiz insert failed: ${error?.message || 'unknown error'}`);
+  }
+
+  return quiz.id;
+}
+
 async function generateForDomain({ domain, domain_label, count }) {
   console.log(`Generating ${count} question(s) for Domain ${domain}: ${domain_label}...`);
 
@@ -132,14 +179,12 @@ async function generateForDomain({ domain, domain_label, count }) {
   return parsed.map((q, i) => validateQuestion(q, i));
 }
 
-async function insertToSupabase(questions, setId) {
+async function insertToSupabase(questions, setId, mode, generatedAt) {
   console.log(`Inserting ${questions.length} questions into Supabase...`);
 
-  const rows = questions.map(q => ({
-    ...q,
-    set_id: setId,
-    created_at: new Date().toISOString(),
-  }));
+  const quizId = await createQuizRecord(setId, mode, generatedAt);
+
+  const rows = questions.map((question, index) => toLegacyQuestionRow(question, quizId, index + 1));
 
   const { error } = await supabase
     .from('quiz_questions')
@@ -178,6 +223,7 @@ async function main() {
 
   // Write seed file
   const dateStr = new Date().toISOString().split('T')[0];
+  const generatedAt = new Date().toISOString();
   const setId = `${MODE}-${dateStr}`;
   const filename = `${setId}.json`;
   const outputPath = path.join(STAGING_DIR, filename);
@@ -189,7 +235,7 @@ async function main() {
   const payload = {
     set_id: setId,
     mode: MODE,
-    generated_at: new Date().toISOString(),
+    generated_at: generatedAt,
     question_count: allQuestions.length,
     questions: allQuestions,
   };
@@ -202,7 +248,7 @@ async function main() {
     return;
   }
 
-  await insertToSupabase(allQuestions, setId);
+  await insertToSupabase(allQuestions, setId, MODE, generatedAt);
   console.log('\nDone.');
 }
 
