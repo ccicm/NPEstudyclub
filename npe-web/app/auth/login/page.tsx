@@ -18,6 +18,11 @@ export default async function Page() {
         .limit(1)
     : { data: null };
   const isApproved = Boolean(approvedRows?.length);
+  const adminEmails = (process.env.ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = Boolean(user?.email && adminEmails.includes(user.email.toLowerCase()));
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -28,9 +33,11 @@ export default async function Page() {
             <Link href="/dashboard">Proceed to member dashboard</Link>
           </Button>
         ) : null}
-        <Button asChild variant="secondary" className="w-full">
-          <Link href="/dashboard?admin=1">Open app now</Link>
-        </Button>
+        {isAdmin ? (
+          <Button asChild variant="secondary" className="w-full">
+            <Link href="/dashboard?admin=1">Open app now (admin preview)</Link>
+          </Button>
+        ) : null}
       </div>
     </div>
   );

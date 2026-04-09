@@ -25,7 +25,7 @@ export default async function StudyPlanPage({
     .maybeSingle();
 
   if (!plan) {
-    return <StudyPlanOnboarding action={createStudyPlanAction} hasError={Boolean(params.error)} />;
+    return <StudyPlanOnboarding action={createStudyPlanAction} errorCode={params.error || null} />;
   }
 
   const { data: weeks } = await supabase

@@ -10,10 +10,10 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 
 export function StudyPlanOnboarding({
   action,
-  hasError,
+  errorCode,
 }: {
   action: (formData: FormData) => Promise<void>;
-  hasError: boolean;
+  errorCode: string | null;
 }) {
   const [step, setStep] = useState<Step>(1);
   const [examDate, setExamDate] = useState("");
@@ -29,9 +29,11 @@ export function StudyPlanOnboarding({
     <div className="space-y-4 rounded-3xl border bg-card p-6">
       <h1 className="text-3xl">Build Your Study Plan</h1>
 
-      {hasError ? (
+      {errorCode ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Could not save your plan. Please check all fields and try again.
+          {errorCode === "auth_required"
+            ? "This action needs a real signed-in session. If preview mode is active, sign in via email link, then try again."
+            : "Could not save your plan. Please check all fields and try again."}
         </p>
       ) : null}
 

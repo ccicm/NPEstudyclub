@@ -138,7 +138,7 @@ export async function createStudyPlanAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/login");
+    redirect("/study-plan?error=auth_required");
   }
 
   const suggestionMaps = await loadSuggestionMaps(supabase);
@@ -217,7 +217,7 @@ export async function logStudyTimeAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return;
+    redirect("/study-plan?error=auth_required");
   }
 
   await supabase.from("study_log").insert({
@@ -284,7 +284,7 @@ export async function updateStudyPlanAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return;
+    redirect("/study-plan?error=auth_required");
   }
 
   const { data: plan } = await supabase
