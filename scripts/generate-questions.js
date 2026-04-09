@@ -598,6 +598,41 @@ async function createQuizRecord(setId, mode, generatedAt) {
   return quiz.id;
 }
 
+async function ensureSupabaseSchemaReady() {
+  if (!supabase) {
+    return;
+  }
+
+  const requiredTables = ['quizzes', 'quiz_questions'];
+
+  for (const table of requiredTables) {
+    const { error } = await supabase.from(table).select('id').limit(1);
+
+    if (!error) {
+      continue;
+    }
+
+    const message = (error.message || '').toLowerCase();
+    const tableMissing =
+      message.includes(`could not find the table 'public.${table}'`) ||
+      message.includes(`relation \"public.${table}\" does not exist`) ||
+      message.includes('schema cache');
+
+    if (tableMissing) {
+      throw new Error(
+        [
+          `Supabase table missing: public.${table}.`,
+          'The generator is connected to a project that does not have the NPE schema yet, or the URL/key points at the wrong project.',
+          'Apply migrations in order from npe-web/supabase/001_npe_schema.sql through npe-web/supabase/007_noticeboard_publish_windows.sql,',
+          'then verify NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in GitHub Secrets target that same project.',
+        ].join(' '),
+      );
+    }
+
+    throw new Error(`Supabase schema check failed for public.${table}: ${error.message}`);
+  }
+}
+
 function toLegacyQuestionRow(question, quizId, displayOrder) {
   const optionLabels = ['A', 'B', 'C', 'D', 'E'];
   const options = optionLabels.map((label) => ({
@@ -638,6 +673,7 @@ async function generateForDomain(domainSpec, mode, offset, dateSeed) {
 
 async function insertToSupabase(questions, setId, mode, generatedAt) {
   console.log(`Inserting ${questions.length} questions into Supabase...`);
+  await ensureSupabaseSchemaReady();
   const quizId = await createQuizRecord(setId, mode, generatedAt);
   const rows = questions.map((question, index) => toLegacyQuestionRow(question, quizId, index + 1));
   const { error } = await supabase.from('quiz_questions').insert(rows);
