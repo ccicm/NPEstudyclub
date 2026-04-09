@@ -75,11 +75,10 @@ jobs:
         if: ${{ github.event.inputs.dry_run != 'true' }}
         env:
           PUSH_TOKEN: ${{ secrets.NPE_BOT_TOKEN }}
-          GH_TOKEN_FALLBACK: ${{ github.token }}
         run: |
-          TOKEN="${PUSH_TOKEN:-$GH_TOKEN_FALLBACK}"
+          TOKEN="$PUSH_TOKEN"
           if [ -z "$TOKEN" ]; then
-            echo "No push token available. Configure secret NPE_BOT_TOKEN or enable write-capable GITHUB_TOKEN."
+            echo "Missing required secret NPE_BOT_TOKEN. Configure a PAT with Contents: Read and write for this repo."
             exit 1
           fi
 
