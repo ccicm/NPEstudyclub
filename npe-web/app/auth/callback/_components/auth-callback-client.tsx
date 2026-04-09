@@ -50,6 +50,14 @@ export function AuthCallbackClient() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
+            if (error.message.toLowerCase().includes("pkce code verifier")) {
+              setState({
+                status: "error",
+                message:
+                  "This sign-in link used PKCE and was opened without the original browser storage. Request a fresh link and open it in the same browser/device, or use the newest email after this update.",
+              });
+              return;
+            }
             setState({ status: "error", message: error.message });
             return;
           }
@@ -79,11 +87,16 @@ export function AuthCallbackClient() {
         <h1 className="text-2xl">Auth callback</h1>
         <p className="mt-3 text-sm text-muted-foreground">{state.message}</p>
         {state.status === "error" ? (
-          <p className="mt-4 text-sm">
-            <Link href="/auth/login" className="underline">
-              Back to login
-            </Link>
-          </p>
+          <div className="mt-4 space-y-2 text-sm">
+            <p className="text-muted-foreground">
+              Tip: if the email opened in a different browser or app, copy the link and open it in the same browser where you requested sign-in.
+            </p>
+            <p>
+              <Link href="/auth/login" className="underline">
+                Back to login
+              </Link>
+            </p>
+          </div>
         ) : null}
       </div>
     </main>

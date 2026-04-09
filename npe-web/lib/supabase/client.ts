@@ -15,5 +15,13 @@ export function createClient() {
   return createBrowserClient(
     supabaseUrl,
     supabaseKey,
+    {
+      auth: {
+        // Use implicit flow for email magic links so callback does not depend
+        // on a PKCE verifier stored in the same browser context.
+        flowType: "implicit",
+        detectSessionInUrl: true,
+      },
+    },
   );
 }

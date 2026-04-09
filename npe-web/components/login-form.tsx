@@ -44,7 +44,7 @@ export function LoginForm({
         },
       });
       if (error) throw error;
-      setNotice("Check your email for the sign-in link.");
+      setNotice("Check your email for the sign-in link, then open it in this same browser/device.");
       router.push("/auth/request-status");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
