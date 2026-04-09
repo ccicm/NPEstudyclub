@@ -152,6 +152,11 @@ for each row execute function public.handle_explanation_feedback_change();
 alter table public.explanation_feedback enable row level security;
 alter table public.explanation_feedback_reviews enable row level security;
 
+drop policy if exists "Users can read own explanation_feedback" on public.explanation_feedback;
+drop policy if exists "Users can insert own explanation_feedback" on public.explanation_feedback;
+drop policy if exists "Users can update own explanation_feedback" on public.explanation_feedback;
+drop policy if exists "Authenticated users can read explanation feedback reviews" on public.explanation_feedback_reviews;
+
 create policy "Users can read own explanation_feedback"
 on public.explanation_feedback for select
 using (auth.uid() = user_id and public.is_approved_member());

@@ -270,6 +270,12 @@ alter table public.user_responses enable row level security;
 alter table public.question_flags enable row level security;
 alter table public.question_reviews enable row level security;
 
+drop policy if exists "Users can read own user_responses" on public.user_responses;
+drop policy if exists "Users can insert own user_responses" on public.user_responses;
+drop policy if exists "Users can read own question_flags" on public.question_flags;
+drop policy if exists "Users can insert own question_flags" on public.question_flags;
+drop policy if exists "Authenticated users can read question_reviews" on public.question_reviews;
+
 create policy "Users can read own user_responses"
 on public.user_responses for select
 using (auth.uid() = user_id and public.is_approved_member());

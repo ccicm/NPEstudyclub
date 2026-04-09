@@ -134,6 +134,31 @@ alter table public.access_requests enable row level security;
 alter table public.forum_threads enable row level security;
 alter table public.forum_replies enable row level security;
 
+drop policy if exists "Authenticated users can read resource objects" on storage.objects;
+drop policy if exists "Authenticated users can upload resource objects" on storage.objects;
+drop policy if exists "Authenticated users can delete resource objects" on storage.objects;
+drop policy if exists "Authenticated users can read resources" on public.resources;
+drop policy if exists "Users can insert resources" on public.resources;
+drop policy if exists "Users can delete own resources" on public.resources;
+drop policy if exists "Authenticated users can read key_references" on public.key_references;
+drop policy if exists "Authenticated users can read sessions" on public.sessions;
+drop policy if exists "Users can insert sessions" on public.sessions;
+drop policy if exists "Users can read own progress" on public.user_progress;
+drop policy if exists "Users can insert own progress" on public.user_progress;
+drop policy if exists "Users can delete own progress" on public.user_progress;
+drop policy if exists "Authenticated users can read comments" on public.comments;
+drop policy if exists "Users can insert comments" on public.comments;
+drop policy if exists "Users can delete own comments" on public.comments;
+drop policy if exists "Users can read own approved_users row" on public.approved_users;
+drop policy if exists "Anyone can submit access request" on public.access_requests;
+drop policy if exists "Users can read own access requests" on public.access_requests;
+drop policy if exists "Authenticated users can read forum_threads" on public.forum_threads;
+drop policy if exists "Users can insert forum_threads" on public.forum_threads;
+drop policy if exists "Users can delete own forum_threads" on public.forum_threads;
+drop policy if exists "Authenticated users can read forum_replies" on public.forum_replies;
+drop policy if exists "Users can insert forum_replies" on public.forum_replies;
+drop policy if exists "Users can delete own forum_replies" on public.forum_replies;
+
 create policy "Authenticated users can read resource objects"
 on storage.objects for select
 using (bucket_id = 'resources' and public.is_approved_member());

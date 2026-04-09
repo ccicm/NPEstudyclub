@@ -97,6 +97,19 @@ alter table public.study_plans enable row level security;
 alter table public.study_plan_weeks enable row level security;
 alter table public.study_log enable row level security;
 
+drop policy if exists "Authenticated users can read forum_upvotes" on public.forum_upvotes;
+drop policy if exists "Users can insert forum_upvotes" on public.forum_upvotes;
+drop policy if exists "Users can delete own forum_upvotes" on public.forum_upvotes;
+drop policy if exists "Authenticated users can read quizzes" on public.quizzes;
+drop policy if exists "Users can insert quizzes" on public.quizzes;
+drop policy if exists "Authenticated users can read quiz_questions" on public.quiz_questions;
+drop policy if exists "Users can insert quiz_questions" on public.quiz_questions;
+drop policy if exists "Users can read own quiz_results" on public.quiz_results;
+drop policy if exists "Users can insert own quiz_results" on public.quiz_results;
+drop policy if exists "Users manage own study_plan" on public.study_plans;
+drop policy if exists "Users manage own study_plan_weeks" on public.study_plan_weeks;
+drop policy if exists "Users manage own study_log" on public.study_log;
+
 create policy "Authenticated users can read forum_upvotes"
 on public.forum_upvotes for select
 using (public.is_approved_member());
