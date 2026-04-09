@@ -16,6 +16,8 @@ type ThreadSummary = {
   is_pinned: boolean | null;
   updated_at: string;
   created_at: string;
+  quiz_id: string | null;
+  publish_at: string | null;
   reply_count: number;
   upvote_count: number;
   upvoted_by_me: boolean;

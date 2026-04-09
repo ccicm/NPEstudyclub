@@ -17,7 +17,15 @@ type QuizCard = {
 
 type QuizTab = "All" | "Exam Prep" | "Clinical Practice";
 
-export function QuizzesBrowser({ quizzes, created }: { quizzes: QuizCard[]; created: boolean }) {
+export function QuizzesBrowser({
+  quizzes,
+  created,
+  noticeMessage,
+}: {
+  quizzes: QuizCard[];
+  created: boolean;
+  noticeMessage?: string | null;
+}) {
   const [tab, setTab] = useState<QuizTab>("All");
   const [domain, setDomain] = useState("");
 
@@ -49,6 +57,10 @@ export function QuizzesBrowser({ quizzes, created }: { quizzes: QuizCard[]; crea
 
       {created ? (
         <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm">Quiz submitted successfully.</p>
+      ) : null}
+
+      {noticeMessage ? (
+        <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{noticeMessage}</p>
       ) : null}
 
       <div className="flex flex-wrap gap-2">

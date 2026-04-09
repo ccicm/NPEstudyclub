@@ -1,4 +1,5 @@
 import { QuizzesBrowser } from "@/components/member/quizzes-browser";
+import { getDailyQuizAvailabilityMessage, isDailyQuizLive } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function QuizzesPage({
@@ -15,9 +16,12 @@ export default async function QuizzesPage({
 
   const { data: quizzes } = await supabase
     .from("quizzes")
-    .select("id,title,category,domain,author_name,is_curated,created_at")
+    .select("id,title,category,domain,author_name,is_curated,created_at,delivery_mode,published_at")
     .order("created_at", { ascending: false })
     .limit(200);
+
+  const dailyQuizLive = isDailyQuizLive();
+  const availabilityMessage = getDailyQuizAvailabilityMessage();
 
   const quizIds = (quizzes ?? []).map((quiz) => quiz.id);
 
@@ -47,7 +51,9 @@ export default async function QuizzesPage({
     resultsByQuiz.set(result.quiz_id, current);
   });
 
-  const preparedQuizzes = (quizzes ?? []).map((quiz) => {
+  const preparedQuizzes = (quizzes ?? [])
+    .filter((quiz) => quiz.delivery_mode !== "daily" || dailyQuizLive)
+    .map((quiz) => {
     const attempts = resultsByQuiz.get(quiz.id) ?? [];
     const average = attempts.length
       ? Math.round(attempts.reduce((sum, value) => sum + value, 0) / attempts.length)
@@ -58,7 +64,7 @@ export default async function QuizzesPage({
       question_count: questionCountMap.get(quiz.id) ?? 0,
       average_score: average,
     };
-  });
+    });
 
-  return <QuizzesBrowser quizzes={preparedQuizzes} created={params.created === "1"} />;
+  return <QuizzesBrowser quizzes={preparedQuizzes} created={params.created === "1"} noticeMessage={availabilityMessage} />;
 }

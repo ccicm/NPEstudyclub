@@ -30,6 +30,7 @@ This brief covers schema design, seed data format, and the initial question gene
 - 4 questions, one per domain
 - Delivered as a single sitting
 - Results (score, correct answers, full explanations, difficulty labels) shown only after all 4 are submitted
+- Daily sets are available Monday to Friday from 6:00am AEST for commute-friendly access
 
 ### Fortnightly full exam
 - 150 questions, proportionally distributed across domains
@@ -53,8 +54,8 @@ This brief covers schema design, seed data format, and the initial question gene
    - Full explanation for correct answer
    - Distractor explanations (why each incorrect option is wrong)
    - Seeded difficulty label per question
-4. Flagging: users can flag any question post-submission as contested. Once flagged by >1% of quiz takers, question is pushed to a community discussion board for review.
-5. Explanation quality verification: users can thumbs up/down each post-submission explanation. If downvotes exceed the configured threshold (currently 20%), the question is automatically pushed to the community board for review.
+4. Flagging: users can flag any question post-submission as contested. Once flagged by >1% of quiz takers, the question is queued for the community board and held until later that day or until the user has completed the relevant quiz.
+5. Explanation quality verification: users can thumbs up/down each post-submission explanation. If downvotes exceed the configured threshold (currently 20%), the question follows the same delayed community-board flow.
 
 **Nothing is revealed mid-quiz.**
 
@@ -145,6 +146,7 @@ User's rolling performance profile (by domain, subdomain, difficulty) feeds dash
 - Flagging system (>1% of quiz takers) routes contested questions to community discussion board post-launch
 - Because generation is seeded locally by date/domain, daily and fortnightly runs stay varied without API token spend
 - Each question must cite only sources present in the local source registry so anchors stay explicit and auditable
+- Notice-board threads created from contest review stay hidden until later in the day, or until the user finishes the linked quiz if they have not seen it yet
 
 ### Seed file structure (suggested)
 ```

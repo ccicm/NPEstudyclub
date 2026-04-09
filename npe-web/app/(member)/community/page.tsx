@@ -18,7 +18,7 @@ export default async function CommunityPage({
 
   const { data: threads } = await supabase
     .from("forum_threads")
-    .select("id,title,body,tag,channel,author_name,is_pinned,updated_at,created_at,created_by")
+    .select("id,title,body,tag,channel,author_name,is_pinned,updated_at,created_at,created_by,quiz_id,publish_at")
     .order("updated_at", { ascending: false })
     .limit(200);
 
@@ -54,13 +54,38 @@ export default async function CommunityPage({
     }
   });
 
-  const preparedThreads = (threads ?? []).map((thread) => ({
+  const quizIdsForThreads = Array.from(new Set((threads ?? []).map((thread) => thread.quiz_id).filter(Boolean))) as string[];
+
+  const { data: completedQuizRows } =
+    user && quizIdsForThreads.length
+      ? await supabase
+          .from("quiz_results")
+          .select("quiz_id")
+          .eq("user_id", user.id)
+          .in("quiz_id", quizIdsForThreads)
+      : { data: [] as Array<{ quiz_id: string }> };
+
+  const completedQuizIds = new Set((completedQuizRows ?? []).map((row) => row.quiz_id));
+
+  const preparedThreads = (threads ?? [])
+    .filter((thread) => {
+      if (!thread.quiz_id) {
+        return true;
+      }
+
+      if (completedQuizIds.has(thread.quiz_id)) {
+        return true;
+      }
+
+      return thread.publish_at ? Date.now() >= new Date(thread.publish_at).getTime() : true;
+    })
+    .map((thread) => ({
     ...thread,
     channel: normalizeChannel(thread.channel),
     reply_count: replyCountMap.get(thread.id) ?? 0,
     upvote_count: upvoteCountMap.get(thread.id) ?? 0,
     upvoted_by_me: upvotedByMe.has(thread.id),
-  }));
+    }));
 
   const visibleThreads = mineOnly && user
     ? preparedThreads.filter((thread) => thread.created_by === user.id)

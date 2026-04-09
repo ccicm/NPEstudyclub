@@ -24,6 +24,10 @@ Private study hub for approved provisional psychologists preparing for the Natio
 	- `supabase/001_npe_schema.sql`
 	- `supabase/002_feature_upgrade.sql`
 	- `supabase/003_p1_refactor.sql`
+	- `supabase/004_quiz_pipeline_upgrade.sql`
+	- `supabase/005_explanation_feedback.sql`
+	- `supabase/006_explanation_feedback_settings.sql`
+	- `supabase/007_noticeboard_publish_windows.sql`
 8. Create a private Supabase Storage bucket named `resources`.
 
 ## Run Locally
@@ -77,6 +81,11 @@ Open `http://localhost:3000`.
 - `/study-plan` study plan onboarding + dashboard
 - `/profile` member progress view
 - `/admin` organiser-only user-management panel (approve/decline access requests)
+
+## Quiz Timing
+
+- Daily quizzes open Monday to Friday from 6:00am AEST.
+- Quiz-related notice-board items are held back until later that day, or until the member completes the linked quiz.
 
 ## Fast Login Recovery (Noob-Friendly)
 

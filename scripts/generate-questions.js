@@ -34,6 +34,25 @@ const DOMAIN_DISTRIBUTION = {
   ],
 };
 
+function getAestDateSeed(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Australia/Brisbane',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+  const day = parts.find((part) => part.type === 'day')?.value;
+
+  if (!year || !month || !day) {
+    throw new Error('Could not derive AEST date seed.');
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 function getSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
@@ -560,12 +579,14 @@ async function createQuizRecord(setId, mode, generatedAt) {
     .from('quizzes')
     .insert({
       title,
+      delivery_mode: mode,
       category: 'Exam Prep',
       domain: 'Mixed',
       description: `Auto-generated ${mode} NPE set created from ${setId}`,
       created_by: null,
       author_name: 'NPE Quiz Bot',
       is_curated: true,
+      published_at: generatedAt,
     })
     .select('id')
     .single();
@@ -639,7 +660,7 @@ async function main() {
     throw new Error(`Unknown mode: ${MODE}`);
   }
 
-  const dateSeed = new Date().toISOString().split('T')[0];
+  const dateSeed = getAestDateSeed();
   const generatedAt = new Date().toISOString();
   const setId = `${MODE}-${dateSeed}`;
 

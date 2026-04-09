@@ -12,12 +12,36 @@ export default async function ThreadDetailPage({ params }: { params: Promise<{ t
 
   const { data: thread } = await supabase
     .from("forum_threads")
-    .select("id,title,body,tag,author_name,created_at")
+    .select("id,title,body,tag,author_name,created_at,quiz_id,publish_at")
     .eq("id", threadId)
     .maybeSingle();
 
   if (!thread) {
     notFound();
+  }
+
+  const { data: completedQuizRows } =
+    user && thread.quiz_id
+      ? await supabase
+          .from("quiz_results")
+          .select("quiz_id")
+          .eq("user_id", user.id)
+          .eq("quiz_id", thread.quiz_id)
+      : { data: [] as Array<{ quiz_id: string }> };
+
+  const canViewThread =
+    !thread.quiz_id || Boolean(completedQuizRows?.length) || !thread.publish_at || Date.now() >= new Date(thread.publish_at).getTime();
+
+  if (!canViewThread) {
+    return (
+      <div className="rounded-2xl border bg-card p-6">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">Notice board</p>
+        <h1 className="mt-2 text-3xl leading-tight">{thread.title}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          This item opens after you finish the related quiz, or later today if you have not completed it yet.
+        </p>
+      </div>
+    );
   }
 
   const { data: replies } = await supabase

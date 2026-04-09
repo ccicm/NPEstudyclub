@@ -12,6 +12,8 @@ type Thread = {
   tag: string | null;
   author_name: string | null;
   created_at: string;
+  quiz_id: string | null;
+  publish_at: string | null;
   upvote_count: number;
   upvoted_by_me: boolean;
 };

@@ -2,11 +2,9 @@ name: Generate Daily NPE Questions
 
 on:
   schedule:
-    # 7:00am AEDT (UTC+11) = 20:00 UTC previous day
-    # 7:00am AEST (UTC+10) = 21:00 UTC previous day
-    # Running at 20:00 UTC covers AEDT (Oct-Apr)
-    # Swap to 21:00 UTC in winter (Apr-Oct) or use a timezone-aware approach
-    - cron: '0 20 * * *'
+    # 6:00am AEST (UTC+10) = 20:00 UTC previous day
+    # Runs Sunday-Thursday UTC, which maps to Monday-Friday 6:00am AEST
+    - cron: '0 20 * * 0-4'
   workflow_dispatch:
     inputs:
       dry_run:

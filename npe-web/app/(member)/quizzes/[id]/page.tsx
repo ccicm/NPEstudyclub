@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { QuizRunner } from "@/components/member/quiz-runner";
+import { getDailyQuizAvailabilityMessage, isDailyQuizLive } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
@@ -8,12 +9,24 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   const { data: quiz } = await supabase
     .from("quizzes")
-    .select("id,title,domain,description")
+    .select("id,title,domain,description,delivery_mode,published_at")
     .eq("id", id)
     .maybeSingle();
 
   if (!quiz) {
     notFound();
+  }
+
+  if (quiz.delivery_mode === "daily" && !isDailyQuizLive()) {
+    return (
+      <div className="rounded-2xl border bg-card p-6">
+        <h1 className="text-3xl">{quiz.title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{quiz.domain || "General"}</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          {getDailyQuizAvailabilityMessage() || "Daily quizzes are temporarily unavailable."}
+        </p>
+      </div>
+    );
   }
 
   const { data: questions } = await supabase
