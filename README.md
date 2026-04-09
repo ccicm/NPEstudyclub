@@ -15,6 +15,8 @@ Private study hub for approved provisional psychologists preparing for the Natio
 
 See [npe-web/README.md](npe-web/README.md) for local setup and contribution guidelines.
 
+Older planning/spec drafts were archived to `docs/archive/` to keep the repo root focused on active handoff docs.
+
 ## Quick Links
 
 * **App:** https://npestudyclub.online

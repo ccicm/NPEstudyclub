@@ -35,6 +35,7 @@ This file tracks current state only (not historical debugging notes).
 
 ## Deferred To Tomorrow
 
+- Resource storage setup is the first task: use [RESOURCE_SETUP_TOMORROW.md](RESOURCE_SETUP_TOMORROW.md).
 - Finish the generator polish pass with a fresh agent after reviewing real output.
 - Keep the work documentation-led for now; do not add more implementation changes before that review.
 - Use [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md) as the starting point for the handoff.

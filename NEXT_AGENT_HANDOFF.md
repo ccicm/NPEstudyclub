@@ -2,8 +2,11 @@
 
 This repo is ready for a fresh agent to continue the final polish pass tomorrow.
 
+Resource setup is a hard priority before polish work.
+
 ## What to pick up
 
+- Complete [RESOURCE_SETUP_TOMORROW.md](RESOURCE_SETUP_TOMORROW.md) first.
 - Review the current generator output for repetition across adjacent days.
 - Expand the template bank only where the repetition is still obvious.
 - Preserve the source registry checks and the current CI flow.
@@ -25,6 +28,7 @@ This repo is ready for a fresh agent to continue the final polish pass tomorrow.
 
 ## Reference docs
 
+- [RESOURCE_SETUP_TOMORROW.md](RESOURCE_SETUP_TOMORROW.md)
 - [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md)
 - [REFACTOR_STATUS.md](REFACTOR_STATUS.md)
 - [npe-web/README.md](npe-web/README.md)
