@@ -10,7 +10,6 @@ async function submitAccessRequest(formData: FormData) {
   const payload = {
     full_name: String(formData.get("full_name") || "").trim(),
     email: String(formData.get("email") || "").trim().toLowerCase(),
-    ahpra_registration: String(formData.get("ahpra_registration") || "").trim(),
     psy_number: String(formData.get("psy_number") || "").trim().toUpperCase(),
     relationship_note: String(formData.get("relationship_note") || "").trim(),
     reason: String(formData.get("reason") || "").trim(),
@@ -18,29 +17,50 @@ async function submitAccessRequest(formData: FormData) {
   };
 
   if (!payload.full_name || !payload.email || !payload.reason || !consentGiven) {
-    return;
+    redirect("/auth/request?error=missing_fields");
   }
 
   const supabase = await createClient();
-  await supabase.from("access_requests").insert(payload);
+  const { error } = await supabase.from("access_requests").insert(payload);
+
+  if (error) {
+    redirect("/auth/request?error=submission_failed");
+  }
 
   redirect("/auth/request-status");
 }
 
-export default function RequestAccessPage() {
+export default function RequestAccessPage({
+  searchParams,
+}: {
+  searchParams?: { error?: string };
+}) {
+  const errorMessage =
+    searchParams?.error === "missing_fields"
+      ? "Please fill in your name, email, reason, and consent before submitting."
+      : searchParams?.error === "submission_failed"
+        ? "We could not save your request. Please try again."
+        : null;
+
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-2xl items-center px-6 py-10">
       <div className="w-full rounded-2xl border bg-card p-8">
         <h1 className="text-3xl">Request access</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Membership is manually approved. Include your AHPRA registration if relevant.
+          Membership is manually approved. Include your PSY number if relevant.
         </p>
 
         <p className="mt-3 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-          Your AHPRA registration number is collected to help verify your provisional psychologist status. It is stored
-          securely and is not shared with third parties. You can request correction or deletion of your information by
-          contacting the organiser.
+          Your PSY number is collected to help verify your provisional psychologist status. It is stored securely and
+          is not shared with third parties. You can request correction or deletion of your information by contacting
+          the organiser.
         </p>
+
+        {errorMessage ? (
+          <p className="mt-4 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {errorMessage}
+          </p>
+        ) : null}
 
         <form action={submitAccessRequest} className="mt-6 space-y-3">
           <input
@@ -57,14 +77,10 @@ export default function RequestAccessPage() {
             className="w-full rounded-md border bg-background px-3 py-2 text-sm"
           />
           <input
-            name="ahpra_registration"
-            placeholder="AHPRA registration number (optional)"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
-          <input
             name="psy_number"
-            pattern="PSY\d{10}"
-            placeholder="AHPRA registration number (PSY0001234567)"
+            pattern="PSY[0-9]{10}"
+            placeholder="PSY0001234567"
+            title="Enter a PSY number in the format PSY followed by 10 digits"
             className="w-full rounded-md border bg-background px-3 py-2 text-sm"
           />
           <input
@@ -82,8 +98,8 @@ export default function RequestAccessPage() {
             <input name="consent_privacy" type="checkbox" required className="mt-0.5" />
             <span>
               I agree to the <Link className="underline" href="/privacy">Privacy Policy</Link> and consent to my
-              personal information, including my AHPRA registration number, being stored for membership verification and
-              participation in NPE Study Club.
+              personal information, including my PSY number, being stored for membership verification and participation
+              in NPE Study Club.
             </span>
           </label>
           <button

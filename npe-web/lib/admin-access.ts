@@ -15,7 +15,6 @@ export async function getAdminSession() {
   const allowAdminBypass =
     process.env.ALLOW_ADMIN_BYPASS === "true" ||
     process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true" ||
     cookieBypass;
 
   const supabase = await createClient();

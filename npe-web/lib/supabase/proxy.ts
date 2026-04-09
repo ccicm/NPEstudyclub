@@ -12,7 +12,6 @@ export async function updateSession(request: NextRequest) {
   const queryBypassDisabled = bypassQuery === "0";
   const allowMemberBypass =
     process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true" ||
     queryBypassEnabled ||
     (bypassCookie && !queryBypassDisabled);
 

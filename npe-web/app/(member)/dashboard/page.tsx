@@ -9,8 +9,7 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   const bypassEnabled =
     process.env.ALLOW_ADMIN_BYPASS === "true" ||
-    process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true";
+    process.env.ALLOW_MEMBER_BYPASS === "true";
 
   const adminEmails = (process.env.ADMIN_EMAIL || "")
     .split(",")

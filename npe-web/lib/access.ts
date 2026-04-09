@@ -6,7 +6,6 @@ export async function isApprovedMember() {
   const cookieBypass = cookieStore.get("member_bypass")?.value === "1";
   const allowMemberBypass =
     process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    process.env.NEXT_PUBLIC_ALLOW_MEMBER_BYPASS === "true" ||
     cookieBypass;
 
   if (allowMemberBypass) {
