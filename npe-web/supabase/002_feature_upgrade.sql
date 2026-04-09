@@ -128,7 +128,10 @@ using (public.is_approved_member());
 
 create policy "Users can insert quizzes"
 on public.quizzes for insert
-with check (auth.uid() = created_by and public.is_approved_member());
+with check (
+  (auth.uid() = created_by and public.is_approved_member())
+  or auth.role() = 'service_role'
+);
 
 create policy "Authenticated users can read quiz_questions"
 on public.quiz_questions for select
@@ -137,8 +140,11 @@ using (public.is_approved_member());
 create policy "Users can insert quiz_questions"
 on public.quiz_questions for insert
 with check (
-  auth.uid() = (select created_by from public.quizzes where id = quiz_id)
-  and public.is_approved_member()
+  (
+    auth.uid() = (select created_by from public.quizzes where id = quiz_id)
+    and public.is_approved_member()
+  )
+  or auth.role() = 'service_role'
 );
 
 create policy "Users can read own quiz_results"

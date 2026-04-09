@@ -65,6 +65,26 @@ function getSupabaseConfig() {
     throw new Error('Missing Supabase service role key. Set SUPABASE_SERVICE_ROLE_KEY in GitHub Secrets or .env.local.');
   }
 
+  try {
+    const parts = serviceRoleKey.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Supabase key is not a JWT.');
+    }
+
+    const payloadRaw = Buffer.from(parts[1], 'base64url').toString('utf8');
+    const payload = JSON.parse(payloadRaw);
+
+    if (payload.role !== 'service_role') {
+      throw new Error(
+        `SUPABASE_SERVICE_ROLE_KEY has role "${payload.role || 'unknown'}". Expected "service_role".`,
+      );
+    }
+  } catch (error) {
+    throw new Error(
+      `Invalid SUPABASE_SERVICE_ROLE_KEY: ${error instanceof Error ? error.message : 'could not parse key payload'}`,
+    );
+  }
+
   return { supabaseUrl, serviceRoleKey };
 }
 
