@@ -54,6 +54,7 @@ This brief covers schema design, seed data format, and the initial question gene
    - Distractor explanations (why each incorrect option is wrong)
    - Seeded difficulty label per question
 4. Flagging: users can flag any question post-submission as contested. Once flagged by >1% of quiz takers, question is pushed to a community discussion board for review.
+5. Explanation quality verification: users can thumbs up/down each post-submission explanation. If downvotes exceed the configured threshold (currently 20%), the question is automatically pushed to the community board for review.
 
 **Nothing is revealed mid-quiz.**
 
@@ -167,6 +168,86 @@ User's rolling performance profile (by domain, subdomain, difficulty) feeds dash
 4. Minimum response threshold for switching from `difficulty_seed` to `difficulty_score` display (suggest n = 30, confirm)
 5. `user_responses` table schema — needs user_id, question_id, selected_answer, is_correct, set_id, timestamp at minimum
 6. Community discussion board integration — is this a separate Supabase table or an external tool?
+
+## Resolutions (implemented in Codespace)
+
+### 1) ID format for `id`
+- **Decision:** Use **UUID** for `quiz_questions.id` (current schema already uses UUID everywhere for quiz entities).
+- **Reason:** Consistent with existing tables (`quizzes`, `quiz_questions`, `quiz_results`) and safer for concurrent/distributed inserts.
+
+### 2) Seed file strategy
+- **Decision:** Use **one JSON file per set** (array of questions in each file), not one file per question.
+- **Reason:** Keeps review context together (daily/fortnightly/targeted set-level quality), while still producing readable Git diffs.
+- **Naming direction:** keep current set-style naming (`daily-set-001.json`, `full-exam-001.json`, etc.).
+
+### 3) Difficulty computation: trigger vs edge function
+- **Decision:** Use a **Postgres trigger path** in Supabase.
+- **Implementation:** `user_responses` writes trigger a metrics refresh function that updates:
+  - `quiz_questions.attempts_count`
+  - `quiz_questions.correct_count`
+  - `quiz_questions.difficulty_score`
+
+### 4) Minimum response threshold
+- **Decision:** **n = 30**.
+- **Implementation detail:** `difficulty_score` remains `NULL` until attempts reach 30, then stores:
+
+```sql
+difficulty_score = correct_count::numeric / attempts_count::numeric
+```
+
+### 5) `user_responses` schema
+- **Implemented table:** `public.user_responses`
+- Fields include:
+  - `user_id`
+  - `quiz_id`
+  - `question_id`
+  - `attempt_id`
+  - `selected_answer`
+  - `is_correct`
+  - `set_id`
+  - `submitted_at`
+- `is_correct` is validated server-side by comparing `selected_answer` against `quiz_questions.correct_answer`.
+
+### 6) Community board integration
+- **Decision:** Keep this **inside Supabase** using existing forum tables.
+- **Implementation path:**
+  - `question_flags` table captures user contest flags (one flag per user per question)
+  - trigger computes contest ratio (`flags / distinct_takers`)
+  - if ratio > 1%, create a forum thread automatically and store linkage in `question_reviews` + `quiz_questions.review_thread_id`
+
+## Migration added
+
+The following migration was added to implement the above:
+
+- `supabase/004_quiz_pipeline_upgrade.sql`
+
+Explanation verification pipeline:
+
+- `supabase/005_explanation_feedback.sql`
+- Adds `explanation_feedback` votes (`up`/`down`) with one vote per user per question
+- Maintains question-level vote counters on `quiz_questions`
+- Auto-escalates to `forum_threads` when explanation downvote ratio exceeds threshold (20%)
+
+Config + moderation enhancements:
+
+- `supabase/006_explanation_feedback_settings.sql`
+- Adds `quiz_settings` table with configurable `explanation_downvote_threshold`
+- Escalation and contested-state functions read threshold from settings (default 20%)
+- Admin page now includes:
+  - threshold editor (% input)
+  - contested explanation queue (downvote ratio + direct community thread link)
+
+It extends existing quiz tables (non-breaking), adds response/flag tables, adds trigger functions, and creates a `user_performance` view.
+
+## Important current app gap to schedule next
+
+Current frontend still runs in legacy mode:
+- 4-option flow (`A-D`) in the quiz builder/runner
+- answer reveal occurs per question during the attempt
+
+To fully match this brief, frontend quiz flow should be updated to:
+- support `A-E`
+- defer all correctness/explanations until end-of-set submission
 
 ---
 

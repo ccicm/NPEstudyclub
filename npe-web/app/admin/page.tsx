@@ -17,6 +17,14 @@ type AccessRequest = {
   created_at: string;
 };
 
+type ContestedExplanation = {
+  id: string;
+  question_text: string;
+  explanation_upvotes_count: number;
+  explanation_downvotes_count: number;
+  explanation_review_thread_id: string | null;
+};
+
 async function reviewRequest(formData: FormData) {
   "use server";
 
@@ -85,6 +93,36 @@ async function approveMyselfNow() {
   redirect("/dashboard?admin=1");
 }
 
+async function updateExplanationThreshold(formData: FormData) {
+  "use server";
+
+  await requireAdmin();
+
+  const rawPercent = String(formData.get("threshold_percent") || "").trim();
+  const parsedPercent = Number(rawPercent);
+
+  if (Number.isNaN(parsedPercent) || parsedPercent <= 0 || parsedPercent >= 100) {
+    return;
+  }
+
+  const ratio = Number((parsedPercent / 100).toFixed(4));
+
+  try {
+    const adminClient = createAdminClient();
+    await adminClient.from("quiz_settings").upsert(
+      {
+        key: "explanation_downvote_threshold",
+        value: { ratio },
+      },
+      { onConflict: "key" },
+    );
+  } catch {
+    // Admin page already surfaces loading constraints through preview/error states.
+  }
+
+  revalidatePath("/admin");
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
@@ -92,12 +130,14 @@ export default async function AdminPage() {
 
   let pendingRequests: AccessRequest[] = [];
   let recentRequests: AccessRequest[] = [];
+  let contestedExplanations: ContestedExplanation[] = [];
+  let explanationThresholdPercent = 20;
   let loadError: string | null = null;
 
   try {
     const adminClient = createAdminClient();
 
-    const [{ data: pending, error: pendingError }, { data: recent, error: recentError }] = await Promise.all([
+    const [{ data: pending, error: pendingError }, { data: recent, error: recentError }, { data: setting }, { data: contested, error: contestedError }] = await Promise.all([
       adminClient
         .from("access_requests")
         .select("id,full_name,email,ahpra_registration,psy_number,relationship_note,reason,status,created_at")
@@ -109,14 +149,33 @@ export default async function AdminPage() {
         .in("status", ["approved", "declined"])
         .order("created_at", { ascending: false })
         .limit(20),
+      adminClient
+        .from("quiz_settings")
+        .select("value")
+        .eq("key", "explanation_downvote_threshold")
+        .maybeSingle(),
+      adminClient
+        .from("quiz_questions")
+        .select(
+          "id,question_text,explanation_upvotes_count,explanation_downvotes_count,explanation_review_thread_id",
+        )
+        .eq("explanation_contested", true)
+        .order("explanation_downvotes_count", { ascending: false })
+        .limit(50),
     ]);
 
-    if (pendingError || recentError) {
-      loadError = pendingError?.message || recentError?.message || "Failed to load requests.";
+    if (pendingError || recentError || contestedError) {
+      loadError = pendingError?.message || recentError?.message || contestedError?.message || "Failed to load admin data.";
     }
 
     pendingRequests = (pending as AccessRequest[] | null) || [];
     recentRequests = (recent as AccessRequest[] | null) || [];
+    contestedExplanations = (contested as ContestedExplanation[] | null) || [];
+
+    const ratio = Number((setting?.value as { ratio?: unknown } | null)?.ratio);
+    if (!Number.isNaN(ratio) && ratio > 0 && ratio < 1) {
+      explanationThresholdPercent = Math.round(ratio * 100);
+    }
   } catch (error) {
     loadError = error instanceof Error ? error.message : "Admin client is not configured.";
   }
@@ -163,6 +222,92 @@ export default async function AdminPage() {
           <p className="mt-1 text-sm">{loadError}</p>
         </section>
       ) : null}
+
+      <section className="mt-6 rounded-2xl border bg-card p-6">
+        <h2 className="text-2xl">Quiz explanation moderation</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Configure downvote threshold and review contested AI-generated explanations.
+        </p>
+
+        {!process.env.SUPABASE_SERVICE_ROLE_KEY ? (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Settings are hidden until a service key is configured.
+          </p>
+        ) : (
+          <>
+            <form action={updateExplanationThreshold} className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border bg-background p-4">
+              <label className="grid gap-1 text-sm">
+                <span>Downvote escalation threshold (%)</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={99}
+                  step={1}
+                  name="threshold_percent"
+                  defaultValue={String(explanationThresholdPercent)}
+                  className="h-10 w-44 rounded-md border bg-card px-3"
+                />
+              </label>
+              <button
+                type="submit"
+                className="h-10 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground"
+              >
+                Save threshold
+              </button>
+              <p className="text-xs text-muted-foreground">
+                Current: {explanationThresholdPercent}% downvotes required for community escalation.
+              </p>
+            </form>
+
+            {!contestedExplanations.length ? (
+              <p className="mt-4 text-sm text-muted-foreground">No contested explanations right now.</p>
+            ) : (
+              <div className="mt-4 overflow-x-auto rounded-xl border bg-background">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="border-b bg-muted/40">
+                    <tr>
+                      <th className="px-4 py-3">Question</th>
+                      <th className="px-4 py-3">Votes</th>
+                      <th className="px-4 py-3">Downvote %</th>
+                      <th className="px-4 py-3">Community thread</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contestedExplanations.map((item) => {
+                      const totalVotes = item.explanation_upvotes_count + item.explanation_downvotes_count;
+                      const downvotePercent = totalVotes
+                        ? Math.round((item.explanation_downvotes_count / totalVotes) * 100)
+                        : 0;
+
+                      return (
+                        <tr key={item.id} className="border-b last:border-0">
+                          <td className="px-4 py-3">
+                            <p className="line-clamp-2 max-w-xl">{item.question_text}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Question ID: {item.id}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            {item.explanation_upvotes_count} up / {item.explanation_downvotes_count} down
+                          </td>
+                          <td className="px-4 py-3">{downvotePercent}%</td>
+                          <td className="px-4 py-3">
+                            {item.explanation_review_thread_id ? (
+                              <Link href={`/community/${item.explanation_review_thread_id}`} className="underline">
+                                Open thread
+                              </Link>
+                            ) : (
+                              <span className="text-muted-foreground">Pending thread link</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+      </section>
 
       <section className="mt-6 rounded-2xl border bg-card p-6">
         <h2 className="text-2xl">Pending requests</h2>

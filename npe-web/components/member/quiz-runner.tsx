@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
-import { saveQuizResultAction } from "@/app/(member)/quizzes/actions";
+import { saveQuizResultAction, voteExplanationAction } from "@/app/(member)/quizzes/actions";
 
 type QuizQuestion = {
   id: string;
@@ -20,6 +20,8 @@ type AnswerRecord = {
   correct: number;
 };
 
+type FeedbackVote = "up" | "down";
+
 export function QuizRunner({
   quiz,
   questions,
@@ -32,6 +34,8 @@ export function QuizRunner({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const current = questions[index];
@@ -51,6 +55,20 @@ export function QuizRunner({
         totalQuestions: questions.length,
         answers: finalAnswers,
       });
+    });
+  };
+
+  const submitFeedbackVote = (questionId: string, vote: FeedbackVote) => {
+    setFeedbackMessage(null);
+    setFeedbackVotes((previous) => ({ ...previous, [questionId]: vote }));
+
+    startTransition(async () => {
+      const result = await voteExplanationAction({ questionId, vote });
+      if (!result.ok) {
+        setFeedbackMessage("Could not save your feedback right now.");
+        return;
+      }
+      setFeedbackMessage("Thanks. Your explanation feedback has been recorded.");
     });
   };
 
@@ -123,10 +141,12 @@ export function QuizRunner({
 
         <div className="rounded-2xl border bg-card p-6">
           <h2 className="text-2xl">Question breakdown</h2>
+          {feedbackMessage ? <p className="mt-2 text-xs text-muted-foreground">{feedbackMessage}</p> : null}
           <div className="mt-3 space-y-2">
             {questions.map((question, questionIndex) => {
               const answer = answers[questionIndex];
               const correct = answer?.selected === answer?.correct;
+              const voted = feedbackVotes[question.id];
               return (
                 <details key={question.id} className="rounded-lg border bg-background p-3">
                   <summary className="cursor-pointer text-sm font-semibold">
@@ -136,7 +156,32 @@ export function QuizRunner({
                   <p className="mt-1 text-sm text-muted-foreground">
                     Your answer: {question.options[answer?.selected ?? 0]?.label || "-"} · Correct: {question.options[answer?.correct ?? 0]?.label}
                   </p>
-                  {question.explanation ? <p className="mt-1 text-sm text-muted-foreground">{question.explanation}</p> : null}
+                  {question.explanation ? (
+                    <>
+                      <p className="mt-1 text-sm text-muted-foreground">{question.explanation}</p>
+                      <div className="mt-2 flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground">Was this explanation helpful?</span>
+                        <button
+                          type="button"
+                          onClick={() => submitFeedbackVote(question.id, "up")}
+                          className={`rounded-md border px-2 py-1 ${
+                            voted === "up" ? "border-green-600 bg-green-50" : "bg-card"
+                          }`}
+                        >
+                          Thumb up
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => submitFeedbackVote(question.id, "down")}
+                          className={`rounded-md border px-2 py-1 ${
+                            voted === "down" ? "border-red-600 bg-red-50" : "bg-card"
+                          }`}
+                        >
+                          Thumb down
+                        </button>
+                      </div>
+                    </>
+                  ) : null}
                 </details>
               );
             })}
