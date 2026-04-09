@@ -6,9 +6,8 @@ Private study hub for approved provisional psychologists preparing for the Natio
 
 - **App:** Vercel (Next.js)
 - **Database:** Supabase PostgreSQL
-- **File Storage - user info:** Supabase Storage (private `resources` bucket)
-- **File Storage - resources:** DigitalOcean Spaces Storage Object
-- **Auth:** Supabase Auth (magic-link & password-based)
+- **File Storage:** DigitalOcean Spaces (resource files) + Supabase DB metadata
+- **Auth:** Supabase Auth (password-first, with email confirm/reset flows)
 - **Domain:** https://npestudyclub.online
 - **GitHub:** GitHub Education Package active - prioritise included products where possible
 

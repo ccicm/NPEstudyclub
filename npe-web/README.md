@@ -37,7 +37,7 @@ Open `http://localhost:3000`.
 
 ## Launch Checklist
 
-- Enable Supabase Email auth for magic links.
+- Enable Supabase Email auth for account confirmation and password reset emails.
 - Set the Supabase Site URL to `https://npestudyclub.online`.
 - Add redirect URLs for local dev and production:
 	- `http://localhost:3000`
@@ -61,7 +61,8 @@ Open `http://localhost:3000`.
 - `/` public landing page
 - `/auth/request` access request form
 - `/privacy` privacy policy
-- `/auth/login` magic-link sign in
+- `/auth/login` member sign in (email + password)
+- `/auth/sign-up` create password for approved member email
 - `/auth/request-status` pending approval notice
 - `/dashboard` member overview
 - `/resources` resource library
@@ -82,9 +83,9 @@ Open `http://localhost:3000`.
 If you are locked out, use this sequence:
 
 1. Set `ADMIN_EMAIL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`.
-2. Run `npm run dev` and sign in from `/auth/login` with the `ADMIN_EMAIL` address.
+2. Run `npm run dev` and sign in from `/auth/login` with your `ADMIN_EMAIL` + password.
 3. Open `/admin` and approve your own access request.
-4. If magic links are failing temporarily, set `ALLOW_MEMBER_BYPASS=true` to unblock yourself, then set it back to `false` once approvals are working.
+4. If you used emergency bypass earlier, open `/dashboard?admin=0` to clear bypass cookie and return to normal auth checks.
 
 ## Notes
 

@@ -116,8 +116,8 @@ export default async function Home() {
               <p className="mt-1">Create your password and use the full dashboard.</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <p className="mt-6 text-sm text-muted-foreground">Read our <Link href="/privacy" className="underline">Privacy Policy</Link>.</p>
     </main>
