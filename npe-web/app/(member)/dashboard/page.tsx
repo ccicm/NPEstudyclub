@@ -67,6 +67,32 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-3xl border bg-card p-8 shadow-sm md:p-10">
+        <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr]">
+          <div>
+            <h1 className="text-4xl leading-tight md:text-5xl">Member Dashboard</h1>
+            <p className="mt-3 max-w-2xl text-base text-muted-foreground">
+              Your study hub for resources, schedule, quizzes, and plan tracking.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/resources" className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+                Open resources
+              </Link>
+              <Link href="/study-plan" className="rounded-md border bg-background px-4 py-2 text-sm font-semibold">
+                Open study plan
+              </Link>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-accent p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground">Account</p>
+            <p className="mt-2 break-all text-sm text-accent-foreground/90">{user?.email}</p>
+            <p className="mt-3 text-sm text-accent-foreground/80">
+              Signed in and approved for member features.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {isAdmin ? (
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

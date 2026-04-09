@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QUICK_LINKS } from "@/lib/quick-links";
 import { createClient } from "@/lib/supabase/server";
@@ -19,6 +18,7 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let isApproved = false;
   if (user?.email) {
     const { data } = await supabase
       .from("approved_users")
@@ -27,10 +27,13 @@ export default async function Home() {
       .eq("status", "approved")
       .limit(1);
 
-    if (data?.length) {
-      redirect("/dashboard");
-    }
+    isApproved = Boolean(data?.length);
   }
+
+  const memberDestination = isApproved ? "/dashboard" : "/auth/login";
+  const resourcesDestination = isApproved ? "/resources" : "/auth/login";
+  const scheduleDestination = isApproved ? "/schedule" : "/auth/login";
+  const communityDestination = isApproved ? "/community" : "/auth/login";
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-8">
@@ -44,7 +47,7 @@ export default async function Home() {
             <Link href="/auth/request">Request access</Link>
           </Button>
           <Button asChild>
-            <Link href="/auth/login">Member sign in</Link>
+            <Link href={memberDestination}>{isApproved ? "Open dashboard" : "Member sign in"}</Link>
           </Button>
         </div>
       </header>
@@ -59,10 +62,10 @@ export default async function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link href="/auth/request">Apply for membership</Link>
+                <Link href={isApproved ? "/dashboard" : "/auth/request"}>{isApproved ? "Go to dashboard" : "Apply for membership"}</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/auth/login">Already approved? Sign in</Link>
+                <Link href={memberDestination}>{isApproved ? "Open member area" : "Already approved? Sign in"}</Link>
               </Button>
             </div>
           </div>
@@ -84,31 +87,37 @@ export default async function Home() {
       </section>
 
       <section className="mt-10 grid gap-4 md:grid-cols-3">
-        <Link href="/auth/request" className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
+        <Link href={resourcesDestination} className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
           <article>
             <h2 className="text-2xl">Resources</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Curated PDFs, protocols, and exam prep materials organised by topic, with private file access for members.
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary">Open request form -&gt;</p>
+            <p className="mt-3 text-sm font-semibold text-primary">
+              {isApproved ? "Open resources -&gt;" : "Sign in to open -&gt;"}
+            </p>
           </article>
         </Link>
-        <Link href="/auth/request" className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
+        <Link href={scheduleDestination} className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
           <article>
             <h2 className="text-2xl">Schedule</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Shared calendar with weekly sessions, ad-hoc meetups, and exam window markers.
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary">Open request form -&gt;</p>
+            <p className="mt-3 text-sm font-semibold text-primary">
+              {isApproved ? "Open schedule -&gt;" : "Sign in to open -&gt;"}
+            </p>
           </article>
         </Link>
-        <Link href="/auth/request" className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
+        <Link href={communityDestination} className="rounded-2xl border bg-card p-6 transition hover:bg-muted/30">
           <article>
             <h2 className="text-2xl">Community</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Private noticeboard/forum for announcements, questions, resource requests, and replies.
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary">Open request form -&gt;</p>
+            <p className="mt-3 text-sm font-semibold text-primary">
+              {isApproved ? "Open community -&gt;" : "Sign in to open -&gt;"}
+            </p>
           </article>
         </Link>
       </section>
