@@ -1,0 +1,125 @@
+{
+  "sources": [
+    {
+      "id": "pba-code-conduct",
+      "citation": "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+      "aliases": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "Psychology Board of Australia Code of Conduct (2020), Section 7 — Collaboration and teamwork",
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "Psychology Board of Australia Code of Conduct (2020), Section 10 — Professional supervision and training"
+      ],
+      "url": "https://www.psychologyboard.gov.au/Code-Guidelines/Code-of-Conduct.aspx",
+      "domains": ["Assessment", "Interventions", "Communication", "Ethics"],
+      "notes": "Core conduct, person-centred practice, good care, records, and collaboration."
+    },
+    {
+      "id": "pba-confidentiality",
+      "citation": "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+      "url": "https://www.psychologyboard.gov.au/Code-Guidelines/Code-of-Conduct.aspx",
+      "domains": ["Ethics", "Communication"],
+      "notes": "Confidentiality, disclosure, and privacy handling."
+    },
+    {
+      "id": "pba-records",
+      "citation": "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+      "url": "https://www.psychologyboard.gov.au/Code-Guidelines/Code-of-Conduct.aspx",
+      "domains": ["Ethics", "Communication"],
+      "notes": "Documentation, record keeping, and reports."
+    },
+    {
+      "id": "pba-supervision",
+      "citation": "Psychology Board of Australia Code of Conduct (2020), Section 10 — Professional supervision and training",
+      "url": "https://www.psychologyboard.gov.au/Code-Guidelines/Code-of-Conduct.aspx",
+      "domains": ["Ethics", "Interventions"],
+      "notes": "Supervision, scope, and training obligations."
+    },
+    {
+      "id": "aps-principle-a",
+      "citation": "APS Code of Ethics (2007, amended 2023), Principle A — Respect for the rights and dignity of people and peoples",
+      "aliases": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.1 — General Respect",
+        "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "APS Code of Ethics (2007, amended 2023), Principle A.1 — General Respect"
+      ],
+      "url": "https://psychology.org.au/about-us/what-we-do/ethics-and-practice-standards/aps-code-of-ethics",
+      "domains": ["Ethics", "Communication"],
+      "notes": "Respect, consent, privacy, cultural responsiveness."
+    },
+    {
+      "id": "aps-principle-b",
+      "citation": "APS Code of Ethics (2007, amended 2023), Principle B — Propriety",
+      "aliases": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "url": "https://psychology.org.au/about-us/what-we-do/ethics-and-practice-standards/aps-code-of-ethics",
+      "domains": ["Ethics", "Interventions", "Assessment"],
+      "notes": "Competence, boundaries, risk management, and service quality."
+    },
+    {
+      "id": "aps-principle-c",
+      "citation": "APS Code of Ethics (2007, amended 2023), Principle C — Integrity",
+      "aliases": [
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "url": "https://psychology.org.au/about-us/what-we-do/ethics-and-practice-standards/aps-code-of-ethics",
+      "domains": ["Ethics", "Communication"],
+      "notes": "Honesty, accurate records, reports, and professional integrity."
+    },
+    {
+      "id": "privacy-app6",
+      "citation": "Privacy Act 1988 (Cth), Australian Privacy Principle 6",
+      "aliases": [
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "url": "https://www.oaic.gov.au/privacy/australian-privacy-principles-guidelines/ipp-6-use-or-disclosure",
+      "domains": ["Ethics", "Communication"],
+      "notes": "Use and disclosure of personal information."
+    },
+    {
+      "id": "npr-law-s140",
+      "citation": "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications",
+      "aliases": [
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "url": "https://www.ahpra.gov.au/About-AHPRA/What-we-do/Legislation.aspx",
+      "domains": ["Assessment", "Ethics"],
+      "notes": "Mandatory notifications and immediate safety-related obligations."
+    },
+    {
+      "id": "cbt-beck-1979",
+      "citation": "Beck et al. (1979), Cognitive Therapy of Depression",
+      "aliases": [
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "url": "https://books.google.com/books?id=1Jq6QgAACAAJ",
+      "domains": ["Interventions"],
+      "notes": "Core CBT reference for behavioural activation and cognitive restructuring."
+    },
+    {
+      "id": "ahpra-npe",
+      "citation": "AHPRA National Psychology Exam guidance",
+      "aliases": [
+        "AHPRA National Psychology Exam guidance"
+      ],
+      "url": "https://www.ahpra.gov.au/Registration/Registration-Exams/National-psychology-exam.aspx",
+      "domains": ["Assessment", "Interventions", "Communication", "Ethics"],
+      "notes": "Official exam information and candidate guidance."
+    },
+    {
+      "id": "ahpra-guidelines",
+      "citation": "AHPRA Guidelines for registered health practitioners (2014)",
+      "aliases": [
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "url": "https://www.ahpra.gov.au/Resources/Guides/Guidelines-for-registered-health-practitioners.aspx",
+      "domains": ["Ethics", "Assessment", "Interventions", "Communication"],
+      "notes": "General AHPRA practice guidance used for safe, compliant professional conduct."
+    }
+  ]
+}

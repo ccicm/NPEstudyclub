@@ -9,6 +9,15 @@ const path = require('path');
 const MODE = process.env.GENERATION_MODE || 'daily';
 const DRY_RUN = process.env.DRY_RUN === 'true';
 const STAGING_DIR = path.join(__dirname, '../seed/staging');
+const SOURCE_BANK = JSON.parse(fs.readFileSync(path.join(__dirname, './source-bank.json'), 'utf8'));
+const SOURCE_CITATIONS = new Map();
+
+for (const source of SOURCE_BANK.sources) {
+  SOURCE_CITATIONS.set(source.citation, source);
+  for (const alias of source.aliases || []) {
+    SOURCE_CITATIONS.set(alias, source);
+  }
+}
 
 const DOMAIN_DISTRIBUTION = {
   daily: [
@@ -137,6 +146,12 @@ function validateQuestion(q, index) {
 
   if (!Array.isArray(q.citations) || q.citations.length === 0) {
     throw new Error(`Question ${index}: citations must be a non-empty array`);
+  }
+
+  for (const citation of q.citations) {
+    if (!SOURCE_CITATIONS.has(citation)) {
+      throw new Error(`Question ${index}: unknown citation "${citation}". Add it to scripts/source-bank.json first.`);
+    }
   }
 
   q.difficulty_score = null;
