@@ -35,9 +35,31 @@ const STAGING_DIR = path.join(__dirname, '../seed/staging');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+function getSupabaseConfig() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+
+  if (!supabaseUrl || !/^https?:\/\//i.test(supabaseUrl)) {
+    throw new Error(
+      'Missing or invalid Supabase URL. Set NEXT_PUBLIC_SUPABASE_URL to the full https:// project URL in GitHub Secrets or .env.local.',
+    );
+  }
+
+  if (!serviceRoleKey) {
+    throw new Error(
+      'Missing Supabase service role key. Set SUPABASE_SERVICE_ROLE_KEY in GitHub Secrets or .env.local.',
+    );
+  }
+
+  return { supabaseUrl, serviceRoleKey };
+}
+
 const supabase = DRY_RUN
   ? null
-  : createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  : (() => {
+      const { supabaseUrl, serviceRoleKey } = getSupabaseConfig();
+      return createClient(supabaseUrl, serviceRoleKey);
+    })();
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
