@@ -4,6 +4,9 @@ import { addAdHocSession } from "./actions";
 
 export default async function SchedulePage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: sessions } = await supabase
     .from("sessions")
@@ -12,5 +15,19 @@ export default async function SchedulePage() {
     .order("scheduled_at", { ascending: true })
     .limit(50);
 
-  return <ScheduleCalendar sessions={sessions ?? []} addSessionAction={addAdHocSession} />;
+  const { data: studyPlan } = user
+    ? await supabase.from("study_plans").select("id").eq("user_id", user.id).maybeSingle()
+    : { data: null };
+
+  const { data: studyPlanWeeks } = studyPlan
+    ? await supabase
+        .from("study_plan_weeks")
+        .select("id,week_start,preferred_days,domain_focus")
+        .eq("study_plan_id", studyPlan.id)
+        .order("week_start", { ascending: true })
+    : { data: null };
+
+  return (
+    <ScheduleCalendar sessions={sessions ?? []} studyPlanWeeks={studyPlanWeeks ?? []} addSessionAction={addAdHocSession} />
+  );
 }

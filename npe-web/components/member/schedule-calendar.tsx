@@ -13,6 +13,13 @@ type Session = {
   video_link: string | null;
 };
 
+type StudyPlanWeek = {
+  id: string;
+  week_start: string;
+  preferred_days: string[] | string;
+  domain_focus: string;
+};
+
 type DayEvent =
   | {
       kind: "session";
@@ -22,6 +29,14 @@ type DayEvent =
       at: Date;
       description: string | null;
       videoLink: string | null;
+    }
+  | {
+      kind: "studyBlock";
+      id: string;
+      title: string;
+      domainFocus: string;
+      at: Date;
+      sessionType: "Study plan";
     }
   | {
       kind: "window";
@@ -50,6 +65,7 @@ function dateKey(date: Date) {
 
 function eventPillClass(event: DayEvent) {
   if (event.kind === "window") return "bg-amber-100 text-amber-700";
+  if (event.kind === "studyBlock") return "bg-violet-100 text-violet-700";
   return event.sessionType === "Ad-hoc" ? "bg-primary/15 text-primary" : "bg-slate-800 text-slate-100";
 }
 
@@ -69,12 +85,15 @@ const TOPICS = [
 
 export function ScheduleCalendar({
   sessions,
+  studyPlanWeeks = [],
   addSessionAction,
 }: {
   sessions: Session[];
+  studyPlanWeeks?: StudyPlanWeek[];
   addSessionAction: (formData: FormData) => Promise<void>;
 }) {
   const [viewDate, setViewDate] = useState(() => new Date());
+  const [filter, setFilter] = useState<"all" | "group" | "adhoc" | "mine">("all");
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [showForm, setShowForm] = useState(false);
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -101,6 +120,34 @@ export function ScheduleCalendar({
       });
     });
 
+    studyPlanWeeks.forEach((week) => {
+      const weekStart = new Date(week.week_start);
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const preferredDays = Array.isArray(week.preferred_days)
+        ? week.preferred_days
+        : String(week.preferred_days || "")
+            .split(",")
+            .map((day) => day.trim())
+            .filter(Boolean);
+
+      for (let i = 0; i < 7; i += 1) {
+        const dayDate = new Date(weekStart);
+        dayDate.setDate(weekStart.getDate() + i);
+        const dayName = daysOfWeek[dayDate.getDay()];
+
+        if (preferredDays.includes(dayName)) {
+          addEvent(dateKey(dayDate), {
+            kind: "studyBlock",
+            id: `study-${week.id}-${i}`,
+            title: `Study: ${week.domain_focus}`,
+            domainFocus: week.domain_focus,
+            at: dayDate,
+            sessionType: "Study plan",
+          });
+        }
+      }
+    });
+
     EXAM_WINDOWS.forEach((window) => {
       const { start, end } = windowToDates(window);
       const cursor = new Date(start);
@@ -116,15 +163,50 @@ export function ScheduleCalendar({
     });
 
     return eventsByDay;
-  }, [sessions]);
+  }, [sessions, studyPlanWeeks]);
+
+  const filteredEvents = useMemo(() => {
+    const result = new Map<string, DayEvent[]>();
+
+    for (const [date, events] of allEvents.entries()) {
+      const filtered = events.filter((event) => {
+        if (event.kind === "window") return true;
+        if (filter === "all") return true;
+        if (filter === "group") return event.kind === "session" && event.sessionType !== "Ad-hoc";
+        if (filter === "adhoc") return event.kind === "session" && event.sessionType === "Ad-hoc";
+        if (filter === "mine") return event.kind === "session" && event.sessionType === "Personal";
+        return false;
+      });
+
+      if (filtered.length > 0) {
+        result.set(date, filtered);
+      }
+    }
+
+    return result;
+  }, [allEvents, filter]);
 
   const visibleDays = useMemo(() => monthMatrix(viewDate), [viewDate]);
-  const selectedEvents = selectedDate ? allEvents.get(dateKey(selectedDate)) ?? [] : [];
+  const selectedEvents = selectedDate ? filteredEvents.get(dateKey(selectedDate)) ?? [] : [];
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl">Schedule</h1>
+        <div className="flex gap-2 flex-wrap">
+          {(["all", "group", "adhoc", "mine"] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setFilter(value)}
+              className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
+                filter === value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {value === "all" ? "All" : value === "group" ? "Group" : value === "adhoc" ? "Ad-hoc" : "My sessions"}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -149,6 +231,25 @@ export function ScheduleCalendar({
             Today
           </button>
         </div>
+
+        <div className="mt-4 flex flex-wrap gap-4 text-sm md:col-span-7">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-slate-800"></div>
+            <span className="text-muted-foreground">Group session</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-primary/15"></div>
+            <span className="text-muted-foreground">Ad-hoc</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-violet-100"></div>
+            <span className="text-muted-foreground">My study plan</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-amber-100"></div>
+            <span className="text-muted-foreground">NPE exam window</span>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-2xl border bg-card p-3 md:p-4">
@@ -161,7 +262,7 @@ export function ScheduleCalendar({
         <div className="grid grid-cols-7 gap-2">
           {visibleDays.map((day) => {
             const key = dateKey(day);
-            const dayEvents = allEvents.get(key) ?? [];
+            const dayEvents = filteredEvents.get(key) ?? [];
             const inMonth = day.getMonth() === viewDate.getMonth();
             const isToday = key === dateKey(new Date());
             const selected = selectedDate ? key === dateKey(selectedDate) : false;
@@ -183,7 +284,7 @@ export function ScheduleCalendar({
                 <div className="mt-1 flex flex-col gap-1">
                   {dayEvents.slice(0, 2).map((event) => (
                     <span key={event.id} className={`truncate rounded-full px-2 py-0.5 text-[10px] ${eventPillClass(event)}`}>
-                      {event.kind === "window" ? "NPE" : event.sessionType}
+                      {event.kind === "window" ? "NPE" : event.kind === "studyBlock" ? "Study" : event.sessionType}
                     </span>
                   ))}
                   {dayEvents.length > 2 ? (
@@ -220,6 +321,12 @@ export function ScheduleCalendar({
                     <a href="https://www.ahpra.gov.au" target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm underline">
                       APS/AHPRA exam info
                     </a>
+                  </>
+                ) : event.kind === "studyBlock" ? (
+                  <>
+                    <p className="font-semibold">{event.title}</p>
+                    <p className="text-sm text-muted-foreground">{event.sessionType}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">Domain focus: {event.domainFocus}</p>
                   </>
                 ) : (
                   <>
@@ -273,6 +380,14 @@ export function ScheduleCalendar({
                     {option}
                   </option>
                 ))}
+              </select>
+            </label>
+            <label className="grid gap-1 text-sm">
+              <span>Session type</span>
+              <select name="session_type" defaultValue="Ad-hoc" className="h-10 rounded-md border bg-background px-3">
+                <option value="Group">Group session</option>
+                <option value="Ad-hoc">Ad-hoc</option>
+                <option value="Personal">Personal study</option>
               </select>
             </label>
 

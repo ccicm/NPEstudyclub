@@ -7,6 +7,7 @@ export async function addAdHocSession(formData: FormData) {
   const hostName = String(formData.get("host_name") || "").trim();
   const date = String(formData.get("date") || "").trim();
   const time = String(formData.get("time") || "19:00").trim();
+  const sessionType = String(formData.get("session_type") || "Ad-hoc").trim();
   const topic = String(formData.get("topic") || "").trim();
   const topicOther = String(formData.get("topic_other") || "").trim();
   const notes = String(formData.get("notes") || "").trim();
@@ -33,7 +34,7 @@ export async function addAdHocSession(formData: FormData) {
 
   await supabase.from("sessions").insert({
     title,
-    session_type: "Ad-hoc",
+    session_type: sessionType,
     scheduled_at: scheduledAt.toISOString(),
     description: description || null,
     video_link: videoLink || null,

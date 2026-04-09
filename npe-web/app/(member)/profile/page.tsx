@@ -68,16 +68,46 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const { data: quizResults, error: quizError } = await supabase
+  const { data: quizResultsRaw, error: quizError } = await supabase
     .from("quiz_results")
-    .select("score,total_questions,completed_at")
+    .select("score, total_questions, completed_at, quizzes(domain)")
     .eq("user_id", user.id);
+
+  type QuizResultWithDomain = {
+    score: number;
+    total_questions: number;
+    completed_at: string;
+    quizzes: { domain?: string } | { domain?: string }[] | null;
+  };
+  const quizResults = (quizResultsRaw ?? []) as QuizResultWithDomain[];
 
   const done = completedCount || 0;
   const total = totalCount || 0;
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-  const quizAttempts = quizError ? [] : quizResults ?? [];
+  const quizAttempts = quizError ? [] : quizResults;
   const quizCount = quizAttempts.length;
+
+  const domainStats = quizAttempts.reduce((acc, result) => {
+    const quizRelation = Array.isArray(result.quizzes) ? result.quizzes[0] : result.quizzes;
+    const domain = quizRelation?.domain || "Other";
+    if (!acc[domain]) {
+      acc[domain] = [];
+    }
+    acc[domain].push(result);
+    return acc;
+  }, {} as Record<string, typeof quizAttempts>);
+
+  const domainPerformance = Object.entries(domainStats)
+    .map(([domain, results]) => ({
+      domain,
+      avg: Math.round(
+        results.reduce((sum, result) => sum + (result.total_questions > 0 ? (result.score / result.total_questions) * 100 : 0), 0) /
+          results.length,
+      ),
+      count: results.length,
+    }))
+    .sort((a, b) => a.avg - b.avg);
+
   const avgQuizPercent = quizCount
     ? Math.round(
         quizAttempts.reduce((sum, result) => {
@@ -143,6 +173,28 @@ export default async function ProfilePage() {
               {quizCount} quizzes taken · Average score: {avgQuizPercent}%
             </p>
           )}
+
+          {domainPerformance.length > 0 ? (
+            <div className="mt-4">
+              <p className="mb-3 text-sm font-semibold">By domain:</p>
+              <div className="grid gap-2 lg:grid-cols-2">
+                {domainPerformance.map((domain) => {
+                  const getColor = (score: number) => {
+                    if (score >= 70) return "bg-green-100 text-green-700";
+                    if (score >= 50) return "bg-amber-100 text-amber-700";
+                    return "bg-red-100 text-red-700";
+                  };
+
+                  return (
+                    <div key={domain.domain} className={`rounded-lg px-3 py-2 text-sm font-semibold ${getColor(domain.avg)}`}>
+                      {domain.domain} - {domain.avg}% ({domain.count})
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
           {!quizCount && !quizError ? (
             <p className="mt-2 text-sm text-muted-foreground">Take a quiz to see your performance by domain.</p>
           ) : null}
