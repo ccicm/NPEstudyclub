@@ -89,59 +89,9 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const [{ count: threadsStarted }, { count: repliesCount }] = await Promise.all([
-    supabase.from("forum_threads").select("id", { count: "exact", head: true }).eq("created_by", user.id),
-    supabase.from("forum_replies").select("id", { count: "exact", head: true }).eq("created_by", user.id),
-  ]);
-
-  const { data: quizResultsRaw, error: quizError } = await supabase
-    .from("quiz_results")
-    .select("score, total_questions, completed_at, quizzes(domain)")
-    .eq("user_id", user.id);
-
-  type QuizResultWithDomain = {
-    score: number;
-    total_questions: number;
-    completed_at: string;
-    quizzes: { domain?: string } | { domain?: string }[] | null;
-  };
-  const quizResults = (quizResultsRaw ?? []) as QuizResultWithDomain[];
-
   const done = completedCount || 0;
   const total = totalCount || 0;
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-  const quizAttempts = quizError ? [] : quizResults;
-  const quizCount = quizAttempts.length;
-
-  const domainStats = quizAttempts.reduce((acc, result) => {
-    const quizRelation = Array.isArray(result.quizzes) ? result.quizzes[0] : result.quizzes;
-    const domain = quizRelation?.domain || "Other";
-    if (!acc[domain]) {
-      acc[domain] = [];
-    }
-    acc[domain].push(result);
-    return acc;
-  }, {} as Record<string, typeof quizAttempts>);
-
-  const domainPerformance = Object.entries(domainStats)
-    .map(([domain, results]) => ({
-      domain,
-      avg: Math.round(
-        results.reduce((sum, result) => sum + (result.total_questions > 0 ? (result.score / result.total_questions) * 100 : 0), 0) /
-          results.length,
-      ),
-      count: results.length,
-    }))
-    .sort((a, b) => a.avg - b.avg);
-
-  const avgQuizPercent = quizCount
-    ? Math.round(
-        quizAttempts.reduce((sum, result) => {
-          const scorePercent = result.total_questions > 0 ? (result.score / result.total_questions) * 100 : 0;
-          return sum + scorePercent;
-        }, 0) / quizCount,
-      )
-    : 0;
 
   return (
     <div className="space-y-4">
@@ -190,44 +140,6 @@ export default async function ProfilePage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border bg-card p-6 lg:col-span-2">
-          <h2 className="text-2xl">Quiz performance</h2>
-          {quizError ? (
-            <p className="mt-2 text-sm text-muted-foreground">Quiz statistics will appear after the quiz module is enabled.</p>
-          ) : (
-            <p className="mt-2 text-sm">
-              {quizCount} quizzes taken · Average score: {avgQuizPercent}%
-            </p>
-          )}
-
-          {domainPerformance.length > 0 ? (
-            <div className="mt-4">
-              <p className="mb-3 text-sm font-semibold">By domain:</p>
-              <div className="grid gap-2 lg:grid-cols-2">
-                {domainPerformance.map((domain) => {
-                  const getColor = (score: number) => {
-                    if (score >= 70) return "bg-green-100 text-green-700";
-                    if (score >= 50) return "bg-amber-100 text-amber-700";
-                    return "bg-red-100 text-red-700";
-                  };
-
-                  return (
-                    <div key={domain.domain} className={`rounded-lg px-3 py-2 text-sm font-semibold ${getColor(domain.avg)}`}>
-                      {domain.domain} - {domain.avg}% ({domain.count})
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-
-          {!quizCount && !quizError ? (
-            <p className="mt-2 text-sm text-muted-foreground">Take a quiz to see your performance by domain.</p>
-          ) : null}
-          <Link href="/quizzes" className="mt-3 inline-block text-sm underline">
-            Browse quizzes
-          </Link>
-        </section>
       </div>
 
       <section className="rounded-2xl border bg-card p-4">
@@ -292,22 +204,6 @@ export default async function ProfilePage() {
           </div>
         </section>
       ) : null}
-
-      <section className="rounded-2xl border bg-card p-4">
-        <h2 className="text-2xl">My Community Activity</h2>
-        <p className="mt-2 text-sm">
-          Threads I started: {threadsStarted || 0}
-        </p>
-        <p className="mt-1 text-sm">
-          Threads I replied to: {repliesCount || 0}
-        </p>
-        {!(threadsStarted || 0) && !(repliesCount || 0) ? (
-          <p className="mt-2 text-sm text-muted-foreground">You have not posted yet - join a thread in Community.</p>
-        ) : null}
-        <Link href="/community?author=me" className="mt-3 inline-block text-sm underline">
-          View my posts
-        </Link>
-      </section>
 
       <div className="rounded-2xl border bg-card p-4">
         <Link href="/resources" className="text-sm underline">Go to Resources to mark items complete</Link>
