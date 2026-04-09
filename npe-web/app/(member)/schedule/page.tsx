@@ -16,23 +16,35 @@ export default async function SchedulePage() {
     .limit(50);
 
   const { data: studyPlan } = user
-    ? await supabase.from("study_plans").select("id").eq("user_id", user.id).maybeSingle()
+    ? await supabase.from("study_plans").select("id,preferred_days").eq("user_id", user.id).maybeSingle()
     : { data: null };
 
   const { data: studyPlanWeeks } = studyPlan
     ? await supabase
         .from("study_plan_weeks")
-        .select("id,week_start,preferred_days,domain_focus")
-        .eq("study_plan_id", studyPlan.id)
+        .select("id,week_start,domain_focus")
+        .eq("plan_id", studyPlan.id)
         .order("week_start", { ascending: true })
     : { data: null };
 
+  const weeksWithDays = (studyPlanWeeks ?? []).map((week) => ({
+    ...week,
+    preferred_days: studyPlan?.preferred_days ?? [],
+  }));
+
   return (
-    <ScheduleCalendar
-      sessions={sessions ?? []}
-      studyPlanWeeks={studyPlanWeeks ?? []}
-      userId={user?.id ?? null}
-      addSessionAction={addAdHocSession}
-    />
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <a href="/schedule/export" className="rounded-md border bg-card px-3 py-2 text-sm font-semibold">
+          Download .ics
+        </a>
+      </div>
+      <ScheduleCalendar
+        sessions={sessions ?? []}
+        studyPlanWeeks={weeksWithDays}
+        userId={user?.id ?? null}
+        addSessionAction={addAdHocSession}
+      />
+    </div>
   );
 }

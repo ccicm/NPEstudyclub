@@ -71,10 +71,17 @@ export function StudyPlanDashboard({
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border bg-card p-5">
-        <h1 className="text-3xl">Study Plan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {weeksUntilExam} weeks until exam · {plan.hours_per_week} hrs planned this week · {progressPercent}% plan complete
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-3xl">Study Plan</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {weeksUntilExam} weeks until exam · {plan.hours_per_week} hrs planned this week · {progressPercent}% plan complete
+            </p>
+          </div>
+          <Link href="/study-plan/export" className="rounded-md border bg-background px-3 py-2 text-sm font-semibold">
+            Download .ics
+          </Link>
+        </div>
       </div>
 
       {currentWeek ? (
