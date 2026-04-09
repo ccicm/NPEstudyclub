@@ -23,7 +23,7 @@ export default async function RequestStatusPage() {
       <div className="w-full rounded-2xl border bg-card p-8">
         <h1 className="text-3xl">Request status</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          If you have submitted a request, it is waiting for manual review. If you are approved, sign in with the same email to enter the member area.
+          If you have submitted a request, it is waiting for manual review. If you are approved, create a password and sign in with the same email to enter the member area.
         </p>
 
         <div className="mt-4 rounded-xl border bg-muted/30 p-4 text-sm">
@@ -43,7 +43,10 @@ export default async function RequestStatusPage() {
             Submit or update request
           </Link>
           <Link className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" href="/auth/login">
-            Try sign in
+            Sign in
+          </Link>
+          <Link className="rounded-md border px-4 py-2 text-sm" href="/auth/sign-up">
+            Create password
           </Link>
           {user && isApproved ? (
             <Link className="rounded-md border px-4 py-2 text-sm font-semibold" href="/dashboard">

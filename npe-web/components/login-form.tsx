@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm({
@@ -23,26 +24,23 @@ export function LoginForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
-    const redirectBase =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-      window.location.origin;
     setIsLoading(true);
     setError(null);
     setNotice(null);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        options: {
-          emailRedirectTo: `${redirectBase}/auth/callback?next=/dashboard`,
-        },
+        password,
       });
       if (error) throw error;
-      setNotice("Check your email for the sign-in link, then open it in this same browser/device.");
+      router.push("/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -56,7 +54,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle className="text-2xl">Member sign in</CardTitle>
           <CardDescription>
-            Enter your approved email. We&apos;ll send a secure sign-in link.
+            Enter your approved email and password to access the member area.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,20 +71,45 @@ export function LoginForm({
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Your password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
               {notice && <p className="text-sm text-emerald-700">{notice}</p>}
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Sending link..." : "Email me a sign-in link"}
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Not approved yet?{" "}
+            <div className="mt-4 space-y-2 text-center text-sm">
+              <div>
+                Need to create your password?{" "}
+                <Link href="/auth/sign-up" className="underline underline-offset-4">
+                  Sign up
+                </Link>
+              </div>
+              <div>
+                Forgot your password?{" "}
+                <Link href="/auth/forgot-password" className="underline underline-offset-4">
+                  Reset it
+                </Link>
+              </div>
+              <div>
+                Not approved yet?{" "}
               <Link
                 href="/auth/request"
                 className="underline underline-offset-4"
               >
                 Request access
               </Link>
+              </div>
             </div>
           </form>
         </CardContent>
