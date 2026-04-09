@@ -178,6 +178,17 @@ export async function createStudyPlanAction(formData: FormData) {
     .single();
 
   if (planError || !plan) {
+    const message = String(planError?.message || "").toLowerCase();
+    if (
+      message.includes("does not exist") ||
+      message.includes("undefined table") ||
+      message.includes("undefined column")
+    ) {
+      redirect("/study-plan?error=schema_not_ready");
+    }
+    if (message.includes("row-level security") || message.includes("permission denied")) {
+      redirect("/study-plan?error=not_authorized");
+    }
     redirect("/study-plan?error=create_failed");
   }
 
@@ -190,12 +201,27 @@ export async function createStudyPlanAction(formData: FormData) {
   });
 
   if (weeks.length) {
-    await supabase.from("study_plan_weeks").insert(
+    const { error: weeksError } = await supabase.from("study_plan_weeks").insert(
       weeks.map((week) => ({
         plan_id: plan.id,
         ...week,
       })),
     );
+
+    if (weeksError) {
+      const message = String(weeksError.message || "").toLowerCase();
+      if (
+        message.includes("does not exist") ||
+        message.includes("undefined table") ||
+        message.includes("undefined column")
+      ) {
+        redirect("/study-plan?error=schema_not_ready");
+      }
+      if (message.includes("row-level security") || message.includes("permission denied")) {
+        redirect("/study-plan?error=not_authorized");
+      }
+      redirect("/study-plan?error=create_failed");
+    }
   }
 
   revalidatePath("/study-plan");
