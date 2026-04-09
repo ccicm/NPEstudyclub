@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-10",
+  "mode": "daily",
+  "generated_at": "2026-04-09T14:05:37.511Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a university clinic, a 24-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "E": "Give a verbal family update because it is routine practice.",
+        "A": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "C": "Share the notes but leave out the most sensitive details.",
+        "B": "Provide a brief summary because the parent is funding therapy.",
+        "D": "Ask the parent to sign a form and then disclose the information."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "B": "Payment for treatment does not create a right to private clinical information.",
+        "C": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "D": "A form signed by the parent alone does not authorise disclosure.",
+        "E": "Routine updates still require client consent and attention to privacy limits."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Collateral and test interpretation",
+      "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
+      "options": {
+        "E": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "D": "Delay testing until all informants agree on the reason for referral.",
+        "B": "Rely on the parent report because they are the legal guardian.",
+        "C": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "A": "Gather collateral information from multiple sources and interpret results in context."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
+      "distractor_explanations": {
+        "B": "Legal guardianship does not make one informant sufficient for a fair assessment.",
+        "C": "A single self-report tool is not enough for a complex developmental concern.",
+        "D": "Perfect agreement is not required before proceeding with assessment.",
+        "E": "A school report alone is not sufficient to conclude the underlying cause."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Trauma-informed practice",
+      "question": "A client with a trauma history freezes and goes silent when asked to describe a recent assault. The psychologist wants a full timeline for treatment planning. What is the best approach?",
+      "options": {
+        "B": "Push for details so the client learns not to avoid the memory.",
+        "E": "Keep asking the same question until the client answers clearly.",
+        "A": "Slow the pace, stabilise, and use trauma-informed choice and grounding.",
+        "D": "Terminate the session because the client is not ready for therapy.",
+        "C": "Switch to confrontation because silence is non-compliance."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "A trauma-informed response prioritises emotional safety, choice, and pacing.",
+      "distractor_explanations": {
+        "B": "Forcing disclosure can increase distress and reduce safety.",
+        "C": "Confrontation is likely to escalate shame or shutdown.",
+        "D": "A trauma response does not mean treatment must stop entirely.",
+        "E": "Repetition without attunement can intensify freezing and harm rapport."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "B": "Ignore the subpoena unless the client asks about it.",
+        "D": "Release everything immediately without checking the scope.",
+        "C": "Destroy the notes before the hearing date.",
+        "A": "Seek legal/supervisory advice and review what must be disclosed under the order.",
+        "E": "Refuse to comply because third-party material is always protected."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "B": "Ignoring a subpoena can create legal risk.",
+        "C": "Destroying records is inappropriate and potentially unlawful.",
+        "D": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "E": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}
