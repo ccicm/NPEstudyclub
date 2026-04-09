@@ -73,10 +73,20 @@ jobs:
 
       - name: Update last run date
         if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          PUSH_TOKEN: ${{ secrets.NPE_BOT_TOKEN }}
+          GH_TOKEN_FALLBACK: ${{ github.token }}
         run: |
+          TOKEN="${PUSH_TOKEN:-$GH_TOKEN_FALLBACK}"
+          if [ -z "$TOKEN" ]; then
+            echo "No push token available. Configure secret NPE_BOT_TOKEN or enable write-capable GITHUB_TOKEN."
+            exit 1
+          fi
+
           echo "$(date +'%Y-%m-%d')" > scripts/.last-fortnightly-run
           git config --global user.name 'NPE Quiz Bot'
           git config --global user.email 'npe-bot@users.noreply.github.com'
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git add scripts/.last-fortnightly-run seed/staging/
           git diff --staged --quiet || git commit -m "chore: fortnightly exam $(date +'%Y-%m-%d')"
           git push origin HEAD:main
