@@ -38,12 +38,18 @@ export function CommunityHub({
   threads,
   createThreadAction,
   showingMine = false,
+  errorCode = null,
+  created = false,
+  initialChannel = "announcements",
 }: {
   threads: ThreadSummary[];
   createThreadAction: (formData: FormData) => Promise<void>;
   showingMine?: boolean;
+  errorCode?: string | null;
+  created?: boolean;
+  initialChannel?: CommunityChannelKey;
 }) {
-  const [activeChannel, setActiveChannel] = useState<CommunityChannelKey>("announcements");
+  const [activeChannel, setActiveChannel] = useState<CommunityChannelKey>(initialChannel);
   const [showComposer, setShowComposer] = useState(false);
   const [isPendingVote, setIsPendingVote] = useState<string | null>(null);
 
@@ -109,6 +115,24 @@ export function CommunityHub({
       </aside>
 
       <section className="space-y-4">
+        {created ? (
+          <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm text-accent-foreground">
+            Post published successfully.
+          </p>
+        ) : null}
+
+        {errorCode ? (
+          <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {errorCode === "missing_required"
+              ? "Please add both title and body before publishing."
+              : errorCode === "schema_not_ready"
+                ? "Community tables are not ready in Supabase. Run migrations 001, 002, and 003."
+                : errorCode === "not_authorized"
+                  ? "Your account does not currently have permission to post in community. Confirm approved member status."
+                  : "Could not save this post. Please try again."}
+          </p>
+        ) : null}
+
         <div className="rounded-2xl border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>

@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 function parseAdminEmails() {
@@ -10,7 +9,7 @@ function parseAdminEmails() {
 }
 
 export async function getAdminSession() {
-  const allowAdminBypass = process.env.ALLOW_ADMIN_BYPASS === "true";
+  const allowAdminBypass = process.env.NODE_ENV !== "production" && process.env.ALLOW_ADMIN_BYPASS === "true";
 
   const supabase = await createClient();
   const {

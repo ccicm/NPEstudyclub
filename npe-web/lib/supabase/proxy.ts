@@ -10,12 +10,14 @@ export async function updateSession(request: NextRequest) {
   const bypassCookie = request.cookies.get("member_bypass")?.value === "1";
   const queryBypassEnabled = bypassQuery === "1";
   const queryBypassDisabled = bypassQuery === "0";
+  const canUseBypass = process.env.NODE_ENV !== "production";
   const allowMemberBypass =
-    process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    queryBypassEnabled ||
-    (bypassCookie && !queryBypassDisabled);
+    canUseBypass &&
+    (process.env.ALLOW_MEMBER_BYPASS === "true" ||
+      queryBypassEnabled ||
+      (bypassCookie && !queryBypassDisabled));
 
-  if (queryBypassEnabled) {
+  if (queryBypassEnabled && canUseBypass) {
     supabaseResponse.cookies.set("member_bypass", "1", {
       httpOnly: true,
       sameSite: "lax",
@@ -25,7 +27,7 @@ export async function updateSession(request: NextRequest) {
     });
   }
 
-  if (queryBypassDisabled) {
+  if (queryBypassDisabled || !canUseBypass) {
     supabaseResponse.cookies.delete("member_bypass");
   }
 

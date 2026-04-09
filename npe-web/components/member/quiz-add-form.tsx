@@ -23,12 +23,44 @@ const blankQuestion = (): DraftQuestion => ({
   explanation: "",
 });
 
+function parseCsvLine(line: string) {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    const next = line[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (char === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  result.push(current.trim());
+  return result;
+}
+
 export function QuizAddForm({
   action,
-  hasError,
+  errorCode,
 }: {
   action: (formData: FormData) => Promise<void>;
-  hasError: boolean;
+  errorCode: string | null;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState("");
@@ -36,6 +68,7 @@ export function QuizAddForm({
   const [domain, setDomain] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion(), blankQuestion(), blankQuestion(), blankQuestion()]);
+  const [csvError, setCsvError] = useState<string | null>(null);
 
   const canContinue = useMemo(() => Boolean(title.trim() && category.trim() && domain.trim()), [category, domain, title]);
   const canSubmit = useMemo(() => questions.length >= 4, [questions.length]);
@@ -44,10 +77,24 @@ export function QuizAddForm({
     <div className="space-y-4">
       <h1 className="text-3xl">Add Quiz</h1>
 
-      {hasError ? (
+      {errorCode ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Unable to submit quiz. Please check all required fields.
+          {errorCode === "missing_required"
+            ? "Please complete title, category, domain, and questions before submitting."
+            : errorCode === "min_questions"
+              ? "At least 4 questions are required."
+              : errorCode === "invalid_payload" || errorCode === "invalid_question"
+                ? "Question payload is invalid. Check your fields or CSV formatting."
+                : errorCode === "schema_not_ready"
+                  ? "Quiz tables are not ready in Supabase. Run migrations 001, 002, and 003."
+                  : errorCode === "not_authorized"
+                    ? "Your account does not currently have permission to create quizzes. Confirm approved member status."
+                    : "Unable to submit quiz. Please try again."}
         </p>
+      ) : null}
+
+      {csvError ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{csvError}</p>
       ) : null}
 
       <form action={action} className="rounded-2xl border bg-card p-5">
@@ -89,6 +136,99 @@ export function QuizAddForm({
                 className="min-h-24 rounded-md border bg-background px-3 py-2"
               />
             </label>
+            <div className="rounded-lg border bg-muted/20 p-3 text-sm md:col-span-2">
+              <p className="font-semibold">CSV option</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Download the template, fill your questions, then upload to auto-populate Step 2.
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <a href="/quizzes/add/template" className="underline" download>
+                  Download CSV template
+                </a>
+                <label className="cursor-pointer underline">
+                  Upload completed CSV
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="sr-only"
+                    onChange={async (event) => {
+                      setCsvError(null);
+                      const file = event.target.files?.[0];
+                      if (!file) {
+                        return;
+                      }
+
+                      try {
+                        const text = await file.text();
+                        const lines = text
+                          .split(/\r?\n/)
+                          .map((line) => line.trim())
+                          .filter(Boolean);
+
+                        if (lines.length < 2) {
+                          setCsvError("CSV appears empty. Add at least 4 question rows.");
+                          return;
+                        }
+
+                        const header = parseCsvLine(lines[0]).map((item) => item.toLowerCase());
+                        const expected = [
+                          "question_text",
+                          "option_a",
+                          "option_b",
+                          "option_c",
+                          "option_d",
+                          "correct_label",
+                          "explanation",
+                        ];
+
+                        const validHeader = expected.every((column, index) => header[index] === column);
+                        if (!validHeader) {
+                          setCsvError("CSV header is invalid. Please use the provided template.");
+                          return;
+                        }
+
+                        const parsed = lines.slice(1).map((line) => {
+                          const [
+                            question_text,
+                            option_a,
+                            option_b,
+                            option_c,
+                            option_d,
+                            correct_label,
+                            explanation,
+                          ] = parseCsvLine(line);
+
+                          const label = (correct_label || "A").toUpperCase();
+                          if (!["A", "B", "C", "D"].includes(label)) {
+                            throw new Error("Invalid correct_label value. Use A, B, C, or D.");
+                          }
+
+                          return {
+                            question_text: question_text || "",
+                            option_a: option_a || "",
+                            option_b: option_b || "",
+                            option_c: option_c || "",
+                            option_d: option_d || "",
+                            correct_label: label as "A" | "B" | "C" | "D",
+                            explanation: explanation || "",
+                          };
+                        });
+
+                        if (parsed.length < 4) {
+                          setCsvError("CSV must include at least 4 questions.");
+                          return;
+                        }
+
+                        setQuestions(parsed);
+                        setStep(2);
+                      } catch (error) {
+                        setCsvError(error instanceof Error ? error.message : "Could not parse CSV file.");
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
             <div className="md:col-span-2">
               <button
                 type="button"

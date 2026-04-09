@@ -6,7 +6,7 @@ import { createThreadAction } from "./actions";
 export default async function CommunityPage({
   searchParams,
 }: {
-  searchParams: Promise<{ author?: string }>;
+  searchParams: Promise<{ author?: string; error?: string; created?: string; channel?: string }>;
 }) {
   const params = await searchParams;
   const mineOnly = params.author === "me";
@@ -66,5 +66,14 @@ export default async function CommunityPage({
     ? preparedThreads.filter((thread) => thread.created_by === user.id)
     : preparedThreads;
 
-  return <CommunityHub threads={visibleThreads} createThreadAction={createThreadAction} showingMine={mineOnly} />;
+  return (
+    <CommunityHub
+      threads={visibleThreads}
+      createThreadAction={createThreadAction}
+      showingMine={mineOnly}
+      errorCode={params.error || null}
+      created={params.created === "1"}
+      initialChannel={normalizeChannel(params.channel || "announcements")}
+    />
+  );
 }

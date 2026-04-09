@@ -1,8 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeChannel } from "@/lib/community";
+
+function classifyError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
+  if (lower.includes("does not exist") || lower.includes("undefined table") || lower.includes("undefined column")) {
+    return "schema_not_ready";
+  }
+  return null;
+}
 
 export async function createThreadAction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
@@ -11,7 +21,7 @@ export async function createThreadAction(formData: FormData) {
   const channel = normalizeChannel(String(formData.get("channel") || "announcements"));
 
   if (!title || !body) {
-    return;
+    redirect(`/community?error=missing_required&channel=${encodeURIComponent(channel)}`);
   }
 
   const supabase = await createClient();
@@ -20,10 +30,10 @@ export async function createThreadAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return;
+    redirect("/auth/login");
   }
 
-  await supabase.from("forum_threads").insert({
+  const { error } = await supabase.from("forum_threads").insert({
     title,
     body,
     tag,
@@ -32,7 +42,16 @@ export async function createThreadAction(formData: FormData) {
     author_name: user.user_metadata?.full_name || user.email,
   });
 
+  if (error) {
+    const classified = classifyError(error.message || "");
+    if (classified) {
+      redirect(`/community?error=${classified}&channel=${encodeURIComponent(channel)}`);
+    }
+    redirect(`/community?error=save_failed&channel=${encodeURIComponent(channel)}`);
+  }
+
   revalidatePath("/community");
+  redirect(`/community?created=1&channel=${encodeURIComponent(channel)}`);
 }
 
 export async function createReplyAction(formData: FormData) {

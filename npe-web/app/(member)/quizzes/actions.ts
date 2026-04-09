@@ -14,6 +14,15 @@ type DraftQuestion = {
   explanation?: string;
 };
 
+function classifyError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
+  if (lower.includes("does not exist") || lower.includes("undefined table") || lower.includes("undefined column")) {
+    return "schema_not_ready";
+  }
+  return null;
+}
+
 export async function saveQuizResultAction(input: {
   quizId: string;
   score: number;
@@ -112,6 +121,10 @@ export async function createQuizAction(formData: FormData) {
     .single();
 
   if (quizError || !quiz) {
+    const classified = classifyError(quizError?.message || "");
+    if (classified) {
+      redirect(`/quizzes/add?error=${classified}`);
+    }
     redirect("/quizzes/add?error=save_quiz");
   }
 
@@ -123,6 +136,10 @@ export async function createQuizAction(formData: FormData) {
   );
 
   if (questionsError) {
+    const classified = classifyError(questionsError.message || "");
+    if (classified) {
+      redirect(`/quizzes/add?error=${classified}`);
+    }
     redirect("/quizzes/add?error=save_questions");
   }
 

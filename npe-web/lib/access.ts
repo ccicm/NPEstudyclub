@@ -24,9 +24,9 @@ export async function isApprovedMember() {
 
   const cookieStore = await cookies();
   const cookieBypass = cookieStore.get("member_bypass")?.value === "1";
+  const canUseBypass = process.env.NODE_ENV !== "production";
   const allowMemberBypass =
-    process.env.ALLOW_MEMBER_BYPASS === "true" ||
-    cookieBypass;
+    canUseBypass && (process.env.ALLOW_MEMBER_BYPASS === "true" || cookieBypass);
 
   if (allowMemberBypass) {
     const bypassEmail = process.env.BYPASS_MEMBER_EMAIL || "admin@npestudyclub.online";

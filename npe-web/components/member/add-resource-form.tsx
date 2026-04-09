@@ -13,7 +13,7 @@ import {
 type Props = {
   action: (formData: FormData) => Promise<void>;
   uploaded: boolean;
-  hasError: boolean;
+  errorCode: string | null;
 };
 
 type Category = "Exam Prep" | "Clinical Practice" | "";
@@ -64,7 +64,7 @@ function SelectWithOther({
   );
 }
 
-export function AddResourceForm({ action, uploaded, hasError }: Props) {
+export function AddResourceForm({ action, uploaded, errorCode }: Props) {
   const [category, setCategory] = useState<Category>("");
   const [domain, setDomain] = useState("");
   const [modality, setModality] = useState("");
@@ -96,9 +96,17 @@ export function AddResourceForm({ action, uploaded, hasError }: Props) {
         </div>
       ) : null}
 
-      {hasError ? (
+      {errorCode ? (
         <p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          Upload failed. Check required fields and try again.
+          {errorCode === "missing_required"
+            ? "Please complete title, category, and file before uploading."
+            : errorCode === "storage_not_ready"
+              ? "Storage bucket is not ready. Create a private 'resources' bucket in Supabase or configure external storage first."
+              : errorCode === "schema_not_ready"
+                ? "Resource tables are not ready in Supabase. Run migrations 001, 002, and 003."
+                : errorCode === "not_authorized"
+                  ? "Your account does not currently have permission to upload resources. Confirm your approved member status."
+                  : "Upload failed. Please try again."}
         </p>
       ) : null}
 

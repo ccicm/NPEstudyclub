@@ -17,7 +17,7 @@ export default async function AddQuizPage({
           Back to quizzes
         </Link>
       </div>
-      <QuizAddForm action={createQuizAction} hasError={Boolean(params.error)} />
+      <QuizAddForm action={createQuizAction} errorCode={params.error || null} />
     </div>
   );
 }

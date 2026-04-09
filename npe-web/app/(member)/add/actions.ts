@@ -26,6 +26,16 @@ function fromSelectWithOther(formData: FormData, key: string) {
   return otherValue || null;
 }
 
+function classifyError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("bucket") && lower.includes("not found")) return "storage_not_ready";
+  if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
+  if (lower.includes("does not exist") || lower.includes("undefined table") || lower.includes("undefined column")) {
+    return "schema_not_ready";
+  }
+  return null;
+}
+
 export async function addResourceAction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const category = String(formData.get("category") || "").trim();
@@ -61,6 +71,10 @@ export async function addResourceAction(formData: FormData) {
   });
 
   if (uploadError) {
+    const classified = classifyError(uploadError.message || "");
+    if (classified) {
+      redirect(`/add?error=${classified}`);
+    }
     redirect("/add?error=upload_failed");
   }
 
@@ -88,6 +102,10 @@ export async function addResourceAction(formData: FormData) {
   });
 
   if (error) {
+    const classified = classifyError(error.message || "");
+    if (classified) {
+      redirect(`/add?error=${classified}`);
+    }
     redirect("/add?error=save_failed");
   }
 

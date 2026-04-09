@@ -7,12 +7,13 @@ export default async function AddResourcePage({
   searchParams: Promise<{ uploaded?: string; error?: string }>;
 }) {
   const params = await searchParams;
+  const errorCode = params.error || null;
 
   return (
     <AddResourceForm
       action={addResourceAction}
       uploaded={params.uploaded === "1"}
-      hasError={Boolean(params.error)}
+      errorCode={errorCode}
     />
   );
 }
