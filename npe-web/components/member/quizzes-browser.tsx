@@ -21,10 +21,12 @@ export function QuizzesBrowser({
   quizzes,
   created,
   noticeMessage,
+  fortnightlyMessage,
 }: {
   quizzes: QuizCard[];
   created: boolean;
   noticeMessage?: string | null;
+  fortnightlyMessage?: string | null;
 }) {
   const [tab, setTab] = useState<QuizTab>("All");
   const [domain, setDomain] = useState("");
@@ -61,6 +63,10 @@ export function QuizzesBrowser({
 
       {noticeMessage ? (
         <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{noticeMessage}</p>
+      ) : null}
+
+      {fortnightlyMessage ? (
+        <p className="rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm text-slate-800">{fortnightlyMessage}</p>
       ) : null}
 
       <div className="flex flex-wrap gap-2">

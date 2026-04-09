@@ -1,5 +1,9 @@
+import fs from "fs";
+import path from "path";
+
 const AEST_OFFSET_MINUTES = 10 * 60;
 const QUIZ_OPEN_HOUR = 6;
+const LAST_FORTNIGHTLY_RUN_FILE = path.join(process.cwd(), "scripts/.last-fortnightly-run");
 
 type AestParts = {
   year: number;
@@ -87,4 +91,29 @@ export function getDailyQuizAvailabilityMessage(now = new Date()) {
 export function formatAestDateTimeForNotice(dateInput: string | Date) {
   const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
   return formatAestDateTime(date);
+}
+
+function formatAestDateOnly(date: Date) {
+  return new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Brisbane",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(date);
+}
+
+export function getFortnightlyBeginMessage() {
+  if (!fs.existsSync(LAST_FORTNIGHTLY_RUN_FILE)) {
+    return "Fortnightlies begin with the next published fortnightly exam.";
+  }
+
+  const lastRunRaw = fs.readFileSync(LAST_FORTNIGHTLY_RUN_FILE, "utf8").trim();
+  const lastRun = new Date(`${lastRunRaw}T00:00:00+10:00`);
+
+  if (Number.isNaN(lastRun.getTime())) {
+    return "Fortnightlies begin with the next published fortnightly exam.";
+  }
+
+  const nextRun = new Date(lastRun.getTime() + 14 * 24 * 60 * 60 * 1000);
+  return `Fortnightlies begin ${formatAestDateOnly(nextRun)}.`;
 }

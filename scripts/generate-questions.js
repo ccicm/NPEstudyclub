@@ -53,6 +53,16 @@ function getAestDateSeed(now = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function formatDisplayDate(dateString) {
+  const date = new Date(`${dateString}T00:00:00+10:00`);
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Australia/Brisbane',
+  }).format(date);
+}
+
 function getSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
@@ -594,7 +604,9 @@ const QUESTION_BANK = {
 };
 
 async function createQuizRecord(setId, mode, generatedAt) {
-  const title = mode === 'daily' ? `Daily NPE Set ${generatedAt}` : `Fortnightly NPE Exam ${generatedAt}`;
+  const sequence = '001';
+  const dateString = formatDisplayDate(generatedAt.split('T')[0]);
+  const title = mode === 'daily' ? `Daily #${sequence} - ${dateString}` : `Fortnightly #${sequence} - ${dateString}`;
   const { data: quiz, error } = await supabase
     .from('quizzes')
     .insert({

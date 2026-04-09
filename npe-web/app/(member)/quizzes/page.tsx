@@ -1,5 +1,5 @@
 import { QuizzesBrowser } from "@/components/member/quizzes-browser";
-import { getDailyQuizAvailabilityMessage, isDailyQuizLive } from "@/lib/quiz-availability";
+import { getDailyQuizAvailabilityMessage, getFortnightlyBeginMessage, isDailyQuizLive } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function QuizzesPage({
@@ -22,6 +22,7 @@ export default async function QuizzesPage({
 
   const dailyQuizLive = isDailyQuizLive();
   const availabilityMessage = getDailyQuizAvailabilityMessage();
+  const fortnightlyMessage = getFortnightlyBeginMessage();
 
   const quizIds = (quizzes ?? []).map((quiz) => quiz.id);
 
@@ -66,5 +67,12 @@ export default async function QuizzesPage({
     };
     });
 
-  return <QuizzesBrowser quizzes={preparedQuizzes} created={params.created === "1"} noticeMessage={availabilityMessage} />;
+  return (
+    <QuizzesBrowser
+      quizzes={preparedQuizzes}
+      created={params.created === "1"}
+      noticeMessage={availabilityMessage}
+      fortnightlyMessage={fortnightlyMessage}
+    />
+  );
 }
