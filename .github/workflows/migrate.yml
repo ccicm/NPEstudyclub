@@ -10,6 +10,9 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -17,7 +20,17 @@ jobs:
         with:
           version: latest
 
+      - name: Validate database URL secret
+        run: |
+          DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
+          if [ -z "$DB_URL" ]; then
+            echo "Missing Supabase database URL secret. Set SUPABASE_DB_URL or DATABASE_URL in GitHub Actions secrets." >&2
+            exit 1
+          fi
+
+          echo "DB_URL is set"
+
       - name: Push migrations
-        run: supabase db push --db-url "$SUPABASE_DB_URL"
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
+          supabase db push --db-url "$DB_URL"
