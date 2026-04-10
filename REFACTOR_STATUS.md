@@ -29,6 +29,11 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Confirm migrations `001` through `011` have been applied in production (still pending from live production SQL access).
 - Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production (still pending from live production account/session).
 - Confirm study-plan save/regenerate/log flows for approved non-admin users in production (still pending in production).
+- Confirm storage privacy posture in production for study-library files:
+  - Space/object access is private by default.
+  - No permanent public file URLs are persisted or rendered.
+  - Download flow is server-authorized and short-lived signed access only.
+  - Spaces credentials/signing logic remain server-side only.
 
 ## Clinical Safeguarding (Started)
 

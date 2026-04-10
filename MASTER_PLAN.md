@@ -84,6 +84,31 @@ Resource upload/storage wiring is now implemented. The remaining blocker is conf
 
 **Capture in summary:** which mode was used, exact env/config changes, result of upload + download test, any remaining blocker.
 
+### 2. Storage privacy architecture verification (mandatory)
+
+Treat this as a release gate for private study-library content. Upload restrictions alone are not sufficient if object URLs are public.
+
+1. Confirm DigitalOcean Space privacy posture:
+   - Bucket is not publicly list/read accessible.
+   - No public bucket policy or CDN path exposing objects by permanent URL.
+   - Object ACL/canned ACL is not set to public-read.
+2. Confirm database persistence model:
+   - `public.resources` stores object key/path in `file_path`.
+   - No permanent public file URL is persisted for private resources.
+3. Confirm download/access flow:
+   - Authorized request reaches server-side code first.
+   - Server-side code generates short-lived signed URLs (or streams file).
+   - Access is temporary and scoped by authorization checks.
+4. Confirm frontend exposure model:
+   - Frontend does not expose permanent file URLs.
+   - Signed URLs are time-limited and not reused as canonical stored URLs.
+5. Confirm authn vs authz behavior:
+   - Access is not "logged-in only"; it enforces approved-member authorization.
+   - Document intended permission model (currently shared library among approved members).
+6. Confirm secrets boundary:
+   - DO Spaces credentials and signing logic remain server-side only.
+   - No client bundle includes Spaces secrets or signing logic.
+
 ---
 
 ## Phase 1 — Fix Immediately (P1)
@@ -406,6 +431,7 @@ Before each deploy, verify:
 - [ ] Resource progress is visible on dashboard (not only profile page)
 - [ ] Profile page links back to dashboard progress overview
 - [ ] Resource upload (1 PDF + 1 Word doc) completes and download works
+- [ ] Storage privacy verified end-to-end (private bucket/object access, no permanent public URLs, short-lived signed access only)
 - [ ] Access request form: PSY field validates format before submit; reason field is optional
 - [ ] "Preview mode" link absent from request page in production build
 - [ ] Nav active state correctly highlights current page

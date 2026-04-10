@@ -118,6 +118,14 @@ Once DNS propagates and SSL is active:
 - [ ] Quiz attempt saves to history
 - [ ] Study plan onboarding and log-time flow work
 
+## 6.1 Storage Privacy Verification (Required)
+
+- [ ] Confirm DigitalOcean Space is private (no public list/read policy).
+- [ ] Confirm objects are not publicly readable via permanent URL/CDN.
+- [ ] Confirm `resources.file_path` stores object key/path, not public URL.
+- [ ] Confirm downloads are short-lived signed URLs generated server-side.
+- [ ] Confirm no DO Spaces credentials/signing logic are exposed client-side.
+
 ## Emergency Bypass (if Auth Email Flows Rate-Limit)
 
 If Supabase email throttling blocks sign-up/reset or session recovery:
