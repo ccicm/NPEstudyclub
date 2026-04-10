@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, Circle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { toggleResourceComplete } from "@/app/(member)/resources/actions";
+import { getResourceDownloadUrlAction, toggleResourceComplete } from "@/app/(member)/resources/actions";
 import { Button } from "@/components/ui/button";
 import {
   CLINICAL_MODALITIES,
@@ -27,7 +27,7 @@ type Resource = {
   tags: string[] | null;
   notes: string | null;
   uploader_name: string | null;
-  signedUrl: string | null;
+  hasFile: boolean;
   completed: boolean;
 };
 
@@ -65,6 +65,8 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErr
     Object.fromEntries(resources.map((resource) => [resource.id, resource.completed])),
   );
   const [isPending, startTransition] = useTransition();
+  const [downloadPendingId, setDownloadPendingId] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedResourceId) {
@@ -201,6 +203,20 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErr
     });
   };
 
+  const openFile = async (resourceId: string) => {
+    setDownloadError(null);
+    setDownloadPendingId(resourceId);
+
+    try {
+      const signedUrl = await getResourceDownloadUrlAction(resourceId);
+      window.open(signedUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      setDownloadError("Could not open this file. Please refresh and try again.");
+    } finally {
+      setDownloadPendingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {loadErrorCode ? (
@@ -210,6 +226,12 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErr
             Run migrations 001 through 011 in production and retry.
           </p>
           {loadErrorHint ? <p className="mt-2 text-xs text-destructive/90">Details: {loadErrorHint}</p> : null}
+        </div>
+      ) : null}
+
+      {downloadError ? (
+        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          {downloadError}
         </div>
       ) : null}
 
@@ -390,11 +412,15 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErr
                 ) : null}
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  {resource.signedUrl ? (
-                    <Button asChild size="sm" variant="outline">
-                      <a href={resource.signedUrl} target="_blank" rel="noreferrer">
-                        Open file
-                      </a>
+                  {resource.hasFile ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => openFile(resource.id)}
+                      disabled={downloadPendingId === resource.id}
+                    >
+                      {downloadPendingId === resource.id ? "Opening..." : "Open file"}
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">No file attached</span>

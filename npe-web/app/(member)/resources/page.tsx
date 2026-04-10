@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { createResourceSignedUrl } from "@/lib/storage";
 import { ResourceLibraryClient } from "@/components/member/resource-library-client";
 
 type ResourceRow = {
@@ -76,24 +75,22 @@ export default async function ResourcesPage() {
     progressIds = new Set((progress ?? []).map((row) => row.resource_id));
   }
 
-  const resourcesWithLinks = await Promise.all(
-    resources.map(async (resource) => {
-      if (!resource.file_path) {
-        return { ...resource, signedUrl: null, completed: progressIds.has(resource.id) };
-      }
+  const resourcesForClient = resources.map((resource) => ({
+    id: resource.id,
+    title: resource.title,
+    file_type: resource.file_type,
+    category: resource.category,
+    domain: resource.domain,
+    modality: resource.modality,
+    population: resource.population,
+    content_type: resource.content_type,
+    source: resource.source,
+    tags: resource.tags,
+    notes: resource.notes,
+    uploader_name: resource.uploader_name,
+    hasFile: Boolean(resource.file_path),
+    completed: progressIds.has(resource.id),
+  }));
 
-      const signedUrl = await createResourceSignedUrl({
-        supabase,
-        objectKey: resource.file_path,
-        expiresInSeconds: 60 * 60,
-      });
-      return {
-        ...resource,
-        signedUrl,
-        completed: progressIds.has(resource.id),
-      };
-    }),
-  );
-
-  return <ResourceLibraryClient resources={resourcesWithLinks} loadErrorCode={loadErrorCode} loadErrorHint={loadErrorHint} />;
+  return <ResourceLibraryClient resources={resourcesForClient} loadErrorCode={loadErrorCode} loadErrorHint={loadErrorHint} />;
 }
