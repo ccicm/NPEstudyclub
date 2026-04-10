@@ -36,11 +36,6 @@ export default async function Page() {
             <Link href="/dashboard">Proceed to member dashboard</Link>
           </Button>
         ) : null}
-        {isAdmin ? (
-          <Button asChild variant="secondary" className="w-full">
-            <Link href="/dashboard?admin=1">Open app now (admin preview)</Link>
-          </Button>
-        ) : null}
       </div>
     </div>
   );

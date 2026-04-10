@@ -120,11 +120,6 @@ export default function RequestAccessPage({
           Already approved? <Link className="text-primary underline" href="/auth/login">Use member sign in</Link>.
         </p>
 
-        {process.env.NODE_ENV === "development" ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            Preview mode on? <Link className="text-primary underline" href="/dashboard?admin=1">Open app now</Link>.
-          </p>
-        ) : null}
       </div>
     </div>
   );

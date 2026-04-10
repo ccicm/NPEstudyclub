@@ -60,9 +60,10 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - `supabase/011_bulk_onboard_members.sql` is ready but still contains sample rows.
 - Next step: replace with real member data and execute once in production.
 
-## Not Started
+## In Progress
 
 - UX audit refactor block (captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`)
+- P1 request-status and member/admin copy cleanup have started in code
 
 ## Generator Polish (Started)
 

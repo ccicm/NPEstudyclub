@@ -20,7 +20,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
 - **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
 - **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
-- **UX audit status:** Not started in code. The full first-pass UX audit is captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md` and is the next non-quiz refactor block once current production verification work is stable.
+- **UX audit status:** In progress. The full first-pass UX audit is captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`; P1 request-status and copy cleanup work has started, and the remaining P2/P3 items are still pending.
 
 ---
 
