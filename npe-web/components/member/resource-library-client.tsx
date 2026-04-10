@@ -33,6 +33,8 @@ type Resource = {
 
 type Props = {
   resources: Resource[];
+  loadErrorCode?: string | null;
+  loadErrorHint?: string | null;
 };
 
 function normalize(value: string | null | undefined) {
@@ -48,7 +50,7 @@ function fileBadgeColor(fileType: string | null) {
   return "bg-slate-100 text-slate-700";
 }
 
-export function ResourceLibraryClient({ resources }: Props) {
+export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErrorHint = null }: Props) {
   const searchParams = useSearchParams();
   const selectedResourceId = searchParams.get("id");
   const [searchInput, setSearchInput] = useState("");
@@ -201,6 +203,16 @@ export function ResourceLibraryClient({ resources }: Props) {
 
   return (
     <div className="space-y-4">
+      {loadErrorCode ? (
+        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <p>
+            Resource metadata read had an error ({loadErrorCode}). The library is showing fallback columns where possible.
+            Run migrations 001 through 011 in production and retry.
+          </p>
+          {loadErrorHint ? <p className="mt-2 text-xs text-destructive/90">Details: {loadErrorHint}</p> : null}
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl">Resources</h1>
         <Button asChild>

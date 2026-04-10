@@ -294,6 +294,26 @@ export async function addResourceAction(formData: FormData) {
     );
   }
 
+  const { data: insertedRow, error: verifyError } = await supabase
+    .from("resources")
+    .select("id")
+    .eq("uploaded_by", user.id)
+    .eq("file_path", storagePath)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (verifyError || !insertedRow) {
+    await deleteResourceObject({
+      supabase,
+      objectKey: storagePath,
+    });
+
+    const verifyCode = encodeURIComponent(String(verifyError?.code || "writeback_missing"));
+    const verifyHint = encodeURIComponent(String(verifyError?.message || "resource_row_not_found_after_insert"));
+    redirect(`/add?error=save_failed&db_code=${verifyCode}&db_hint=${verifyHint}&db_col=`);
+  }
+
   revalidatePath("/resources");
   revalidatePath("/dashboard");
   redirect("/add?uploaded=1");
