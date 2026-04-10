@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteResourceObject } from "@/lib/storage";
 import { uploadResourceObject } from "@/lib/storage";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 function normalizeFileName(name: string) {
@@ -107,6 +108,18 @@ export async function addResourceAction(formData: FormData) {
   const storagePath = `${user.id}/${Date.now()}-${safeName}`;
   const fileBuffer = Buffer.from(await fileInput.arrayBuffer());
 
+  const normalizedEmail = (user.email || "").toLowerCase();
+  const { data: approvalRow } = await supabase
+    .from("approved_users")
+    .select("email,status")
+    .eq("email", normalizedEmail)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  if (!approvalRow) {
+    redirect("/add?error=not_authorized");
+  }
+
   const uploadResult = await uploadResourceObject({
     supabase,
     objectKey: storagePath,
@@ -158,8 +171,18 @@ export async function addResourceAction(formData: FormData) {
 
   let error: { message?: string; code?: string } | null = null;
 
+  const adminClient = (() => {
+    try {
+      return createAdminClient();
+    } catch {
+      return null;
+    }
+  })();
+
   for (const payload of insertAttempts) {
-    const { error: attemptError } = await supabase.from("resources").insert(payload);
+    const { error: attemptError } = adminClient
+      ? await adminClient.from("resources").insert(payload)
+      : await supabase.from("resources").insert(payload);
     if (!attemptError) {
       error = null;
       break;
