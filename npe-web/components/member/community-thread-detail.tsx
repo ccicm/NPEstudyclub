@@ -120,13 +120,13 @@ export function CommunityThreadDetail({
 
       {reportError ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Could not save your report. Please try again.
+          We could not save your report. Please try again.
         </p>
       ) : null}
 
       {errorCode === "posting_restricted" ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          You are currently restricted from posting in community. Please contact a moderator if you need this reviewed.
+          You cannot post right now. If this seems wrong, contact a moderator.
         </p>
       ) : null}
 

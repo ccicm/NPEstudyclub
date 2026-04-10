@@ -60,6 +60,17 @@ export function CommunityHub({
   const [activeChannel, setActiveChannel] = useState<CommunityChannelKey>(initialChannel);
   const [showComposer, setShowComposer] = useState(false);
   const [isPendingVote, setIsPendingVote] = useState<string | null>(null);
+  const errorMessage = !errorCode
+    ? null
+    : errorCode === "missing_required"
+      ? "Please add a title and body before publishing."
+      : errorCode === "schema_not_ready"
+        ? "Community setup is still being prepared. Please try again later."
+        : errorCode === "posting_restricted"
+          ? "You cannot post right now. If this seems wrong, contact a moderator."
+          : errorCode === "not_authorized"
+            ? "Your account cannot post right now. Please check your access."
+            : "Could not save this post. Please try again.";
 
   useEffect(() => {
     const key = `community-last-seen-${activeChannel}`;
@@ -143,21 +154,13 @@ export function CommunityHub({
 
         {reportError ? (
           <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-            Could not save your report. Please try again.
+            We could not save your report. Please try again.
           </p>
         ) : null}
 
         {errorCode ? (
           <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-            {errorCode === "missing_required"
-              ? "Please add both title and body before publishing."
-              : errorCode === "schema_not_ready"
-                ? "Community tables are not ready in Supabase. Run migrations 001, 002, and 003."
-                : errorCode === "posting_restricted"
-                  ? "You are currently restricted from posting in community. Please contact a moderator if this should be reviewed."
-                : errorCode === "not_authorized"
-                  ? "Your account does not currently have permission to post in community. Confirm approved member status."
-                  : "Could not save this post. Please try again."}
+            {errorMessage}
           </p>
         ) : null}
 

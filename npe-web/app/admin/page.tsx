@@ -176,8 +176,8 @@ export default async function AdminPage() {
     if (!Number.isNaN(ratio) && ratio > 0 && ratio < 1) {
       explanationThresholdPercent = Math.round(ratio * 100);
     }
-  } catch (error) {
-    loadError = error instanceof Error ? error.message : "Admin client is not configured.";
+  } catch {
+    loadError = "Admin data could not load right now.";
   }
 
   return (

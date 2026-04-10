@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ScheduleCalendar } from "@/components/member/schedule-calendar";
 import { addAdHocSession } from "./actions";
@@ -39,6 +40,15 @@ export default async function SchedulePage() {
           Download .ics
         </a>
       </div>
+      {user && !studyPlan ? (
+        <section className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">
+          <p className="font-semibold text-foreground">Set up your study plan to personalise this calendar.</p>
+          <p className="mt-2">Your preferred study blocks will appear here once the plan is created.</p>
+          <Link href="/study-plan" className="mt-3 inline-block underline">
+            Create your study plan
+          </Link>
+        </section>
+      ) : null}
       <ScheduleCalendar
         sessions={sessions ?? []}
         studyPlanWeeks={weeksWithDays}

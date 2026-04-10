@@ -71,6 +71,19 @@ export function QuizAddForm({
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion(), blankQuestion(), blankQuestion(), blankQuestion()]);
   const [csvError, setCsvError] = useState<string | null>(null);
+  const errorMessage = !errorCode
+    ? null
+    : errorCode === "missing_required"
+      ? "Please complete the required fields before submitting."
+      : errorCode === "min_questions"
+        ? "Add at least 4 questions before submitting."
+        : errorCode === "invalid_payload" || errorCode === "invalid_question"
+          ? "The quiz data looks incomplete. Please check the form or CSV and try again."
+          : errorCode === "schema_not_ready"
+            ? "Quiz setup is still being prepared. Please try again later."
+            : errorCode === "not_authorized"
+              ? "Your account cannot create quizzes right now. Please check your access."
+              : "Unable to submit the quiz. Please try again.";
 
   const canContinue = useMemo(() => Boolean(title.trim() && category.trim() && domain.trim()), [category, domain, title]);
   const canSubmit = useMemo(() => questions.length >= 4, [questions.length]);
@@ -81,17 +94,7 @@ export function QuizAddForm({
 
       {errorCode ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          {errorCode === "missing_required"
-            ? "Please complete title, category, domain, and questions before submitting."
-            : errorCode === "min_questions"
-              ? "At least 4 questions are required."
-              : errorCode === "invalid_payload" || errorCode === "invalid_question"
-                ? "Question payload is invalid. Check your fields or CSV formatting."
-                : errorCode === "schema_not_ready"
-                  ? "Quiz tables are not ready in Supabase. Run migrations 001, 002, and 003."
-                  : errorCode === "not_authorized"
-                    ? "Your account does not currently have permission to create quizzes. Confirm approved member status."
-                    : "Unable to submit quiz. Please try again."}
+          {errorMessage}
         </p>
       ) : null}
 
@@ -226,8 +229,8 @@ export function QuizAddForm({
 
                         setQuestions(parsed);
                         setStep(2);
-                      } catch (error) {
-                        setCsvError(error instanceof Error ? error.message : "Could not parse CSV file.");
+                      } catch {
+                        setCsvError("The CSV file needs a quick fix. Please check the template and try again.");
                       }
                     }}
                   />

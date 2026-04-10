@@ -96,18 +96,7 @@ export default async function ProfilePage() {
             </Link>
           </div>
         </section>
-
       </div>
-
-        <section className="rounded-2xl border bg-card p-4">
-          <h2 className="text-2xl">Progress Overview</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Resource completion now lives on the dashboard so this page can stay focused on account settings.
-          </p>
-          <Link href="/dashboard" className="mt-3 inline-block text-sm underline">
-            Open dashboard overview
-          </Link>
-        </section>
 
       <section className="rounded-2xl border bg-card p-4">
         <h2 className="text-2xl">Account settings</h2>

@@ -83,26 +83,29 @@ export function StudyPlanDashboard({
 
   const tipDomain = currentWeek?.domain_focus || NPE_DOMAINS[0];
   const weeklyTip = STUDY_TIPS[tipDomain] || "Focus on active recall and spaced revision this week.";
+  const errorMessage = !errorCode
+    ? null
+    : errorCode === "auth_required"
+      ? "Please sign in again and try saving."
+      : errorCode === "missing_exam_date"
+        ? "Please choose your exam date before saving."
+        : errorCode === "invalid_exam_date"
+          ? "Please choose a valid exam date and save again."
+          : errorCode === "missing_priorities"
+            ? "Please set at least one domain priority before saving."
+            : errorCode === "schema_not_ready"
+              ? "Study plan setup is still being prepared. Please try again later."
+              : errorCode === "not_authorized"
+                ? "Your account cannot update this plan right now. Please check your access."
+                : errorCode === "save_conflict"
+                  ? "We found a conflicting plan update. Refresh and try again."
+                  : "Could not save study plan changes. Please try again.";
 
   return (
     <div className="space-y-4">
       {errorCode ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          {errorCode === "auth_required"
-            ? "This action needs a real signed-in session. Sign in again and retry."
-            : errorCode === "missing_exam_date"
-              ? "Please choose your exam date before saving."
-              : errorCode === "invalid_exam_date"
-                ? "That exam date could not be parsed. Please select a valid date and save again."
-                : errorCode === "missing_priorities"
-                  ? "Please set at least one domain priority before saving."
-            : errorCode === "schema_not_ready"
-              ? "Study Plan tables/columns are not ready. Apply migrations (001-008) in Supabase, then retry."
-              : errorCode === "not_authorized"
-                ? "Database permissions blocked this save. Confirm this email is approved in approved_users."
-                : errorCode === "save_conflict"
-                  ? "A conflicting study-plan record was detected. Refresh and retry."
-                : "Could not save study plan changes. Please try again."}
+          {errorMessage}
         </p>
       ) : null}
 
@@ -135,9 +138,9 @@ export function StudyPlanDashboard({
                   {currentResource.title}
                 </Link>
               ) : (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  No resources yet for this domain. <Link href="/add" className="underline">Upload one</Link> or <Link href="/community" className="underline">Request in Community</Link>.
-                </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    No resources yet for this domain. <Link href="/add" className="underline">Upload one</Link> or <Link href="/community" className="underline">Ask in Community</Link>.
+                  </p>
               )}
             </div>
             <div className="rounded-xl border bg-background p-3">

@@ -67,7 +67,7 @@ function SelectWithOther({
   );
 }
 
-export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint, dbColumn }: Props) {
+export function AddResourceForm({ action, uploaded, errorCode }: Props) {
   const [category, setCategory] = useState<Category>("");
   const [domain, setDomain] = useState("");
   const [modality, setModality] = useState("");
@@ -75,6 +75,21 @@ export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint, d
   const [contentType, setContentType] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const canSubmit = useMemo(() => Boolean(category && file), [category, file]);
+  const errorMessage = !errorCode
+    ? null
+    : errorCode === "missing_required"
+      ? "Please complete the required fields before uploading."
+      : errorCode === "storage_not_ready"
+        ? "Storage is not ready yet. Try again after setup is complete."
+        : errorCode === "storage_misconfigured"
+          ? "We could not connect to file storage. Please try again later."
+          : errorCode === "schema_not_ready"
+            ? "The library is still finishing setup. Please try again later."
+            : errorCode === "not_authorized"
+              ? "Your account cannot upload resources yet. Please check your access."
+              : errorCode === "save_failed"
+                ? "We could not save this upload. Please try again."
+                : "Upload failed. Please try again.";
 
   return (
     <div className="space-y-4">
@@ -101,29 +116,7 @@ export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint, d
 
       {errorCode ? (
         <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          <p>
-            {errorCode === "missing_required"
-            ? "Please complete title, category, and file before uploading."
-            : errorCode === "storage_not_ready"
-              ? "Storage bucket is not ready. Create a private 'resources' bucket in Supabase or configure external storage first."
-              : errorCode === "storage_misconfigured"
-                ? "Storage is configured incorrectly. For DigitalOcean, confirm region, key/secret, bucket, and endpoint format (e.g. nyc3.digitaloceanspaces.com)."
-              : errorCode === "schema_not_ready"
-                ? "Resource tables are not ready in Supabase. Run migrations 001, 002, 003, and 009."
-                : errorCode === "not_authorized"
-                  ? "Your account does not currently have permission to upload resources. Confirm your approved member status."
-            : errorCode === "save_failed" && dbCode === "42501" && (dbHint || "").toLowerCase().includes("users")
-              ? "Resource write is blocked by a stale production policy. Run migration 013_resources_policy_hard_reset.sql in Supabase, then retry upload."
-                  : errorCode === "save_failed"
-                    ? "File upload completed but resource metadata could not be saved. Confirm your account is approved and database policies are active."
-                  : "Upload failed. If using DigitalOcean Spaces, check endpoint/region/key/bucket values and retry."}
-          </p>
-          {errorCode === "save_failed" && (dbCode || dbHint) ? (
-            <p className="mt-2 text-xs text-destructive/90">
-              Diagnostic: {dbCode || "unknown"} / {dbHint || "unknown"}
-              {dbColumn ? ` / column: ${dbColumn}` : ""}
-            </p>
-          ) : null}
+          <p>{errorMessage}</p>
         </div>
       ) : null}
 
