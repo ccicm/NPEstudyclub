@@ -30,6 +30,7 @@ In `.env.local`:
 - Run `supabase/009_resource_schema_guard.sql` in SQL Editor
 - Run `supabase/010_resources_policy_cleanup.sql` in SQL Editor
 - Optional: Run `supabase/011_bulk_onboard_members.sql` to quickly approve known members
+- Optional: Run `supabase/012_content_reports.sql` to enable community post/reply reporting scaffold
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`

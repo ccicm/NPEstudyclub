@@ -1,6 +1,6 @@
 # NPE Study Club — Master Plan
 
-Last updated: 2026-04-10
+Last updated: 2026-04-10 (session update)
 
 This document is the single source of truth for all active and planned work. It supersedes `NEXT_AGENT_HANDOFF.md`, `REFACTOR_STATUS.md`, `RESOURCE_SETUP_TOMORROW.md`, and `QUESTION_GENERATOR_PLAN.md` (kept in repo for reference). Any new agent session should read this file first.
 
@@ -16,9 +16,9 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 - **P1 status:** Complete in code.
 - **P2 status:** Complete in code.
-- **P3 status:** Complete in code except production migration/state verification and bulk-onboarding execution.
-- **Storage status:** Upload pipeline to DigitalOcean Spaces is now connected and returning success. Remaining follow-up is visibility of newly uploaded resources in `/resources` for production users.
-- **Clinical safeguarding status:** Not started (guidelines page, thread disclaimer, moderation/reporting features still pending).
+- **P3 status:** UX items 3.1-3.3 are complete in code. Operational verification (3.4) and bulk onboarding execution (3.5) are pending production run.
+- **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
+- **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
 - **Generator polish status:** Not started (repetition audit and diversity controls still pending).
 
 ---
@@ -39,8 +39,8 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - Admin: user management, access approvals
 
 **Known broken / incomplete:**
-- Uploads can succeed while newly uploaded items are not immediately visible in library for some production attempts (follow-up debug item)
-- Clinical safeguarding features from this plan are not implemented yet
+- Uploads can succeed while newly uploaded items are not immediately visible in library for some production attempts (follow-up debug item pending production reproduction)
+- Clinical safeguarding is partially implemented; remaining moderator controls are still pending
 - Generator repetition-audit/polish work has not started
 
 ---
@@ -260,9 +260,29 @@ Connor needs to manually onboard approximately 6 existing users who joined befor
 - Insert rows directly into `approved_users` table via Supabase dashboard (name, email, status = 'approved')
 - Alternatively: build a simple admin bulk-add UI in `/admin` (deferred — Supabase direct insert is fine for now)
 
+**Current execution state:**
+- SQL helper is present in `supabase/011_bulk_onboard_members.sql`.
+- Sample rows still need replacement with real member emails/names, then one production execution.
+
 ---
 
 ## Clinical Safeguarding — Community Forum
+
+### Implementation progress (2026-04-10)
+
+Implemented in app code:
+- `/community/guidelines` page added and linked from the community hub and thread composer.
+- Thread creation disclaimer banner added above composer fields.
+- Reporting flow scaffold added in UI and server actions for threads/replies.
+- New migration scaffold added: `supabase/012_content_reports.sql`.
+- Initial moderator controls added in thread detail (admin delete thread/reply).
+
+Still pending:
+- Moderator edit-with-marker capability.
+- Moderator note pinning for content concerns.
+- Member posting suspension/ban controls.
+- Email notification on report submission.
+- Production execution of migration `012_content_reports.sql`.
 
 This section defines mandatory parameters for the community/forum feature. The forum exists for exam preparation discussion among provisional psychologists. It must not become a clinical supervision space or a venue where client information is shared.
 

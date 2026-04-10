@@ -1,6 +1,6 @@
 # UX Refactor Implementation Status
 
-Last updated: April 10, 2026
+Last updated: April 10, 2026 (session update)
 
 This file tracks implementation status only. `MASTER_PLAN.md` remains the source of truth.
 
@@ -26,12 +26,29 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 
 ## Active Verification Focus
 
-- Confirm migrations `001` through `011` have been applied in production.
-- Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production.
-- Confirm study-plan save/regenerate/log flows for approved non-admin users in production.
+- Confirm migrations `001` through `011` have been applied in production (still pending from live production SQL access).
+- Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production (still pending from live production account/session).
+- Confirm study-plan save/regenerate/log flows for approved non-admin users in production (still pending in production).
+
+## Clinical Safeguarding (Started)
+
+- Implemented in code:
+  - `/community/guidelines` page with permitted/prohibited scope.
+  - Thread creation disclaimer banner with guidelines link.
+  - Report flow scaffold in thread detail for both threads and replies.
+  - Initial moderator controls in thread detail (admin delete thread/reply).
+  - New migration scaffold: `supabase/012_content_reports.sql`.
+- Pending:
+  - Apply migration `012_content_reports.sql` in production.
+  - Wire report email notifications.
+  - Add remaining moderator controls (edit with marker, moderator note pinning, suspension/ban).
+
+## P3.5 Bulk Onboarding
+
+- `supabase/011_bulk_onboard_members.sql` is ready but still contains sample rows.
+- Next step: replace with real member data and execute once in production.
 
 ## Not Started
 
-- Clinical safeguarding implementation (guidelines page, thread disclaimer, report flow, moderation controls)
 - Question generator repetition audit and diversity controls
 - Deferred backlog items listed in `MASTER_PLAN.md`

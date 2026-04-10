@@ -168,6 +168,9 @@ export default async function DashboardPage() {
             <li>1. Browse the resource library.</li>
             <li>2. Set up your study plan.</li>
             <li>3. Introduce yourself in Community.</li>
+            <li>
+              4. Read <Link href="/community/guidelines" className="underline">community guidelines</Link> before posting.
+            </li>
           </ol>
           <Link
             href="/study-plan"

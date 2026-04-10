@@ -6,7 +6,15 @@ import { createThreadAction } from "./actions";
 export default async function CommunityPage({
   searchParams,
 }: {
-  searchParams: Promise<{ author?: string; error?: string; created?: string; channel?: string }>;
+  searchParams: Promise<{
+    author?: string;
+    error?: string;
+    created?: string;
+    channel?: string;
+    reported?: string;
+    moderated?: string;
+    report_error?: string;
+  }>;
 }) {
   const params = await searchParams;
   const mineOnly = params.author === "me";
@@ -98,6 +106,9 @@ export default async function CommunityPage({
       showingMine={mineOnly}
       errorCode={params.error || null}
       created={params.created === "1"}
+      reported={params.reported === "1"}
+      moderated={params.moderated === "1"}
+      reportError={params.report_error || null}
       initialChannel={normalizeChannel(params.channel || "announcements")}
     />
   );

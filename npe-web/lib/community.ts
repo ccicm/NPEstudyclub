@@ -13,8 +13,8 @@ export const COMMUNITY_CHANNELS = [
   },
   {
     key: "clinical-practice",
-    name: "Clinical Practice",
-    description: "Cases, interventions, and supervision discussion",
+    name: "Hypothetical Cases & Exam Prep",
+    description: "Hypothetical clinical scenarios, interventions, and exam-linked discussion",
     icon: "🏥",
   },
   {

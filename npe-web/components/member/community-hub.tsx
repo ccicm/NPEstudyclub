@@ -42,6 +42,9 @@ export function CommunityHub({
   showingMine = false,
   errorCode = null,
   created = false,
+  reported = false,
+  moderated = false,
+  reportError = null,
   initialChannel = "announcements",
 }: {
   threads: ThreadSummary[];
@@ -49,6 +52,9 @@ export function CommunityHub({
   showingMine?: boolean;
   errorCode?: string | null;
   created?: boolean;
+  reported?: boolean;
+  moderated?: boolean;
+  reportError?: string | null;
   initialChannel?: CommunityChannelKey;
 }) {
   const [activeChannel, setActiveChannel] = useState<CommunityChannelKey>(initialChannel);
@@ -123,6 +129,24 @@ export function CommunityHub({
           </p>
         ) : null}
 
+        {reported ? (
+          <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm text-accent-foreground">
+            Report submitted. Moderators have been notified in-app.
+          </p>
+        ) : null}
+
+        {moderated ? (
+          <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm text-accent-foreground">
+            Moderation action completed.
+          </p>
+        ) : null}
+
+        {reportError ? (
+          <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            Could not save your report. Please try again.
+          </p>
+        ) : null}
+
         {errorCode ? (
           <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             {errorCode === "missing_required"
@@ -144,6 +168,12 @@ export function CommunityHub({
               <p className="mt-1 text-sm text-muted-foreground">
                 {COMMUNITY_CHANNELS.find((channel) => channel.key === activeChannel)?.description}
               </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Community is for exam prep discussion only. Do not post client-identifying information. {" "}
+                <Link href="/community/guidelines" className="underline">
+                  Read guidelines
+                </Link>
+              </p>
               {showingMine ? (
                 <p className="mt-2 text-xs text-primary">
                   Showing your posts only. <Link href="/community" className="underline">Clear filter</Link>
@@ -161,6 +191,13 @@ export function CommunityHub({
 
           {showComposer ? (
             <form action={createThreadAction} className="mt-4 grid gap-3 rounded-xl border bg-muted/20 p-4">
+              <div className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+                This forum is for exam prep discussion only. Do not share client, student, or placement information,
+                even deidentified. Use hypothetical or composite framing for clinical questions. {" "}
+                <Link href="/community/guidelines" className="underline">
+                  Full guidelines
+                </Link>
+              </div>
               <label className="grid gap-1 text-sm">
                 <span>Channel</span>
                 <select name="channel" defaultValue={activeChannel} className="h-10 rounded-md border bg-background px-3">

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/admin-access";
 import { normalizeChannel } from "@/lib/community";
 
 function classifyError(message: string) {
@@ -156,4 +157,83 @@ export async function toggleReplyUpvoteAction(replyId: string, threadId: string)
 
   revalidatePath("/community");
   revalidatePath(`/community/${threadId}`);
+}
+
+export async function reportContentAction(formData: FormData) {
+  const threadId = String(formData.get("thread_id") || "").trim();
+  const replyId = String(formData.get("reply_id") || "").trim();
+  const reason = String(formData.get("reason") || "Potential safeguarding/privacy issue").trim();
+  const returnTo = String(formData.get("return_to") || "/community").trim();
+
+  if (!threadId && !replyId) {
+    redirect(`${returnTo}?report_error=missing_target`);
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const payload = {
+    thread_id: threadId || null,
+    reply_id: replyId || null,
+    reporter_id: user.id,
+    reason: reason || "Potential safeguarding/privacy issue",
+  };
+
+  const { error } = await supabase.from("content_reports").insert(payload);
+
+  if (error) {
+    redirect(`${returnTo}?report_error=save_failed`);
+  }
+
+  revalidatePath("/community");
+  if (threadId) {
+    revalidatePath(`/community/${threadId}`);
+  }
+
+  redirect(`${returnTo}?reported=1`);
+}
+
+export async function deleteThreadAsAdminAction(formData: FormData) {
+  const threadId = String(formData.get("thread_id") || "").trim();
+  if (!threadId) {
+    return;
+  }
+
+  const { isAdmin } = await getAdminSession();
+  if (!isAdmin) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("forum_threads").delete().eq("id", threadId);
+
+  revalidatePath("/community");
+  redirect("/community?moderated=1");
+}
+
+export async function deleteReplyAsAdminAction(formData: FormData) {
+  const replyId = String(formData.get("reply_id") || "").trim();
+  const threadId = String(formData.get("thread_id") || "").trim();
+
+  if (!replyId || !threadId) {
+    return;
+  }
+
+  const { isAdmin } = await getAdminSession();
+  if (!isAdmin) {
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.from("forum_replies").delete().eq("id", replyId);
+
+  revalidatePath("/community");
+  revalidatePath(`/community/${threadId}`);
+  redirect(`/community/${threadId}?moderated=1`);
 }

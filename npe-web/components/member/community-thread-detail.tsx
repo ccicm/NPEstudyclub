@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowBigUp, CornerDownRight } from "lucide-react";
-import { createReplyAction, toggleReplyUpvoteAction, toggleThreadUpvoteAction } from "@/app/(member)/community/actions";
+import {
+  createReplyAction,
+  deleteReplyAsAdminAction,
+  deleteThreadAsAdminAction,
+  reportContentAction,
+  toggleReplyUpvoteAction,
+  toggleThreadUpvoteAction,
+} from "@/app/(member)/community/actions";
 
 type Thread = {
   id: string;
@@ -42,7 +49,21 @@ function relativeTime(dateInput: string) {
   return `${months}mo ago`;
 }
 
-export function CommunityThreadDetail({ thread, replies }: { thread: Thread; replies: Reply[] }) {
+export function CommunityThreadDetail({
+  thread,
+  replies,
+  isAdmin = false,
+  reported = false,
+  moderated = false,
+  reportError = null,
+}: {
+  thread: Thread;
+  replies: Reply[];
+  isAdmin?: boolean;
+  reported?: boolean;
+  moderated?: boolean;
+  reportError?: string | null;
+}) {
   const [replyTarget, setReplyTarget] = useState<string | null>(null);
   const [pendingVote, setPendingVote] = useState<string | null>(null);
 
@@ -69,6 +90,24 @@ export function CommunityThreadDetail({ thread, replies }: { thread: Thread; rep
         Back to channel
       </Link>
 
+      {reported ? (
+        <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm text-accent-foreground">
+          Report submitted. Moderators have been notified in-app.
+        </p>
+      ) : null}
+
+      {moderated ? (
+        <p className="rounded-xl border border-primary/30 bg-accent p-3 text-sm text-accent-foreground">
+          Moderation action completed.
+        </p>
+      ) : null}
+
+      {reportError ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          Could not save your report. Please try again.
+        </p>
+      ) : null}
+
       <article className="rounded-2xl border bg-card p-5">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">{thread.tag || "General"}</p>
         <h1 className="mt-2 text-3xl leading-tight">{thread.title}</h1>
@@ -90,6 +129,24 @@ export function CommunityThreadDetail({ thread, replies }: { thread: Thread; rep
         >
           <ArrowBigUp className="h-4 w-4" /> {thread.upvote_count}
         </button>
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+          <form action={reportContentAction}>
+            <input type="hidden" name="thread_id" value={thread.id} />
+            <input type="hidden" name="reason" value="Potential safeguarding/privacy issue" />
+            <input type="hidden" name="return_to" value={`/community/${thread.id}`} />
+            <button type="submit" className="underline">
+              Report post
+            </button>
+          </form>
+          {isAdmin ? (
+            <form action={deleteThreadAsAdminAction}>
+              <input type="hidden" name="thread_id" value={thread.id} />
+              <button type="submit" className="text-destructive underline">
+                Delete thread (moderator)
+              </button>
+            </form>
+          ) : null}
+        </div>
       </article>
 
       <section className="rounded-2xl border bg-card p-5">
@@ -120,6 +177,24 @@ export function CommunityThreadDetail({ thread, replies }: { thread: Thread; rep
                 <button type="button" className="text-xs underline" onClick={() => setReplyTarget(reply.id)}>
                   Reply
                 </button>
+                <form action={reportContentAction}>
+                  <input type="hidden" name="thread_id" value={thread.id} />
+                  <input type="hidden" name="reply_id" value={reply.id} />
+                  <input type="hidden" name="reason" value="Potential safeguarding/privacy issue" />
+                  <input type="hidden" name="return_to" value={`/community/${thread.id}`} />
+                  <button type="submit" className="text-xs underline">
+                    Report
+                  </button>
+                </form>
+                {isAdmin ? (
+                  <form action={deleteReplyAsAdminAction}>
+                    <input type="hidden" name="reply_id" value={reply.id} />
+                    <input type="hidden" name="thread_id" value={thread.id} />
+                    <button type="submit" className="text-xs text-destructive underline">
+                      Delete (moderator)
+                    </button>
+                  </form>
+                ) : null}
               </div>
 
               {(grouped.get(reply.id) ?? []).map((nested) => (
@@ -142,6 +217,26 @@ export function CommunityThreadDetail({ thread, replies }: { thread: Thread; rep
                   >
                     <ArrowBigUp className="h-3.5 w-3.5" /> {nested.upvote_count}
                   </button>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <form action={reportContentAction}>
+                      <input type="hidden" name="thread_id" value={thread.id} />
+                      <input type="hidden" name="reply_id" value={nested.id} />
+                      <input type="hidden" name="reason" value="Potential safeguarding/privacy issue" />
+                      <input type="hidden" name="return_to" value={`/community/${thread.id}`} />
+                      <button type="submit" className="text-xs underline">
+                        Report
+                      </button>
+                    </form>
+                    {isAdmin ? (
+                      <form action={deleteReplyAsAdminAction}>
+                        <input type="hidden" name="reply_id" value={nested.id} />
+                        <input type="hidden" name="thread_id" value={thread.id} />
+                        <button type="submit" className="text-xs text-destructive underline">
+                          Delete (moderator)
+                        </button>
+                      </form>
+                    ) : null}
+                  </div>
                 </div>
               ))}
 

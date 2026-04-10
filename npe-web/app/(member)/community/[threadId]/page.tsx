@@ -1,10 +1,19 @@
 import { notFound } from "next/navigation";
 import { CommunityThreadDetail } from "@/components/member/community-thread-detail";
+import { getAdminSession } from "@/lib/admin-access";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function ThreadDetailPage({ params }: { params: Promise<{ threadId: string }> }) {
+export default async function ThreadDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ threadId: string }>;
+  searchParams: Promise<{ reported?: string; moderated?: string; report_error?: string }>;
+}) {
   const { threadId } = await params;
+  const qs = await searchParams;
   const supabase = await createClient();
+  const adminSession = await getAdminSession();
 
   const {
     data: { user },
@@ -89,6 +98,10 @@ export default async function ThreadDetailPage({ params }: { params: Promise<{ t
     <CommunityThreadDetail
       thread={{ ...thread, upvote_count: threadUpvoteCount, upvoted_by_me: threadUpvotedByMe }}
       replies={preparedReplies}
+      isAdmin={adminSession.isAdmin}
+      reported={qs.reported === "1"}
+      moderated={qs.moderated === "1"}
+      reportError={qs.report_error || null}
     />
   );
 }
