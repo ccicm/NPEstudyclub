@@ -28,7 +28,9 @@ Private study hub for approved provisional psychologists preparing for the Natio
 	- `supabase/005_explanation_feedback.sql`
 	- `supabase/006_explanation_feedback_settings.sql`
 	- `supabase/007_noticeboard_publish_windows.sql`
-8. Create a private Supabase Storage bucket named `resources`.
+8. Choose one storage mode for resource files:
+	- Supabase (default): create a private Supabase Storage bucket named `resources`.
+	- DigitalOcean Spaces (optional): set `DO_SPACES_KEY`, `DO_SPACES_SECRET`, `DO_SPACES_REGION`, `DO_SPACES_BUCKET`, and `DO_SPACES_ENDPOINT`.
 
 ## Run Locally
 
@@ -107,4 +109,7 @@ If you are locked out, use this sequence:
 
 - Member routes are protected and redirect unauthenticated users to sign in.
 - Approved status is checked against the `approved_users` table.
-- Resource files are stored in the private `resources` bucket and exposed with signed URLs.
+- Resource files are stored in either:
+	- Supabase private `resources` bucket (default), or
+	- DigitalOcean Spaces when all `DO_SPACES_*` env vars are configured.
+- Download links are always served as signed URLs.

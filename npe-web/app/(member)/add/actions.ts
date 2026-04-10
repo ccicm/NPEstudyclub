@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { uploadResourceObject } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 
 function normalizeFileName(name: string) {
@@ -28,7 +29,6 @@ function fromSelectWithOther(formData: FormData, key: string) {
 
 function classifyError(message: string) {
   const lower = message.toLowerCase();
-  if (lower.includes("bucket") && lower.includes("not found")) return "storage_not_ready";
   if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
   if (lower.includes("does not exist") || lower.includes("undefined table") || lower.includes("undefined column")) {
     return "schema_not_ready";
@@ -65,17 +65,15 @@ export async function addResourceAction(formData: FormData) {
   const storagePath = `${user.id}/${Date.now()}-${safeName}`;
   const fileBuffer = Buffer.from(await fileInput.arrayBuffer());
 
-  const { error: uploadError } = await supabase.storage.from("resources").upload(storagePath, fileBuffer, {
+  const uploadResult = await uploadResourceObject({
+    supabase,
+    objectKey: storagePath,
+    body: fileBuffer,
     contentType: fileInput.type || "application/octet-stream",
-    upsert: false,
   });
 
-  if (uploadError) {
-    const classified = classifyError(uploadError.message || "");
-    if (classified) {
-      redirect(`/add?error=${classified}`);
-    }
-    redirect("/add?error=upload_failed");
+  if (!uploadResult.ok) {
+    redirect(`/add?error=${uploadResult.code}`);
   }
 
   const fileType = fileInput.name.includes(".") ? fileInput.name.split(".").pop() || null : null;

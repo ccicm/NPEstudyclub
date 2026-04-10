@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createResourceSignedUrl } from "@/lib/storage";
 import { ResourceLibraryClient } from "@/components/member/resource-library-client";
 
 export default async function ResourcesPage() {
@@ -30,10 +31,14 @@ export default async function ResourcesPage() {
         return { ...resource, signedUrl: null, completed: progressIds.has(resource.id) };
       }
 
-      const { data } = await supabase.storage.from("resources").createSignedUrl(resource.file_path, 60 * 60);
+      const signedUrl = await createResourceSignedUrl({
+        supabase,
+        objectKey: resource.file_path,
+        expiresInSeconds: 60 * 60,
+      });
       return {
         ...resource,
-        signedUrl: data?.signedUrl ?? null,
+        signedUrl,
         completed: progressIds.has(resource.id),
       };
     }),

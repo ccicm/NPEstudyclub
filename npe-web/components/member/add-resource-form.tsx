@@ -102,6 +102,8 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
             ? "Please complete title, category, and file before uploading."
             : errorCode === "storage_not_ready"
               ? "Storage bucket is not ready. Create a private 'resources' bucket in Supabase or configure external storage first."
+              : errorCode === "storage_misconfigured"
+                ? "Storage is configured incorrectly. Check storage environment variables and bucket permissions."
               : errorCode === "schema_not_ready"
                 ? "Resource tables are not ready in Supabase. Run migrations 001, 002, and 003."
                 : errorCode === "not_authorized"
