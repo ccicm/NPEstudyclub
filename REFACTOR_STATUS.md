@@ -71,6 +71,10 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Request-access copy now uses "AHPRA registration number" wording (replacing PSY-focused label copy)
 - Admin self-approval helper text and button label clarified
 - Dashboard account chip label softened to "Member access"
+- Quiz list now includes a clear AI-generated disclosure banner
+- Quiz runner now shows AI-generated disclosure copy on intro and results stages
+- Calendar export study blocks now use UTC-safe timing aligned to 7:00pm AEST defaults
+- Schedule filter now supports exam windows and my exam window views
 - Profile stale progress section removed
 - Schedule now shows a dependency prompt when no study plan exists
 - Resource library fetch cap raised from 200 to 1000 (pagination still pending)

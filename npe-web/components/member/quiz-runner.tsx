@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
+import { Bot } from "lucide-react";
 import { saveQuizResultAction, voteExplanationAction } from "@/app/(member)/quizzes/actions";
 
 type QuizQuestion = {
@@ -87,6 +88,10 @@ export function QuizRunner({
         <h1 className="text-3xl">{quiz.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{quiz.domain || "General"}</p>
         {quiz.description ? <p className="mt-3 text-sm text-muted-foreground">{quiz.description}</p> : null}
+        <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
+          <Bot className="h-4 w-4" />
+          AI-generated. Your feedback tunes the model.
+        </p>
         <p className="mt-4 text-sm">{questions.length} questions · ~{questions.length} mins</p>
         <button
           type="button"
@@ -111,6 +116,10 @@ export function QuizRunner({
             {percent}% · {percent >= 70 ? "Pass" : "Needs review"}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">Domain: {quiz.domain || "General"}</p>
+          <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
+            <Bot className="h-4 w-4" />
+            These explanations were written by AI. Rate each one below to improve future questions.
+          </p>
 
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
             <button

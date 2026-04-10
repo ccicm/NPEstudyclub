@@ -22,6 +22,10 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Request-access PSY-focused label/copy renamed to "AHPRA registration number" wording.
 	- Admin self-approval helper copy and button label clarified.
 	- Dashboard account card label softened to "Member access".
+	- Quiz list now includes a consistent AI-generated disclosure callout.
+	- Quiz runner now includes AI-generated disclosure copy in intro and results.
+	- Calendar export study blocks now use UTC-safe AEST-aligned times.
+	- Schedule filter controls now include `Exam windows` and conditional `My exam window` views.
 - In progress:
 	- Replace remaining developer-facing error strings with user-safe copy across all surfaces.
 	- Confirm remaining resource actions across non-library surfaces retain consistent "View"/"Download" language.

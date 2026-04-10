@@ -45,6 +45,7 @@ type DayEvent =
       id: string;
       label: string;
       registrationInfo: string;
+      date: string;
     };
 
 function monthMatrix(viewDate: Date) {
@@ -89,15 +90,17 @@ export function ScheduleCalendar({
   sessions,
   studyPlanWeeks = [],
   userId = null,
+  myExamDate = null,
   addSessionAction,
 }: {
   sessions: Session[];
   studyPlanWeeks?: StudyPlanWeek[];
   userId?: string | null;
+  myExamDate?: string | null;
   addSessionAction: (formData: FormData) => Promise<void>;
 }) {
   const [viewDate, setViewDate] = useState(() => new Date());
-  const [filter, setFilter] = useState<"all" | "group" | "adhoc" | "studyplan" | "mine">("all");
+  const [filter, setFilter] = useState<"all" | "group" | "adhoc" | "studyplan" | "mine" | "exam" | "myexam">("all");
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [showForm, setShowForm] = useState(false);
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -162,6 +165,7 @@ export function ScheduleCalendar({
           kind: "window",
           id: `${window.label}-${dateKey(cursor)}`,
           label: window.label,
+          date: dateKey(cursor),
           registrationInfo: `Registrations open ${registrationOpen.toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
@@ -180,7 +184,11 @@ export function ScheduleCalendar({
 
     for (const [date, events] of allEvents.entries()) {
       const filtered = events.filter((event) => {
-        if (event.kind === "window") return true;
+        if (event.kind === "window") {
+          if (filter === "all" || filter === "exam") return true;
+          if (filter === "myexam") return Boolean(myExamDate && event.date === myExamDate);
+          return false;
+        }
         if (filter === "all") return true;
         if (filter === "group") return event.kind === "session" && event.sessionType !== "Ad-hoc";
         if (filter === "adhoc") return event.kind === "session" && event.sessionType === "Ad-hoc";
@@ -195,7 +203,7 @@ export function ScheduleCalendar({
     }
 
     return result;
-  }, [allEvents, filter, userId]);
+  }, [allEvents, filter, myExamDate, userId]);
 
   const visibleDays = useMemo(() => monthMatrix(viewDate), [viewDate]);
   const selectedEvents = selectedDate ? filteredEvents.get(dateKey(selectedDate)) ?? [] : [];
@@ -205,7 +213,7 @@ export function ScheduleCalendar({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl">Schedule</h1>
         <div className="flex gap-2 flex-wrap">
-          {(["all", "group", "adhoc", "studyplan", "mine"] as const).map((value) => (
+          {(["all", "group", "adhoc", "studyplan", "mine", "exam", ...(myExamDate ? (["myexam"] as const) : [])] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -222,6 +230,10 @@ export function ScheduleCalendar({
                     ? "Ad-hoc"
                     : value === "studyplan"
                       ? "My study plan"
+                      : value === "exam"
+                        ? "Exam windows"
+                        : value === "myexam"
+                          ? "My exam window"
                       : "My sessions"}
             </button>
           ))}

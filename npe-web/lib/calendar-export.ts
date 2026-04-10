@@ -98,9 +98,11 @@ export async function generateUserCalendarIcs(args: {
 
     dates.forEach((date) => {
       const start = new Date(date);
-      start.setHours(19, 0, 0, 0);
+      // 7:00pm AEST is 09:00 UTC.
+      start.setUTCHours(9, 0, 0, 0);
       const end = new Date(start);
-      end.setHours(end.getHours() + 1);
+      // Default study block is 1.5 hours.
+      end.setUTCHours(10, 30, 0, 0);
 
       cal.createEvent({
         start,

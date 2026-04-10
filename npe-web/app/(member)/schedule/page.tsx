@@ -17,7 +17,7 @@ export default async function SchedulePage() {
     .limit(50);
 
   const { data: studyPlan } = user
-    ? await supabase.from("study_plans").select("id,preferred_days").eq("user_id", user.id).maybeSingle()
+    ? await supabase.from("study_plans").select("id,preferred_days,exam_date").eq("user_id", user.id).maybeSingle()
     : { data: null };
 
   const { data: studyPlanWeeks } = studyPlan
@@ -53,6 +53,7 @@ export default async function SchedulePage() {
         sessions={sessions ?? []}
         studyPlanWeeks={weeksWithDays}
         userId={user?.id ?? null}
+        myExamDate={studyPlan?.exam_date ?? null}
         addSessionAction={addAdHocSession}
       />
     </div>

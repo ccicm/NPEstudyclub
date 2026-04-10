@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Bot } from "lucide-react";
 import { EXAM_PREP_DOMAINS } from "@/lib/resource-options";
 
 type QuizCard = {
@@ -68,6 +69,14 @@ export function QuizzesBrowser({
       {fortnightlyMessage ? (
         <p className="rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm text-slate-800">{fortnightlyMessage}</p>
       ) : null}
+
+      <p className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+        <span className="inline-flex items-center gap-2 font-medium">
+          <Bot className="h-4 w-4" />
+          All quizzes are AI-generated.
+        </span>{" "}
+        Your ratings after each quiz help improve question quality.
+      </p>
 
       <div className="flex flex-wrap gap-2">
         {(["All", "Exam Prep", "Clinical Practice"] as const).map((item) => (
