@@ -129,6 +129,7 @@ function mapDoSpacesError(error: unknown): UploadFailureCode {
     message.includes("invalidaccesskeyid") ||
     message.includes("signaturedoesnotmatch") ||
     message.includes("credentials") ||
+    message.includes("unknown endpoint") ||
     message.includes("authorizationheadermalformed") ||
     message.includes("could not load credentials") ||
     message.includes("getaddrinfo") ||
@@ -138,6 +139,10 @@ function mapDoSpacesError(error: unknown): UploadFailureCode {
     status === 401 ||
     status === 403
   ) {
+    return "storage_misconfigured";
+  }
+
+  if (status >= 400 && status < 500) {
     return "storage_misconfigured";
   }
 

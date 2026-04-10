@@ -64,7 +64,6 @@ export function StudyPlanOnboarding({
               <span>When is your NPE exam?</span>
               <input
                 type="date"
-                name="exam_date"
                 value={examDate}
                 onChange={(event) => setExamDate(event.target.value)}
                 className="h-10 rounded-md border bg-background px-3"
@@ -159,6 +158,8 @@ export function StudyPlanOnboarding({
             </div>
           </div>
         ) : null}
+
+        <input type="hidden" name="exam_date" value={examDate} />
 
         <input type="hidden" name="hours_per_week" value={hoursPerWeek} />
         <input type="hidden" name="preferred_days" value={JSON.stringify(preferredDays)} />
