@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteResourceObject } from "@/lib/storage";
 import { uploadResourceObject } from "@/lib/storage";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 function normalizeFileName(name: string) {
@@ -33,20 +32,36 @@ function classifyError(error: { message?: string; code?: string } | null | undef
   const message = String(error?.message || "").toLowerCase();
   const code = String(error?.code || "").toUpperCase();
 
+  // Log for debugging
+  if (process.env.NODE_ENV === "development") {
+    console.error("[addResourceAction] Error code:", code, "Message:", message);
+  }
+
   if (code === "42501" || message.includes("row-level security") || message.includes("permission denied")) {
     return "not_authorized";
   }
 
-  if (code === "42P01" || code === "42703" || code === "PGRST204") {
+  // Only classify as schema_not_ready for genuine schema errors
+  if (code === "42P01") {
+    // Table doesn't exist
+    return "schema_not_ready";
+  }
+
+  if (
+    code === "42703" &&
+    !message.includes("modality") &&
+    !message.includes("population") &&
+    !message.includes("content_type") &&
+    !message.includes("source") &&
+    !message.includes("tags")
+  ) {
+    // Column doesn't exist (but not a metadata column we expect)
     return "schema_not_ready";
   }
 
   if (
     message.includes("undefined table") ||
-    message.includes("undefined column") ||
-    (message.includes("relation") && message.includes("does not exist")) ||
-    message.includes("schema cache") ||
-    (message.includes("could not find the") && message.includes("column"))
+    (message.includes("relation") && message.includes("does not exist"))
   ) {
     return "schema_not_ready";
   }
@@ -171,18 +186,9 @@ export async function addResourceAction(formData: FormData) {
 
   let error: { message?: string; code?: string } | null = null;
 
-  const adminClient = (() => {
-    try {
-      return createAdminClient();
-    } catch {
-      return null;
-    }
-  })();
-
+  // Use user's own Supabase client (preserves auth context for RLS)
   for (const payload of insertAttempts) {
-    const { error: attemptError } = adminClient
-      ? await adminClient.from("resources").insert(payload)
-      : await supabase.from("resources").insert(payload);
+    const { error: attemptError } = await supabase.from("resources").insert(payload);
     if (!attemptError) {
       error = null;
       break;
