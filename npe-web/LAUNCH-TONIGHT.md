@@ -21,6 +21,13 @@ In `.env.local`:
 **Database:**
 - Run `supabase/001_npe_schema.sql` in SQL Editor
 - Run `supabase/002_feature_upgrade.sql` in SQL Editor
+- Run `supabase/003_p1_refactor.sql` in SQL Editor
+- Run `supabase/004_quiz_pipeline_upgrade.sql` in SQL Editor
+- Run `supabase/005_explanation_feedback.sql` in SQL Editor
+- Run `supabase/006_explanation_feedback_settings.sql` in SQL Editor
+- Run `supabase/007_noticeboard_publish_windows.sql` in SQL Editor
+- Run `supabase/008_study_plan_enhancements.sql` in SQL Editor
+- Run `supabase/009_resource_schema_guard.sql` in SQL Editor
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`

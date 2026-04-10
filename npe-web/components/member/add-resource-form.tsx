@@ -105,7 +105,7 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
               : errorCode === "storage_misconfigured"
                 ? "Storage is configured incorrectly. For DigitalOcean, confirm region, key/secret, bucket, and endpoint format (e.g. nyc3.digitaloceanspaces.com)."
               : errorCode === "schema_not_ready"
-                ? "Resource tables are not ready in Supabase. Run migrations 001, 002, and 003."
+                ? "Resource tables are not ready in Supabase. Run migrations 001, 002, 003, and 009."
                 : errorCode === "not_authorized"
                   ? "Your account does not currently have permission to upload resources. Confirm your approved member status."
                   : errorCode === "save_failed"

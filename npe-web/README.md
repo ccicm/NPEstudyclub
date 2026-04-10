@@ -28,6 +28,8 @@ Private study hub for approved provisional psychologists preparing for the Natio
 	- `supabase/005_explanation_feedback.sql`
 	- `supabase/006_explanation_feedback_settings.sql`
 	- `supabase/007_noticeboard_publish_windows.sql`
+	- `supabase/008_study_plan_enhancements.sql`
+	- `supabase/009_resource_schema_guard.sql`
 8. Choose one storage mode for resource files:
 	- Supabase (default): create a private Supabase Storage bucket named `resources`.
 	- DigitalOcean Spaces (optional): set `DO_SPACES_KEY`, `DO_SPACES_SECRET`, `DO_SPACES_REGION`, `DO_SPACES_BUCKET`, and `DO_SPACES_ENDPOINT`.
