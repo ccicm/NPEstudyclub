@@ -14,14 +14,13 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 ## Delivery Status Snapshot (2026-04-10)
 
-- **P1 status:** Complete in code.
-- **P2 status:** Complete in code.
-- **P3 status:** UX items 3.1-3.3 are complete in code. Operational verification (3.4) and bulk onboarding execution (3.5) are pending production run.
-- **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
-- **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
-- **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
-- **UX audit status:** In progress. P1 request-status state rendering and organiser-note removal are complete; user-facing technical error copy has been simplified across key member surfaces. Recent UX cleanup completed: resource search placeholder simplified, resource file action verb standardised to "View file", add-resource category helper text added, request-access PSY copy relabeled to AHPRA registration number wording, admin self-approval copy clarified, AI-generated disclosure callouts added to quiz list + runner intro/results, calendar export study blocks switched to UTC-safe AEST timing, schedule filter controls now include exam windows/my exam window states, and quiz results now enforce a sequential explanation-rating review flow before completion. Remaining UX follow-ups are now narrowed to unresolved taxonomy/channel and deeper flow items.
+- **Core implementation status:** P1 and P2 are complete in code. P3 UX items 3.1-3.3 are complete in code; operational verification (3.4) and bulk onboarding execution (3.5) remain pending production run.
+- **Quiz moderation status:** Quiz review flow redesign is implemented in UI and min-vote escalation guards are implemented in SQL/migration files; production rollout verification is still pending migration execution.
+- **UX/copy status:** Request-status rendering, technical-copy simplification, and major UX P2/P3 cleanup items are implemented; remaining follow-ups are narrowed to residual taxonomy/channel and copy consistency checks.
+- **Storage/resource status:** Upload pipeline is implemented with fallback/diagnostics. Production verification from upload through visibility and signed URL open is still pending from a live production session.
 - **Migration CI status:** In progress. GitHub Action + migration file are committed, but rollout is blocked by connection endpoint/secret mismatch. This is deferred for tonight and resumes next session with pooler URL verification.
+- **Clinical safeguarding status:** Started in code (guidelines, disclaimer banner, report scaffold, initial moderator controls). Remaining moderator controls and production migration execution are pending.
+- **Generator polish status:** Started. Repetition audit baseline completed and initial variation fixes applied; diversity/rotation hardening remains in progress.
 
 ---
 
