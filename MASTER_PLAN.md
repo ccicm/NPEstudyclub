@@ -52,6 +52,8 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 Code changes are complete in repository SQL files, but escalation behavior is unchanged in live environments until SQL is applied.
 
+**GitHub Actions secret required:** `SUPABASE_DB_URL` or `DATABASE_URL`, containing a full Postgres DSN such as `postgres://user:password@host:5432/postgres?sslmode=require`.
+
 **What must be applied:**
 1. `npe-web/supabase/006_explanation_feedback_settings.sql` (adds `explanation_min_votes` default and guard in explanation escalation)
 2. `npe-web/supabase/007_noticeboard_publish_windows.sql` (adds min-vote guards for flagged-question + explanation escalation)
