@@ -24,11 +24,18 @@ jobs:
 
       - name: Validate database URL secret
         run: |
-          DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
+          DB_URL=""
+          SOURCE=""
 
-          if [ -z "$DB_URL" ] && [ -n "$SUPABASE_DB_PASSWORD" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
+          # Prefer deriving the DSN from project ref + password because this safely URL-encodes
+          # special characters that often break raw pasted connection strings.
+          if [ -n "$SUPABASE_DB_PASSWORD" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
             ENCODED_PASSWORD=$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')
             DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres?sslmode=require"
+            SOURCE="derived"
+          else
+            DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
+            SOURCE="secret"
           fi
 
           if [ -z "$DB_URL" ]; then
@@ -50,7 +57,7 @@ jobs:
             exit 1
           fi
 
-          echo "DB_URL is set"
+          echo "DB_URL is set (source: $SOURCE)"
           echo "RESOLVED_DB_URL=$DB_URL" >> "$GITHUB_ENV"
 
       - name: Push migrations
