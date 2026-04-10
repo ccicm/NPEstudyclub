@@ -28,7 +28,7 @@ export default async function ResourcesPage() {
     .from("resources")
     .select("id,title,file_type,category,domain,modality,population,content_type,source,tags,notes,uploader_name,file_path,created_at")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(1000);
 
   let resources: ResourceRow[] = (richResources ?? []) as ResourceRow[];
   let loadErrorCode: string | null = null;
@@ -42,7 +42,7 @@ export default async function ResourcesPage() {
       .from("resources")
       .select("id,title,file_type,category,notes,uploader_name,file_path,created_at")
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(1000);
 
     if (!fallbackError && fallbackResources) {
       resources = fallbackResources.map((row) => ({

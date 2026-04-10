@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   const { data: studyPlan } = user
     ? await supabase
         .from("study_plans")
-        .select("id")
+        .select("id,exam_date")
         .eq("user_id", user.id)
         .maybeSingle()
     : { data: null };
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <ExamCountdown />
+      <ExamCountdown studyPlanExamDate={studyPlan?.exam_date ?? null} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border bg-card p-6">
@@ -261,7 +261,9 @@ export default async function DashboardPage() {
         <section className="rounded-2xl border bg-card p-6">
           <h2 className="text-2xl">Recently Added Resources</h2>
           {!recentResources?.length ? (
-            <p className="mt-2 text-sm text-muted-foreground">No resources yet.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Nothing uploaded yet. <Link href="/add" className="underline">Add a resource</Link> to get started.
+            </p>
           ) : (
             <ul className="mt-3 space-y-3 text-sm">
               {recentResources.map((resource) => (
@@ -344,7 +346,9 @@ export default async function DashboardPage() {
           ) : null}
 
           {!quizCount && !quizError ? (
-            <p className="mt-2 text-sm text-muted-foreground">Take a quiz to see your activity and performance by domain.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              You haven&apos;t taken any quizzes yet. <Link href="/quizzes" className="underline">Browse quizzes</Link> to start.
+            </p>
           ) : null}
 
           <Link href="/quizzes/results" className="mt-3 inline-block text-sm underline">
@@ -356,9 +360,9 @@ export default async function DashboardPage() {
           <h2 className="text-2xl">Community Activity</h2>
           {!(threadsStarted || 0) && !(repliesCount || 0) ? (
             <div className="mt-3 rounded-xl border bg-muted/30 p-4">
-              <p className="text-sm">You haven&apos;t posted yet.</p>
+              <p className="text-sm">Jump into the conversation.</p>
               <Link href="/community" className="mt-2 inline-block text-sm font-semibold underline">
-                Start a thread in Community -&gt;
+                Browse threads -&gt;
               </Link>
             </div>
           ) : (

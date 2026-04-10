@@ -338,7 +338,13 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
 
       {!filtered.length ? (
         <p className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground">
-          No resources match. Try clearing a filter.
+          {resources.length === 0 ? (
+            <>
+              Nothing has been uploaded yet. <Link href="/add" className="underline">Add a resource</Link> to get started.
+            </>
+          ) : (
+            <>No resources match. Try clearing a filter.</>
+          )}
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

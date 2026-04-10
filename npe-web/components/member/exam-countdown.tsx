@@ -38,11 +38,32 @@ function formatDate(date: Date) {
   });
 }
 
-export function ExamCountdown() {
-  const now = new Date();
-  const timeline = getTimelineWindow(now);
+function parseDate(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
 
-  if (!timeline.window) {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function findWindowForDate(targetDate: Date) {
+  return (
+    EXAM_WINDOWS.find((window) => {
+      const { start, end } = windowToDates(window);
+      return targetDate >= start && targetDate <= end;
+    }) ?? null
+  );
+}
+
+export function ExamCountdown({ studyPlanExamDate = null }: { studyPlanExamDate?: string | null }) {
+  const now = new Date();
+  const personalExamDate = parseDate(studyPlanExamDate);
+  const personalWindow = personalExamDate ? findWindowForDate(personalExamDate) : null;
+  const timeline = getTimelineWindow(now);
+  const activeWindow = personalWindow ?? timeline.window;
+
+  if (!activeWindow) {
     return (
       <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-sm md:p-6">
         <h1 className="text-3xl">NPE Timeline</h1>
@@ -52,26 +73,37 @@ export function ExamCountdown() {
   }
 
   const registrationOpen = new Date(
-    timeline.window.registrationOpen[0],
-    timeline.window.registrationOpen[1] - 1,
-    timeline.window.registrationOpen[2],
+    activeWindow.registrationOpen[0],
+    activeWindow.registrationOpen[1] - 1,
+    activeWindow.registrationOpen[2],
   );
-  const { start, end } = windowToDates(timeline.window);
+  const { start, end } = windowToDates(activeWindow);
 
   return (
     <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-sm md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-            {timeline.window.label}
+            {activeWindow.label}
           </span>
-          <h1 className="mt-3 text-3xl">NPE Timeline</h1>
-          <p className="mt-1 text-sm text-primary-foreground/90">Key dates for planning, not a countdown clock.</p>
+          <h1 className="mt-3 text-3xl">{personalExamDate ? "Your exam timeline" : "NPE Timeline"}</h1>
+          <p className="mt-1 text-sm text-primary-foreground/90">
+            {personalExamDate
+              ? "Based on the exam date you set in your study plan."
+              : "Key dates for planning, not a countdown clock."}
+          </p>
         </div>
         <Link href="/schedule" className="text-sm underline underline-offset-4">
           View in schedule
         </Link>
       </div>
+
+      {personalExamDate ? (
+        <div className="mt-5 rounded-xl bg-white/15 px-4 py-3 text-sm">
+          <p className="font-semibold">Your exam date</p>
+          <p>{formatDate(personalExamDate)}</p>
+        </div>
+      ) : null}
 
       <div className="mt-5 grid gap-3 text-sm md:max-w-2xl">
         <div className="grid grid-cols-[170px_1fr] items-center rounded-xl bg-white/15 px-4 py-3">
