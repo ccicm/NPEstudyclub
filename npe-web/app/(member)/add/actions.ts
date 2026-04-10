@@ -107,11 +107,17 @@ function isMissingMetadataColumnError(error: { message?: string; code?: string }
   );
 }
 
-function getDbDiagnostic(error: { message?: string; code?: string; details?: string; hint?: string }) {
+function getDbDiagnostic(error: { message?: string; code?: string; details?: string; hint?: string }): {
+  dbCode: string;
+  dbHint: string;
+  dbColumn: string;
+} {
   const code = String(error.code || "unknown").toUpperCase();
   const message = String(error.message || "").toLowerCase();
   const details = String(error.details || "").toLowerCase();
   const hint = String(error.hint || "").toLowerCase();
+  const match = `${message} ${details} ${hint}`.match(/column\s+['"]?([a-z_][a-z0-9_]*)['"]?/i);
+  const dbColumn = match?.[1] || "";
 
   if (
     code === "42501" ||
@@ -120,26 +126,23 @@ function getDbDiagnostic(error: { message?: string; code?: string; details?: str
     details.includes("policy") ||
     hint.includes("policy")
   ) {
-    return { dbCode: code, dbHint: "rls_policy" };
+    return { dbCode: code, dbHint: "rls_policy", dbColumn };
   }
 
   if (code === "23503" || message.includes("foreign key")) {
-    return { dbCode: code, dbHint: "foreign_key" };
+    return { dbCode: code, dbHint: "foreign_key", dbColumn };
   }
 
   if (code === "23502" || message.includes("null value")) {
-    return { dbCode: code, dbHint: "not_null" };
+    return { dbCode: code, dbHint: "not_null", dbColumn };
   }
-
-  const match = `${message} ${details} ${hint}`.match(/column\s+['"]?([a-z_][a-z0-9_]*)['"]?/i);
-  const dbColumn = match?.[1] || "";
 
   if (code === "42703" || code === "PGRST204" || message.includes("undefined column")) {
     return { dbCode: code, dbHint: "missing_column", dbColumn };
   }
 
   if (code === "42P01" || message.includes("relation") || message.includes("does not exist")) {
-    return { dbCode: code, dbHint: "missing_table" };
+    return { dbCode: code, dbHint: "missing_table", dbColumn };
   }
 
   return { dbCode: code, dbHint: "unknown", dbColumn };
