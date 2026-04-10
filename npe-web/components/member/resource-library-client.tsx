@@ -222,8 +222,9 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null, loadErr
       {loadErrorCode ? (
         <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           <p>
-            Resource metadata read had an error ({loadErrorCode}). The library is showing fallback columns where possible.
-            Run migrations 001 through 011 in production and retry.
+            {loadErrorCode === "42501" && (loadErrorHint || "").toLowerCase().includes("table users")
+              ? "Resource metadata read is blocked by a stale policy referencing table users. Run migration 013_resources_policy_hard_reset.sql in production and retry."
+              : `Resource metadata read had an error (${loadErrorCode}). The library is showing fallback columns where possible. Run migrations 001 through 011 in production and retry.`}
           </p>
           {loadErrorHint ? <p className="mt-2 text-xs text-destructive/90">Details: {loadErrorHint}</p> : null}
         </div>

@@ -112,6 +112,8 @@ export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint, d
                 ? "Resource tables are not ready in Supabase. Run migrations 001, 002, 003, and 009."
                 : errorCode === "not_authorized"
                   ? "Your account does not currently have permission to upload resources. Confirm your approved member status."
+            : errorCode === "save_failed" && dbCode === "42501" && (dbHint || "").toLowerCase().includes("users")
+              ? "Resource write is blocked by a stale production policy. Run migration 013_resources_policy_hard_reset.sql in Supabase, then retry upload."
                   : errorCode === "save_failed"
                     ? "File upload completed but resource metadata could not be saved. Confirm your account is approved and database policies are active."
                   : "Upload failed. If using DigitalOcean Spaces, check endpoint/region/key/bucket values and retry."}
