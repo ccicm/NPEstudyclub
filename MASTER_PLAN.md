@@ -48,6 +48,18 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 ## Hard Blockers — Current
 
+### 0. Escalation min-vote guard rollout (must apply in DB)
+
+Code changes are complete in repository SQL files, but escalation behavior is unchanged in live environments until SQL is applied.
+
+**What must be applied:**
+1. `npe-web/supabase/006_explanation_feedback_settings.sql` (adds `explanation_min_votes` default and guard in explanation escalation)
+2. `npe-web/supabase/007_noticeboard_publish_windows.sql` (adds min-vote guards for flagged-question + explanation escalation)
+
+**Acceptance check:**
+1. A single downvote must not create a review thread.
+2. Escalation should only evaluate ratio after `explanation_min_votes` (default 5) is reached.
+
 ### 1. Resource storage verification and visibility follow-up
 
 Resource upload/storage wiring is now implemented. The remaining blocker is confirming production visibility and download for newly uploaded items.
@@ -84,6 +96,17 @@ Resource upload/storage wiring is now implemented. The remaining blocker is conf
 5. Verify failure handling shows an actionable message when keys/bucket are misconfigured.
 
 **Capture in summary:** which mode was used, exact env/config changes, result of upload + download test, any remaining blocker.
+
+### 1.1 Bulk resource upload plan (operational)
+
+After storage verification is green, run a controlled bulk upload pass for existing resource files.
+
+**Execution plan:**
+1. Build upload batch list (title, category, metadata, file path, owner attribution).
+2. Upload in batches of 10-20 resources and confirm each batch appears in `/resources` before next batch.
+3. Track failures (file type, size, metadata mismatch, permission/storage error) and retry after correction.
+4. Confirm signed URL open behavior for at least one file per type in each batch.
+5. Log completion count and unresolved items in `REFACTOR_STATUS.md`.
 
 ### 2. Storage privacy architecture verification (mandatory)
 

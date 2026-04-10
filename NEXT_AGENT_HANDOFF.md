@@ -33,7 +33,13 @@ Use [MASTER_PLAN.md](MASTER_PLAN.md) as the source of truth. This file is a quic
 
 ## 2) High-priority infra/product follow-up
 
+- Apply the min-vote escalation guard SQL changes in environment(s) before relying on moderation thresholds:
+  - `npe-web/supabase/006_explanation_feedback_settings.sql`
+  - `npe-web/supabase/007_noticeboard_publish_windows.sql`
+- Verify: one downvote cannot escalate; ratio checks run only after minimum vote count.
 - Keep resources page at limit 1000 for now; add follow-up task for server-side pagination/filtering.
+- Prepare and execute a controlled bulk resource upload run once storage verification is green.
+- Capture batch upload outcomes (success/failure counts and retry list) in status docs.
 - Decide whether to raise non-resource list caps still at 200 (community/quizzes) or leave intentionally scoped.
 - Prepare for migration 014 rollout dependencies (status field + policy changes), but do not apply production SQL from agent unless requested.
 
