@@ -20,6 +20,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
 - **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
 - **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
+- **UX audit status:** Not started in code. The full first-pass UX audit is captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md` and is the next non-quiz refactor block once current production verification work is stable.
 
 ---
 
@@ -414,6 +415,39 @@ Progress update (2026-04-10):
 - Keep the current seed-file output shape (`seed/daily/`, `seed/fortnightly/`, `seed/staging/`)
 - Do not change the GitHub Actions workflow unless there is a specific blocker
 - Do not introduce paid API calls
+
+---
+
+## UX Audit — NPE Study Club
+
+This is the next refactor block after current storage/safeguarding verification work is stable.
+
+**Source:** `docs/UX_AUDIT_NPE_STUDY_CLUB.md`
+
+### Priority Order
+
+**P1 — Critical**
+- Condition `/auth/request-status` on auth + approval state.
+- Remove organiser-only text from the public request-status page.
+- Strip developer-facing error strings from production UI; keep diagnostics internal.
+
+**P2 — High**
+- Standardise file actions to `View` or `Download`.
+- Remove the stale Profile progress section.
+- Make empty states more inviting and linked.
+- Simplify the resource search placeholder.
+
+**P3 — Medium**
+- Add schedule dependency prompts when no plan exists.
+- Add helper text for conditional upload metadata sections.
+- Rename PSY labels to AHPRA registration number.
+- Rename ambiguous community channel labels.
+- Clarify admin approval copy/helper text.
+
+**P4 — Low**
+- Replace dashboard hero subtitle with more useful copy.
+- Convert admin reviewed items into a minimal table.
+- Remove or soften the dashboard `ACCOUNT` label.
 
 ---
 

@@ -62,7 +62,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 
 ## Not Started
 
-- (none)
+- UX audit refactor block (captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`)
 
 ## Generator Polish (Started)
 
