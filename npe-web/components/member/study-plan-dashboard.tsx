@@ -36,6 +36,7 @@ export function StudyPlanDashboard({
   quizzes,
   logStudyTimeAction,
   updateStudyPlanAction,
+  resetStudyPlanAction,
 }: {
   errorCode: string | null;
   plan: {
@@ -50,6 +51,7 @@ export function StudyPlanDashboard({
   quizzes: QuizItem[];
   logStudyTimeAction: (formData: FormData) => Promise<void>;
   updateStudyPlanAction: (formData: FormData) => Promise<void>;
+  resetStudyPlanAction: () => Promise<void>;
 }) {
   const now = new Date();
   const examDate = new Date(plan.exam_date);
@@ -273,6 +275,18 @@ export function StudyPlanDashboard({
               Save and regenerate remaining weeks
             </button>
           </div>
+        </form>
+
+        <form action={resetStudyPlanAction} className="mt-4 border-t pt-4">
+          <p className="text-sm text-muted-foreground">
+            Need a fresh start? Delete this plan and begin again from onboarding.
+          </p>
+          <button
+            type="submit"
+            className="mt-3 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
+          >
+            Delete plan and restart
+          </button>
         </form>
       </details>
     </div>

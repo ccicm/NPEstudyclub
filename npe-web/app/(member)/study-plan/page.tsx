@@ -1,7 +1,7 @@
 import { StudyPlanDashboard } from "@/components/member/study-plan-dashboard";
 import { StudyPlanOnboarding } from "@/components/member/study-plan-onboarding";
 import { createClient } from "@/lib/supabase/server";
-import { createStudyPlanAction, logStudyTimeAction, updateStudyPlanAction } from "./actions";
+import { createStudyPlanAction, logStudyTimeAction, resetStudyPlanAction, updateStudyPlanAction } from "./actions";
 
 export default async function StudyPlanPage({
   searchParams,
@@ -89,6 +89,7 @@ export default async function StudyPlanPage({
       quizzes={quizzes ?? []}
       logStudyTimeAction={logStudyTimeAction}
       updateStudyPlanAction={updateStudyPlanAction}
+      resetStudyPlanAction={resetStudyPlanAction}
     />
   );
 }

@@ -165,10 +165,14 @@ function mapDoSpacesError(error: unknown): UploadFailureCode {
 }
 
 function createDoSpacesClient(config: DoSpacesConfig) {
+  return createDoSpacesClientWithStyle(config, true);
+}
+
+function createDoSpacesClientWithStyle(config: DoSpacesConfig, forcePathStyle: boolean) {
   return new S3Client({
     region: config.region,
     endpoint: config.endpoint,
-    forcePathStyle: true,
+    forcePathStyle,
     credentials: {
       accessKeyId: config.key,
       secretAccessKey: config.secret,
@@ -191,10 +195,11 @@ export async function uploadResourceObject({
       return { ok: false, code: "storage_misconfigured" };
     }
 
-    const client = createDoSpacesClient(config);
+    const pathStyleClient = createDoSpacesClient(config);
+    const virtualHostClient = createDoSpacesClientWithStyle(config, false);
 
     try {
-      await client.send(
+      await pathStyleClient.send(
         new PutObjectCommand({
           Bucket: config.bucket,
           Key: objectKey,
@@ -204,8 +209,21 @@ export async function uploadResourceObject({
       );
 
       return { ok: true };
-    } catch (error) {
-      return { ok: false, code: mapDoSpacesError(error) };
+    } catch (firstError) {
+      try {
+        await virtualHostClient.send(
+          new PutObjectCommand({
+            Bucket: config.bucket,
+            Key: objectKey,
+            Body: body,
+            ContentType: contentType,
+          }),
+        );
+
+        return { ok: true };
+      } catch (secondError) {
+        return { ok: false, code: mapDoSpacesError(secondError || firstError) };
+      }
     }
   }
 
@@ -235,7 +253,8 @@ export async function createResourceSignedUrl({
       return null;
     }
 
-    const client = createDoSpacesClient(config);
+    const pathStyleClient = createDoSpacesClient(config);
+    const virtualHostClient = createDoSpacesClientWithStyle(config, false);
 
     try {
       const command = new GetObjectCommand({
@@ -243,9 +262,17 @@ export async function createResourceSignedUrl({
         Key: objectKey,
       });
 
-      return await getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+      return await getSignedUrl(pathStyleClient, command, { expiresIn: expiresInSeconds });
     } catch {
-      return null;
+      try {
+        const command = new GetObjectCommand({
+          Bucket: config.bucket,
+          Key: objectKey,
+        });
+        return await getSignedUrl(virtualHostClient, command, { expiresIn: expiresInSeconds });
+      } catch {
+        return null;
+      }
     }
   }
 

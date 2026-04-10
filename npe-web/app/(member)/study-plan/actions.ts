@@ -65,6 +65,70 @@ async function loadSuggestionMaps(supabase: Awaited<ReturnType<typeof createClie
   return { resourcesByDomain, quizzesByDomain };
 }
 
+type QuizResultWithDomain = {
+  score: number;
+  total_questions: number;
+  quizzes: { domain?: string } | { domain?: string }[] | null;
+};
+
+async function loadDomainPerformance(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<Map<string, number>> {
+  const { data } = await supabase
+    .from("quiz_results")
+    .select("score,total_questions,quizzes(domain)")
+    .eq("user_id", userId);
+
+  const totals = new Map<string, { score: number; total: number }>();
+
+  ((data ?? []) as QuizResultWithDomain[]).forEach((result) => {
+    const quizRelation = Array.isArray(result.quizzes) ? result.quizzes[0] : result.quizzes;
+    const domain = normalizeDomain(quizRelation?.domain);
+    if (!domain || !result.total_questions) {
+      return;
+    }
+
+    const current = totals.get(domain) ?? { score: 0, total: 0 };
+    current.score += Number(result.score || 0);
+    current.total += Number(result.total_questions || 0);
+    totals.set(domain, current);
+  });
+
+  const performance = new Map<string, number>();
+  totals.forEach((value, domain) => {
+    performance.set(domain, value.total > 0 ? (value.score / value.total) * 100 : 0);
+  });
+
+  return performance;
+}
+
+function applyQuizPerformanceAdjustments(
+  domainPriorities: DomainPriorities,
+  domainPerformance: Map<string, number>,
+): DomainPriorities {
+  const adjusted: DomainPriorities = { ...domainPriorities };
+
+  Object.entries(adjusted).forEach(([domain, priority]) => {
+    const normalized = normalizeDomain(domain);
+    const score = domainPerformance.get(normalized);
+    if (typeof score !== "number") {
+      return;
+    }
+
+    let boosted = priority;
+    if (score < 45) {
+      boosted += 2;
+    } else if (score < 60) {
+      boosted += 1;
+    }
+
+    adjusted[domain] = Math.max(1, Math.min(3, boosted));
+  });
+
+  return adjusted;
+}
+
 function buildDomainPool(domainPriorities: DomainPriorities) {
   const entries = Object.entries(domainPriorities)
     .filter(([, priority]) => priority >= 1 && priority <= 3)
@@ -167,13 +231,15 @@ export async function createStudyPlanAction(formData: FormData) {
   }
 
   const suggestionMaps = await loadSuggestionMaps(supabase);
+  const domainPerformance = await loadDomainPerformance(supabase, user.id);
+  const adjustedPriorities = applyQuizPerformanceAdjustments(domainPriorities, domainPerformance);
 
   const planPayload = {
     user_id: user.id,
     exam_date: examDate.toISOString().slice(0, 10),
     hours_per_week: hoursPerWeek,
     preferred_days: preferredDays,
-    domain_priorities: domainPriorities,
+    domain_priorities: adjustedPriorities,
     updated_at: new Date().toISOString(),
   };
 
@@ -197,7 +263,7 @@ export async function createStudyPlanAction(formData: FormData) {
 
   const weeks = generateWeeks({
     examDate,
-    domainPriorities,
+    domainPriorities: adjustedPriorities,
     startDate: new Date(),
     startingWeekNumber: 1,
     suggestionMaps,
@@ -359,10 +425,12 @@ export async function updateStudyPlanAction(formData: FormData) {
   const removableWeeks = (existingWeeks ?? []).filter((week) => week.status !== "complete");
 
   const suggestionMaps = await loadSuggestionMaps(supabase);
+  const domainPerformance = await loadDomainPerformance(supabase, user.id);
+  const adjustedPriorities = applyQuizPerformanceAdjustments(domainPriorities, domainPerformance);
 
   const newWeeks = generateWeeks({
     examDate,
-    domainPriorities,
+    domainPriorities: adjustedPriorities,
     startDate: new Date(),
     startingWeekNumber: completedWeeks.length + 1,
     maxWeeks: undefined,
@@ -403,7 +471,7 @@ export async function updateStudyPlanAction(formData: FormData) {
     .update({
       exam_date: examDate.toISOString().slice(0, 10),
       hours_per_week: hoursPerWeek,
-      domain_priorities: domainPriorities,
+      domain_priorities: adjustedPriorities,
       updated_at: new Date().toISOString(),
     })
     .eq("id", plan.id);
@@ -414,4 +482,56 @@ export async function updateStudyPlanAction(formData: FormData) {
   }
 
   revalidatePath("/study-plan");
+}
+
+export async function resetStudyPlanAction() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/study-plan?error=auth_required");
+  }
+
+  const { data: plan } = await supabase
+    .from("study_plans")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!plan) {
+    redirect("/study-plan");
+  }
+
+  const { data: weeks } = await supabase
+    .from("study_plan_weeks")
+    .select("id")
+    .eq("plan_id", plan.id);
+
+  const weekIds = (weeks ?? []).map((week) => week.id);
+  if (weekIds.length) {
+    const { error: logDeleteError } = await supabase.from("study_log").delete().in("plan_week_id", weekIds);
+    if (logDeleteError) {
+      const errorCode = classifyStudyPlanError(String(logDeleteError.message || ""));
+      redirect(`/study-plan?error=${errorCode}`);
+    }
+
+    const { error: weekDeleteError } = await supabase.from("study_plan_weeks").delete().in("id", weekIds);
+    if (weekDeleteError) {
+      const errorCode = classifyStudyPlanError(String(weekDeleteError.message || ""));
+      redirect(`/study-plan?error=${errorCode}`);
+    }
+  }
+
+  const { error: planDeleteError } = await supabase.from("study_plans").delete().eq("id", plan.id);
+  if (planDeleteError) {
+    const errorCode = classifyStudyPlanError(String(planDeleteError.message || ""));
+    redirect(`/study-plan?error=${errorCode}`);
+  }
+
+  revalidatePath("/study-plan");
+  revalidatePath("/dashboard");
+  revalidatePath("/schedule");
+  redirect("/study-plan");
 }
