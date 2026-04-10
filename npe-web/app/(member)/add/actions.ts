@@ -31,13 +31,30 @@ function fromSelectWithOther(formData: FormData, key: string) {
 function classifyError(error: { message?: string; code?: string } | null | undefined) {
   const message = String(error?.message || "").toLowerCase();
   const code = String(error?.code || "").toUpperCase();
+  const errorObj = error as any || {};
+  const details = String(errorObj.details || "").toLowerCase();
+  const hint = String(errorObj.hint || "").toLowerCase();
 
   // Log for debugging
   if (process.env.NODE_ENV === "development") {
-    console.error("[addResourceAction] Error code:", code, "Message:", message);
+    console.error("[addResourceAction] Error details:", {
+      code,
+      message,
+      details,
+      hint,
+      fullError: error,
+    });
   }
 
-  if (code === "42501" || message.includes("row-level security") || message.includes("permission denied")) {
+  // Check for RLS/permission errors in multiple places
+  if (
+    code === "42501" ||
+    message.includes("row-level security") ||
+    message.includes("permission denied") ||
+    message.includes("new row violates row-level security") ||
+    hint.includes("row-level") ||
+    errorObj.code === "PGRST200"
+  ) {
     return "not_authorized";
   }
 
@@ -186,6 +203,12 @@ export async function addResourceAction(formData: FormData) {
 
   let error: { message?: string; code?: string } | null = null;
 
+  // Verify user context is preserved for RLS
+  const { data: sessionCheck } = await supabase.auth.getUser();
+  if (!sessionCheck.user) {
+    redirect("/auth/login");
+  }
+
   // Use user's own Supabase client (preserves auth context for RLS)
   for (const payload of insertAttempts) {
     const { error: attemptError } = await supabase.from("resources").insert(payload);
@@ -206,6 +229,21 @@ export async function addResourceAction(formData: FormData) {
       supabase,
       objectKey: storagePath,
     });
+
+    // Log full error for debugging
+    const errorMessage = String(error.message || "");
+    const errorCode = String(error.code || "");
+    const hint =
+      errorMessage.includes("permission") || errorMessage.includes("row-level")
+        ? `RLS_HINT: ${errorMessage}`
+        : "";
+    if (process.env.NODE_ENV === "development") {
+      console.error("[addResourceAction] Insert failed:", {
+        code: errorCode,
+        message: errorMessage,
+        hint,
+      });
+    }
 
     const classified = classifyError(error);
     redirect(`/add?error=${classified}`);
