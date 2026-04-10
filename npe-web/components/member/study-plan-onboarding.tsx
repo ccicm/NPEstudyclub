@@ -22,6 +22,7 @@ export function StudyPlanOnboarding({
   const [domainPriorities, setDomainPriorities] = useState<Record<string, number>>(
     Object.fromEntries(NPE_DOMAINS.map((domain) => [domain, 2])),
   );
+  const [prioritiesReviewed, setPrioritiesReviewed] = useState(false);
 
   const canSubmit = useMemo(() => Boolean(examDate), [examDate]);
 
@@ -156,6 +157,14 @@ export function StudyPlanOnboarding({
                 </div>
               ))}
             </div>
+            <label className="mt-3 inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={prioritiesReviewed}
+                onChange={(event) => setPrioritiesReviewed(event.target.checked)}
+              />
+              I have reviewed my priorities and want to generate my plan.
+            </label>
           </div>
         ) : null}
 
@@ -182,7 +191,7 @@ export function StudyPlanOnboarding({
           ) : (
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || !prioritiesReviewed}
               className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
             >
               Generate plan

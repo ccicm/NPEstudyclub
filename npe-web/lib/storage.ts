@@ -38,17 +38,32 @@ type DoSpacesConfig = {
   endpoint: string;
 };
 
-function normalizeEndpoint(endpoint: string) {
+function normalizeEndpoint(endpoint: string, bucket: string) {
   const trimmed = endpoint.trim();
   if (!trimmed) {
     return trimmed;
   }
 
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimmed;
-  }
+  const withProtocol =
+    trimmed.startsWith("http://") || trimmed.startsWith("https://")
+      ? trimmed
+      : `https://${trimmed}`;
 
-  return `https://${trimmed}`;
+  try {
+    const parsed = new URL(withProtocol);
+    parsed.pathname = "";
+    parsed.search = "";
+    parsed.hash = "";
+
+    const bucketPrefix = `${bucket.toLowerCase()}.`;
+    if (parsed.hostname.toLowerCase().startsWith(bucketPrefix)) {
+      parsed.hostname = parsed.hostname.slice(bucketPrefix.length);
+    }
+
+    return parsed.origin;
+  } catch {
+    return withProtocol;
+  }
 }
 
 function getDoSpacesConfig(): DoSpacesConfig | null {
@@ -62,7 +77,7 @@ function getDoSpacesConfig(): DoSpacesConfig | null {
     return null;
   }
 
-  return { key, secret, region, bucket, endpoint: normalizeEndpoint(endpoint) };
+  return { key, secret, region, bucket, endpoint: normalizeEndpoint(endpoint, bucket) };
 }
 
 function hasAnyDoSpacesEnv() {
@@ -153,6 +168,7 @@ function createDoSpacesClient(config: DoSpacesConfig) {
   return new S3Client({
     region: config.region,
     endpoint: config.endpoint,
+    forcePathStyle: true,
     credentials: {
       accessKeyId: config.key,
       secretAccessKey: config.secret,
