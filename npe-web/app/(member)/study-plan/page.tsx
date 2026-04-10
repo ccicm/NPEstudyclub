@@ -68,6 +68,7 @@ export default async function StudyPlanPage({
 
   return (
     <StudyPlanDashboard
+      errorCode={params.error || null}
       plan={{
         exam_date: plan.exam_date,
         hours_per_week: plan.hours_per_week,

@@ -16,6 +16,28 @@ type SuggestionMaps = {
   quizzesByDomain: Map<string, string[]>;
 };
 
+function classifyStudyPlanError(message: string) {
+  const lower = message.toLowerCase();
+
+  if (lower.includes("duplicate key value") || lower.includes("unique constraint")) {
+    return "save_conflict";
+  }
+
+  if (
+    lower.includes("does not exist") ||
+    lower.includes("undefined table") ||
+    lower.includes("undefined column")
+  ) {
+    return "schema_not_ready";
+  }
+
+  if (lower.includes("row-level security") || lower.includes("permission denied")) {
+    return "not_authorized";
+  }
+
+  return "save_failed";
+}
+
 async function loadSuggestionMaps(supabase: Awaited<ReturnType<typeof createClient>>): Promise<SuggestionMaps> {
   const [{ data: resources }, { data: quizzes }] = await Promise.all([
     supabase.from("resources").select("id,domain"),
@@ -124,6 +146,9 @@ export async function createStudyPlanAction(formData: FormData) {
   }
 
   const examDate = new Date(examDateRaw);
+  if (Number.isNaN(examDate.getTime())) {
+    redirect("/study-plan?error=invalid_exam_date");
+  }
   const hoursPerWeek = Math.max(1, Math.min(20, Number(hoursRaw) || 5));
   const domainPriorities = parseDomainPriorities(prioritiesRaw);
   const preferredDays = parsePreferredDays(daysRaw);
@@ -143,66 +168,32 @@ export async function createStudyPlanAction(formData: FormData) {
 
   const suggestionMaps = await loadSuggestionMaps(supabase);
 
-  const { data: existingPlan } = await supabase
-    .from("study_plans")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
   const planPayload = {
+    user_id: user.id,
     exam_date: examDate.toISOString().slice(0, 10),
     hours_per_week: hoursPerWeek,
     preferred_days: preferredDays,
     domain_priorities: domainPriorities,
+    updated_at: new Date().toISOString(),
   };
 
-  const { data: plan, error: planError } = existingPlan
-    ? await supabase
-        .from("study_plans")
-        .update({
-          ...planPayload,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existingPlan.id)
-        .select("id")
-        .single()
-    : await supabase
-        .from("study_plans")
-        .insert({
-          user_id: user.id,
-          ...planPayload,
-        })
-        .select("id")
-        .single();
+  const { data: plan, error: planError } = await supabase
+    .from("study_plans")
+    .upsert(planPayload, { onConflict: "user_id" })
+    .select("id")
+    .single();
 
   if (planError || !plan) {
-    const message = String(planError?.message || "").toLowerCase();
-    if (
-      message.includes("does not exist") ||
-      message.includes("undefined table") ||
-      message.includes("undefined column")
-    ) {
-      redirect("/study-plan?error=schema_not_ready");
-    }
-    if (message.includes("row-level security") || message.includes("permission denied")) {
-      redirect("/study-plan?error=not_authorized");
-    }
-    redirect("/study-plan?error=create_failed");
+    const errorCode = classifyStudyPlanError(String(planError?.message || ""));
+    redirect(`/study-plan?error=${errorCode}`);
   }
 
-  if (existingPlan) {
-    const { data: existingWeeks } = await supabase
-      .from("study_plan_weeks")
-      .select("id")
-      .eq("plan_id", existingPlan.id);
+  const { data: existingWeeks } = await supabase
+    .from("study_plan_weeks")
+    .select("id")
+    .eq("plan_id", plan.id);
 
-    const weekIds = (existingWeeks ?? []).map((week) => week.id);
-
-    if (weekIds.length) {
-      await supabase.from("study_log").delete().in("plan_week_id", weekIds);
-      await supabase.from("study_plan_weeks").delete().in("id", weekIds);
-    }
-  }
+  const existingWeekIds = (existingWeeks ?? []).map((week) => week.id);
 
   const weeks = generateWeeks({
     examDate,
@@ -221,18 +212,22 @@ export async function createStudyPlanAction(formData: FormData) {
     );
 
     if (weeksError) {
-      const message = String(weeksError.message || "").toLowerCase();
-      if (
-        message.includes("does not exist") ||
-        message.includes("undefined table") ||
-        message.includes("undefined column")
-      ) {
-        redirect("/study-plan?error=schema_not_ready");
+      const errorCode = classifyStudyPlanError(String(weeksError.message || ""));
+      redirect(`/study-plan?error=${errorCode}`);
+    }
+
+    if (existingWeekIds.length) {
+      const { error: logDeleteError } = await supabase.from("study_log").delete().in("plan_week_id", existingWeekIds);
+      if (logDeleteError) {
+        const errorCode = classifyStudyPlanError(String(logDeleteError.message || ""));
+        redirect(`/study-plan?error=${errorCode}`);
       }
-      if (message.includes("row-level security") || message.includes("permission denied")) {
-        redirect("/study-plan?error=not_authorized");
+
+      const { error: weekDeleteError } = await supabase.from("study_plan_weeks").delete().in("id", existingWeekIds);
+      if (weekDeleteError) {
+        const errorCode = classifyStudyPlanError(String(weekDeleteError.message || ""));
+        redirect(`/study-plan?error=${errorCode}`);
       }
-      redirect("/study-plan?error=create_failed");
     }
   }
 
@@ -261,7 +256,7 @@ export async function logStudyTimeAction(formData: FormData) {
     redirect("/study-plan?error=auth_required");
   }
 
-  await supabase.from("study_log").insert({
+  const { error: logError } = await supabase.from("study_log").insert({
     user_id: user.id,
     plan_week_id: planWeekId,
     hours_logged: hours,
@@ -269,6 +264,11 @@ export async function logStudyTimeAction(formData: FormData) {
     quiz_insight: quizInsight || null,
     notes: notes || null,
   });
+
+  if (logError) {
+    const errorCode = classifyStudyPlanError(String(logError.message || ""));
+    redirect(`/study-plan?error=${errorCode}`);
+  }
 
   const { data: week } = await supabase
     .from("study_plan_weeks")
@@ -285,10 +285,15 @@ export async function logStudyTimeAction(formData: FormData) {
     const totalLogged = (logs ?? []).reduce((sum, row) => sum + Number(row.hours_logged || 0), 0);
     const target = plan?.hours_per_week ?? 5;
 
-    await supabase
+    const { error: statusError } = await supabase
       .from("study_plan_weeks")
       .update({ status: totalLogged >= target ? "complete" : "in_progress" })
       .eq("id", week.id);
+
+    if (statusError) {
+      const errorCode = classifyStudyPlanError(String(statusError.message || ""));
+      redirect(`/study-plan?error=${errorCode}`);
+    }
   }
 
   revalidatePath("/study-plan");
@@ -303,6 +308,9 @@ export async function updateStudyPlanAction(formData: FormData) {
   }
 
   const examDate = new Date(examDateRaw);
+  if (Number.isNaN(examDate.getTime())) {
+    redirect("/study-plan?error=invalid_exam_date");
+  }
   const hoursPerWeek = Math.max(1, Math.min(20, Number(hoursRaw) || 5));
   const domainPriorities: DomainPriorities = {};
 
@@ -338,18 +346,8 @@ export async function updateStudyPlanAction(formData: FormData) {
     .maybeSingle();
 
   if (!plan) {
-    return;
+    redirect("/study-plan?error=save_failed");
   }
-
-  await supabase
-    .from("study_plans")
-    .update({
-      exam_date: examDate.toISOString().slice(0, 10),
-      hours_per_week: hoursPerWeek,
-      domain_priorities: domainPriorities,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", plan.id);
 
   const { data: existingWeeks } = await supabase
     .from("study_plan_weeks")
@@ -380,18 +378,39 @@ export async function updateStudyPlanAction(formData: FormData) {
     );
 
     if (insertError) {
-      return;
+      const errorCode = classifyStudyPlanError(String(insertError.message || ""));
+      redirect(`/study-plan?error=${errorCode}`);
     }
 
     if (removableWeeks.length) {
-      await supabase
+      const { error: deleteError } = await supabase
         .from("study_plan_weeks")
         .delete()
         .in(
           "id",
           removableWeeks.map((week) => week.id),
         );
+
+      if (deleteError) {
+        const errorCode = classifyStudyPlanError(String(deleteError.message || ""));
+        redirect(`/study-plan?error=${errorCode}`);
+      }
     }
+  }
+
+  const { error: updateError } = await supabase
+    .from("study_plans")
+    .update({
+      exam_date: examDate.toISOString().slice(0, 10),
+      hours_per_week: hoursPerWeek,
+      domain_priorities: domainPriorities,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", plan.id);
+
+  if (updateError) {
+    const errorCode = classifyStudyPlanError(String(updateError.message || ""));
+    redirect(`/study-plan?error=${errorCode}`);
   }
 
   revalidatePath("/study-plan");

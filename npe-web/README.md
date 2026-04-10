@@ -31,6 +31,7 @@ Private study hub for approved provisional psychologists preparing for the Natio
 8. Choose one storage mode for resource files:
 	- Supabase (default): create a private Supabase Storage bucket named `resources`.
 	- DigitalOcean Spaces (optional): set `DO_SPACES_KEY`, `DO_SPACES_SECRET`, `DO_SPACES_REGION`, `DO_SPACES_BUCKET`, and `DO_SPACES_ENDPOINT`.
+	- If resources must stay in DigitalOcean only, set `RESOURCE_STORAGE_MODE=do-spaces`.
 
 ## Run Locally
 

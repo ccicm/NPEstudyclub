@@ -38,6 +38,19 @@ type DoSpacesConfig = {
   endpoint: string;
 };
 
+function normalizeEndpoint(endpoint: string) {
+  const trimmed = endpoint.trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+}
+
 function getDoSpacesConfig(): DoSpacesConfig | null {
   const key = process.env.DO_SPACES_KEY;
   const secret = process.env.DO_SPACES_SECRET;
@@ -49,11 +62,35 @@ function getDoSpacesConfig(): DoSpacesConfig | null {
     return null;
   }
 
-  return { key, secret, region, bucket, endpoint };
+  return { key, secret, region, bucket, endpoint: normalizeEndpoint(endpoint) };
+}
+
+function hasAnyDoSpacesEnv() {
+  return Boolean(
+    process.env.DO_SPACES_KEY ||
+      process.env.DO_SPACES_SECRET ||
+      process.env.DO_SPACES_REGION ||
+      process.env.DO_SPACES_BUCKET ||
+      process.env.DO_SPACES_ENDPOINT,
+  );
 }
 
 function getStorageMode(): StorageMode {
-  return getDoSpacesConfig() ? "do-spaces" : "supabase";
+  const configuredMode = (process.env.RESOURCE_STORAGE_MODE || "").trim().toLowerCase();
+
+  if (configuredMode === "do-spaces") {
+    return "do-spaces";
+  }
+
+  if (configuredMode === "supabase") {
+    return "supabase";
+  }
+
+  if (hasAnyDoSpacesEnv()) {
+    return "do-spaces";
+  }
+
+  return "supabase";
 }
 
 function mapSupabaseError(message: string): UploadFailureCode {
@@ -69,9 +106,21 @@ function mapSupabaseError(message: string): UploadFailureCode {
 }
 
 function mapDoSpacesError(error: unknown): UploadFailureCode {
-  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  const maybeError = error as {
+    message?: string;
+    name?: string;
+    $metadata?: { httpStatusCode?: number };
+  };
+  const message = String(maybeError?.message || "").toLowerCase();
+  const name = String(maybeError?.name || "").toLowerCase();
+  const status = Number(maybeError?.$metadata?.httpStatusCode || 0);
 
-  if (message.includes("nosuchbucket") || message.includes("the specified bucket does not exist")) {
+  if (
+    name.includes("nosuchbucket") ||
+    message.includes("nosuchbucket") ||
+    message.includes("the specified bucket does not exist") ||
+    status === 404
+  ) {
     return "storage_not_ready";
   }
 
@@ -79,7 +128,15 @@ function mapDoSpacesError(error: unknown): UploadFailureCode {
     message.includes("accessdenied") ||
     message.includes("invalidaccesskeyid") ||
     message.includes("signaturedoesnotmatch") ||
-    message.includes("credentials")
+    message.includes("credentials") ||
+    message.includes("authorizationheadermalformed") ||
+    message.includes("could not load credentials") ||
+    message.includes("getaddrinfo") ||
+    message.includes("enotfound") ||
+    message.includes("econnrefused") ||
+    message.includes("unknownendpoint") ||
+    status === 401 ||
+    status === 403
   ) {
     return "storage_misconfigured";
   }

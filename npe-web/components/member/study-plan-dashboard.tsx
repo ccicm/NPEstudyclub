@@ -27,6 +27,7 @@ type StudyLogItem = {
 };
 
 export function StudyPlanDashboard({
+  errorCode,
   plan,
   weeks,
   hoursByWeek,
@@ -36,6 +37,7 @@ export function StudyPlanDashboard({
   logStudyTimeAction,
   updateStudyPlanAction,
 }: {
+  errorCode: string | null;
   plan: {
     exam_date: string;
     hours_per_week: number;
@@ -82,6 +84,26 @@ export function StudyPlanDashboard({
 
   return (
     <div className="space-y-4">
+      {errorCode ? (
+        <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {errorCode === "auth_required"
+            ? "This action needs a real signed-in session. Sign in again and retry."
+            : errorCode === "missing_exam_date"
+              ? "Please choose your exam date before saving."
+              : errorCode === "invalid_exam_date"
+                ? "That exam date could not be parsed. Please select a valid date and save again."
+                : errorCode === "missing_priorities"
+                  ? "Please set at least one domain priority before saving."
+            : errorCode === "schema_not_ready"
+              ? "Study Plan tables/columns are not ready. Apply migrations (001-008) in Supabase, then retry."
+              : errorCode === "not_authorized"
+                ? "Database permissions blocked this save. Confirm this email is approved in approved_users."
+                : errorCode === "save_conflict"
+                  ? "A conflicting study-plan record was detected. Refresh and retry."
+                : "Could not save study plan changes. Please try again."}
+        </p>
+      ) : null}
+
       <div className="rounded-2xl border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

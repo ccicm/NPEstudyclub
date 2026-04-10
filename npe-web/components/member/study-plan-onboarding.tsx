@@ -33,11 +33,19 @@ export function StudyPlanOnboarding({
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {errorCode === "auth_required"
             ? "This action needs a real signed-in session. If preview mode is active, sign in with your email and password, then try again."
+            : errorCode === "missing_exam_date"
+              ? "Please choose your exam date before generating the plan."
+              : errorCode === "invalid_exam_date"
+                ? "That exam date could not be parsed. Please select a valid date and try again."
+                : errorCode === "missing_priorities"
+                  ? "Please set domain priorities before generating the plan."
             : errorCode === "schema_not_ready"
               ? "Study Plan tables are not ready in Supabase yet. Apply the SQL migrations (001, 002, 003) in your Supabase project, then refresh and try again."
               : errorCode === "not_authorized"
                 ? "Your account is signed in, but database permissions blocked this save. Confirm this email is in approved_users with status 'approved'."
-            : "Could not save your plan. Please check all fields and try again."}
+                : errorCode === "save_conflict"
+                  ? "A conflicting study-plan record was detected. Refresh the page and try again."
+                  : "Could not save your plan. Please check your approved access and try again."}
         </p>
       ) : null}
 
