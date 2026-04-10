@@ -30,6 +30,11 @@ jobs:
 
           DB_HOST=$(python3 -c 'import os, urllib.parse; print(urllib.parse.urlparse(os.environ["SUPABASE_DB_URL"]).hostname or "")')
 
+          if ! echo "$DB_HOST" | grep -Eq 'pooler\.supabase\.com$'; then
+            echo "SUPABASE_DB_URL must use a Supabase pooler host (..pooler.supabase.com). Current host: $DB_HOST" >&2
+            exit 1
+          fi
+
           if echo "$DB_HOST" | grep -Eq '^db\..*\.supabase\.co$'; then
             echo "SUPABASE_DB_URL is using direct host ($DB_HOST). For GitHub runners in this setup, use a Session pooler URI instead." >&2
             exit 1
