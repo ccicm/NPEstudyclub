@@ -8,6 +8,24 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 
 ## Priority Plan
 
+### Implementation Snapshot (2026-04-10)
+- Done:
+	- `/auth/request-status` now renders by auth/approval state and no longer shows organiser-only instructions.
+	- Stale profile progress section removed.
+	- Schedule shows a prompt when a study plan is missing.
+	- Dashboard now uses study-plan exam date in the timeline card when available.
+	- Resource library fetch limit raised to 1000 (interim mitigation before pagination).
+	- Several empty states now include direct action links (resources, quizzes, community).
+- In progress:
+	- Replace remaining developer-facing error strings with user-safe copy across all surfaces.
+	- Standardise file action verbs to `View` or `Download`.
+- Pending:
+	- Simplify resource search placeholder.
+	- Add helper text for conditional upload metadata sections.
+	- Rename PSY label to AHPRA registration number.
+	- Rename ambiguous community channel labels.
+	- Clarify admin approval helper copy.
+
 ### P1 — Critical
 - Conditionally render `/auth/request-status` based on auth + approval state.
 - Remove organiser/admin instruction text from the request-status page.

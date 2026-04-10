@@ -20,7 +20,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
 - **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
 - **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
-- **UX audit status:** In progress. The full first-pass UX audit is captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`; P1 request-status and copy cleanup work has started, and the remaining P2/P3 items are still pending.
+- **UX audit status:** In progress. P1 request-status state rendering and organiser-note removal are complete; user-facing technical error copy has been simplified across key member surfaces. P2/P3 follow-ups remain.
 
 ---
 
@@ -42,7 +42,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 **Known broken / incomplete:**
 - Uploads can succeed while newly uploaded items are not immediately visible in library for some production attempts (follow-up debug item pending production reproduction)
 - Clinical safeguarding is partially implemented; remaining moderator controls are still pending
-- Generator repetition-audit/polish work has not started
+- Generator repetition-audit/polish work is in progress; domain template-bank expansion remains pending
 
 ---
 
@@ -427,22 +427,22 @@ This is the next refactor block after current storage/safeguarding verification 
 ### Priority Order
 
 **P1 — Critical**
-- Condition `/auth/request-status` on auth + approval state.
-- Remove organiser-only text from the public request-status page.
-- Strip developer-facing error strings from production UI; keep diagnostics internal.
+- [done] Condition `/auth/request-status` on auth + approval state.
+- [done] Remove organiser-only text from the public request-status page.
+- [in progress] Strip developer-facing error strings from production UI; keep diagnostics internal.
 
 **P2 — High**
-- Standardise file actions to `View` or `Download`.
-- Remove the stale Profile progress section.
-- Make empty states more inviting and linked.
-- Simplify the resource search placeholder.
+- [pending] Standardise file actions to `View` or `Download`.
+- [done] Remove the stale Profile progress section.
+- [in progress] Make empty states more inviting and linked.
+- [pending] Simplify the resource search placeholder.
 
 **P3 — Medium**
-- Add schedule dependency prompts when no plan exists.
-- Add helper text for conditional upload metadata sections.
-- Rename PSY labels to AHPRA registration number.
-- Rename ambiguous community channel labels.
-- Clarify admin approval copy/helper text.
+- [done] Add schedule dependency prompts when no plan exists.
+- [pending] Add helper text for conditional upload metadata sections.
+- [pending] Rename PSY labels to AHPRA registration number.
+- [pending] Rename ambiguous community channel labels.
+- [pending] Clarify admin approval copy/helper text.
 
 **P4 — Low**
 - Replace dashboard hero subtitle with more useful copy.
@@ -476,7 +476,7 @@ Before each deploy, verify:
 - [ ] Study-plan saves do not wipe current plan before a successful regeneration
 - [ ] Study-plan logs save hours, topics covered, quiz insight, and notes
 - [ ] Resource progress is visible on dashboard (not only profile page)
-- [ ] Profile page links back to dashboard progress overview
+- [ ] Profile page remains focused on account/settings only (no stale progress scaffolding)
 - [ ] Resource upload (1 PDF + 1 Word doc) completes and download works
 - [ ] Storage privacy verified end-to-end (private bucket/object access, no permanent public URLs, short-lived signed access only)
 - [ ] Access request form: PSY field validates format before submit; reason field is optional

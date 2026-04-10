@@ -63,7 +63,13 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 ## In Progress
 
 - UX audit refactor block (captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`)
-- P1 request-status and member/admin copy cleanup have started in code
+- P1 request-status state rendering is complete (state-based CTAs, organiser note removed)
+- User-facing technical copy cleanup is in progress across member/admin surfaces
+- Profile stale progress section removed
+- Schedule now shows a dependency prompt when no study plan exists
+- Resource library fetch cap raised from 200 to 1000 (pagination still pending)
+- Dashboard now passes study-plan exam date into timeline card
+- Dashboard and resource-library empty states are being converted to actionable CTAs
 
 ## Generator Polish (Started)
 
