@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-09",
+  "mode": "daily",
+  "generated_at": "2026-04-10T09:05:39.807Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Duty of care and boundaries",
+      "question": "A provisional psychologist in a private practice notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "options": {
+        "A": "Document the presentation and assume the client will rebook if needed.",
+        "B": "Send a text asking the client to confirm they are safe and stop there.",
+        "C": "Wait until the next booked session so the client can settle.",
+        "D": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "E": "Contact the police immediately without any further assessment."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
+      "distractor_explanations": {
+        "A": "Documentation is necessary but not a substitute for active risk management.",
+        "B": "A text alone is not an adequate risk management response.",
+        "C": "Delaying follow-up may miss a potentially acute risk window.",
+        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Risk and urgency",
+      "question": "A client reports that they have a firearm at home, have been drinking heavily, and are angry after a relationship breakup. They say they are \"not sure what I might do tonight\". What is the priority?",
+      "options": {
+        "A": "End the session once the client says they do not want hospitalisation.",
+        "B": "Assume the client is only venting because they have not named a specific target.",
+        "C": "Focus on substance use first and ignore the weapon access until later.",
+        "D": "Take a note and reassess at the next session if the client survives the night.",
+        "E": "Conduct immediate high-risk management, including emergency escalation and supervision."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Access to means, intoxication, and uncertainty about imminent behaviour converge to create an acute high-risk presentation.",
+      "distractor_explanations": {
+        "A": "Client refusal does not remove the clinician's duty to respond to imminent risk.",
+        "B": "The absence of a named target does not reduce the seriousness of the threat.",
+        "C": "Substance use may be relevant, but it is not the immediate priority in this scenario.",
+        "D": "Delaying action is unsafe when the risk is immediate."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Trauma-informed practice",
+      "question": "A client with a trauma history freezes and goes silent when asked to describe a recent assault. The psychologist wants a full timeline for treatment planning. What is the best approach?",
+      "options": {
+        "A": "Slow the pace, stabilise, and use trauma-informed choice and grounding.",
+        "B": "Push for details so the client learns not to avoid the memory.",
+        "C": "Terminate the session because the client is not ready for therapy.",
+        "D": "Keep asking the same question until the client answers clearly.",
+        "E": "Switch to confrontation because silence is non-compliance."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "A trauma-informed response prioritises emotional safety, choice, and pacing.",
+      "distractor_explanations": {
+        "B": "Forcing disclosure can increase distress and reduce safety.",
+        "C": "A trauma response does not mean treatment must stop entirely.",
+        "D": "Repetition without attunement can intensify freezing and harm rapport.",
+        "E": "Confrontation is likely to escalate shame or shutdown."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Destroy the notes before the hearing date.",
+        "B": "Seek legal/supervisory advice and review what must be disclosed under the order.",
+        "C": "Ignore the subpoena unless the client asks about it.",
+        "D": "Release everything immediately without checking the scope.",
+        "E": "Refuse to comply because third-party material is always protected."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Destroying records is inappropriate and potentially unlawful.",
+        "C": "Ignoring a subpoena can create legal risk.",
+        "D": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "E": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

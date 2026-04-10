@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-08",
+  "mode": "daily",
+  "generated_at": "2026-04-10T09:05:39.752Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a private practice, a 31-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Ask the parent to sign a form and then disclose the information.",
+        "B": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "C": "Share the notes but leave out the most sensitive details.",
+        "D": "Provide a brief summary because the parent is funding therapy.",
+        "E": "Give a verbal family update because it is routine practice."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "A": "A form signed by the parent alone does not authorise disclosure.",
+        "C": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "D": "Payment for treatment does not create a right to private clinical information.",
+        "E": "Routine updates still require client consent and attention to privacy limits."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Collateral and test interpretation",
+      "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
+      "options": {
+        "A": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "B": "Rely on the parent report because they are the legal guardian.",
+        "C": "Delay testing until all informants agree on the reason for referral.",
+        "D": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "E": "Gather collateral information from multiple sources and interpret results in context."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
+      "distractor_explanations": {
+        "A": "A school report alone is not sufficient to conclude the underlying cause.",
+        "B": "Legal guardianship does not make one informant sufficient for a fair assessment.",
+        "C": "Perfect agreement is not required before proceeding with assessment.",
+        "D": "A single self-report tool is not enough for a complex developmental concern."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Apologise only if the client explicitly asks for it.",
+        "B": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "C": "Defend the intervention because the psychologist is the expert.",
+        "D": "Ignore the comment and move straight to the next agenda item.",
+        "E": "End therapy because the client is being resistant."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "A": "Repair often needs direct discussion, not just passive apology.",
+        "C": "Defensiveness usually worsens the rupture.",
+        "D": "Ignoring the issue can leave the alliance damaged.",
+        "E": "A single rupture does not justify dropping a willing client."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Interpreter-assisted communication",
+      "question": "A psychologist is explaining assessment results to a client who prefers to speak through an interpreter. The client is visibly uncomfortable when family members offer to translate instead. What is the best choice?",
+      "options": {
+        "A": "Use the family members because they know the client best.",
+        "B": "Skip the interpreter and speak more slowly in English.",
+        "C": "Give the client a written summary only and end the session early.",
+        "D": "Use a qualified interpreter and maintain the client's privacy and control.",
+        "E": "Ask the family to leave the room and proceed without communication support."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Interpreter-assisted communication should prioritise accuracy, confidentiality, and client autonomy.",
+      "distractor_explanations": {
+        "A": "Family translators can compromise privacy and accuracy.",
+        "B": "Slowing down English does not solve the language barrier.",
+        "C": "Written summaries alone may not be enough for nuanced feedback.",
+        "E": "Removing support without replacing it can leave the client unable to engage."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

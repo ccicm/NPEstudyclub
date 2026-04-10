@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-06",
+  "mode": "daily",
+  "generated_at": "2026-04-10T09:05:39.644Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Record keeping and supervision",
+      "question": "A provisional psychologist realises they forgot to update the file after a complex session involving a boundary concern and a treatment change. Their supervisor is off-site and the client is not due back for two weeks. What is the best action?",
+      "options": {
+        "A": "Leave the note out because the client will not remember the details anyway.",
+        "B": "Delete the session plan so the record looks cleaner.",
+        "C": "Complete an accurate contemporaneous note and flag the issue for supervision.",
+        "D": "Write a vague note later so the boundary issue is less obvious.",
+        "E": "Wait until the next supervision meeting before updating the record."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Record keeping should be accurate and timely, especially when the session involved a clinical change or boundary issue.",
+      "distractor_explanations": {
+        "A": "Omitting relevant information weakens continuity of care and accountability.",
+        "B": "Deleting records is inappropriate and compromises integrity.",
+        "D": "Vagueness can be misleading and does not meet documentation standards.",
+        "E": "Delaying updates risks loss of detail and weakens the clinical record."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Assessment fairness",
+      "question": "A recently arrived refugee client has limited English and asks whether they can bring an interpreter to a cognitive screening appointment. The psychologist is worried this could affect test validity. What is the best response?",
+      "options": {
+        "A": "Use family members as interpreters to reduce the risk of misunderstanding.",
+        "B": "Use a qualified interpreter where needed and choose instruments appropriate to the client's language background.",
+        "C": "Proceed in English only because that is how the instrument was normed.",
+        "D": "Delay the assessment until the client becomes fluent in English.",
+        "E": "Refuse the interpreter so the test results remain fully standardised."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Assessment should be fair and accessible, which may require an interpreter and cautious test selection.",
+      "distractor_explanations": {
+        "A": "Family interpreters can compromise accuracy, privacy, and clinical neutrality.",
+        "C": "English-only testing may be inappropriate when language barriers are material.",
+        "D": "Assessment should not be postponed unnecessarily if suitable adaptations are available.",
+        "E": "Excluding interpretation can make the assessment invalid or unfair."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "CBT treatment planning",
+      "question": "A client with panic symptoms wants a psychologist to \"just tell me what to do\" and expects reassurance during every anxious spike. Which intervention choice best fits an evidence-based CBT approach?",
+      "options": {
+        "A": "Change the topic whenever the client reports bodily symptoms.",
+        "B": "Focus only on childhood causes before teaching any coping skills.",
+        "C": "Provide reassurance at every session and avoid homework to keep the client calm.",
+        "D": "Use psychoeducation, monitoring, and graduated exposure with collaboratively set goals.",
+        "E": "Tell the client to think positively whenever anxiety appears."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "CBT for panic commonly uses psychoeducation, symptom monitoring, and graded exposure.",
+      "distractor_explanations": {
+        "A": "Avoiding symptom discussion undermines treatment and learning.",
+        "B": "Historical factors can matter, but intervention should still be active and skills-based.",
+        "C": "Constant reassurance can reinforce avoidance and dependence.",
+        "E": "Positive thinking alone is not a full CBT intervention."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Report writing",
+      "question": "A provisional psychologist is drafting a report for a referrer. The client asked that a sensitive family issue not be mentioned, but it is relevant to the referral question. What is the most appropriate approach?",
+      "options": {
+        "A": "Use vague language that hides the key information.",
+        "B": "Omit the issue entirely so the client feels protected.",
+        "C": "Send the raw notes instead of a formal report.",
+        "D": "Include everything in full detail because the referrer paid for the report.",
+        "E": "Include only what is necessary, within the consent limits discussed with the client."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Reports should be relevant, proportionate, and consistent with consent and confidentiality limits.",
+      "distractor_explanations": {
+        "A": "Vagueness can reduce clinical usefulness and accuracy.",
+        "B": "Omitting relevant material can make the report misleading.",
+        "C": "Raw notes are not a substitute for a considered report.",
+        "D": "Reports should not include unnecessary sensitive detail."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

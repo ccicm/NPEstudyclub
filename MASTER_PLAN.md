@@ -19,7 +19,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - **P3 status:** UX items 3.1-3.3 are complete in code. Operational verification (3.4) and bulk onboarding execution (3.5) are pending production run.
 - **Storage status:** Upload pipeline to DigitalOcean Spaces is implemented with fallback and diagnostics. Production verification from upload through resource visibility and signed URL open is still pending from a live production account/session.
 - **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
-- **Generator polish status:** Not started (repetition audit and diversity controls still pending).
+- **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
 
 ---
 
@@ -386,6 +386,16 @@ Increase variation in daily question sets without reintroducing paid API calls, 
 If a change improves variety but weakens traceability to the source registry, it is rejected.
 
 ### Active steps
+
+Progress update (2026-04-10):
+- Repetition audit script added and run across 7 adjacent days.
+- Audit report generated: `docs/GENERATOR_REPETITION_AUDIT.2026-04-04_to_2026-04-10.md`.
+- Generator fixes applied:
+   - Correct-answer position remapping now genuinely shuffles labels.
+   - Daily template selection now rotates by seeded per-day selection rather than static template index.
+   - Configurable lookback anti-repeat guard added (`TEMPLATE_LOOKBACK_DAYS`, default 5) using recent daily seed history.
+   - Missing source citation entry added to registry to preserve traceability checks.
+- Next: expand low-variety domain template banks based on audit residual repeats.
 
 1. **Run a repetition audit first.** Run the generator against 5–7 adjacent days and compare: stems, distractor patterns, correct-answer position distribution, scenario shapes. Document which domains are most repetitive before writing any code.
 

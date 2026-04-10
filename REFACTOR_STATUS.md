@@ -63,5 +63,19 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 
 ## Not Started
 
-- Question generator repetition audit and diversity controls
+- (none)
+
+## Generator Polish (Started)
+
+- Implemented:
+  - Added adjacent-day repetition audit tooling: `scripts/repetition-audit.js`
+  - Added audit npm script: `scripts/package.json` (`audit:repetition`)
+  - Added date-seed override support for deterministic audits: `scripts/generate-questions.js`
+  - Fixed answer-label randomisation to avoid answer key lock-in.
+  - Improved per-day template rotation selection for higher adjacent-day variation.
+  - Added configurable lookback anti-repeat rule (`TEMPLATE_LOOKBACK_DAYS`, default 5).
+  - Added missing source citation to preserve registry checks: `scripts/source-bank.json`.
+  - Generated baseline report: `docs/GENERATOR_REPETITION_AUDIT.2026-04-04_to_2026-04-10.md`.
+- Pending:
+  - Expand domain template banks with lowest residual variety in audit results.
 - Deferred backlog items listed in `MASTER_PLAN.md`

@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-07",
+  "mode": "daily",
+  "generated_at": "2026-04-10T09:05:39.699Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a university clinic, a 19-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "B": "Share the notes but leave out the most sensitive details.",
+        "C": "Ask the parent to sign a form and then disclose the information.",
+        "D": "Provide a brief summary because the parent is funding therapy.",
+        "E": "Give a verbal family update because it is routine practice."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "B": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "C": "A form signed by the parent alone does not authorise disclosure.",
+        "D": "Payment for treatment does not create a right to private clinical information.",
+        "E": "Routine updates still require client consent and attention to privacy limits."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Suicide risk assessment",
+      "question": "A 27-year-old client describes poor sleep, low mood, and says they feel like a burden. They deny a current plan but admit having thought about not waking up. Which assessment action is most appropriate next?",
+      "options": {
+        "A": "Tell the client to contact emergency services if their thoughts worsen and end the session.",
+        "B": "Refer the client elsewhere without discussing risk in the current session.",
+        "C": "Conduct a structured suicide risk assessment including intent, means, and protective factors.",
+        "D": "Focus only on depression severity and avoid asking more about suicide.",
+        "E": "Document the symptoms and schedule the next routine appointment."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Suicidal ideation requires a structured risk assessment, even when there is no current plan.",
+      "distractor_explanations": {
+        "A": "Advice may be part of management, but it is not a substitute for assessment.",
+        "B": "Referral alone does not discharge the current duty of care.",
+        "D": "Avoiding direct suicide questions can miss important risk details.",
+        "E": "Routine scheduling without risk assessment is insufficient."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Defend the intervention because the psychologist is the expert.",
+        "B": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "C": "End therapy because the client is being resistant.",
+        "D": "Apologise only if the client explicitly asks for it.",
+        "E": "Ignore the comment and move straight to the next agenda item."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "A": "Defensiveness usually worsens the rupture.",
+        "C": "A single rupture does not justify dropping a willing client.",
+        "D": "Repair often needs direct discussion, not just passive apology.",
+        "E": "Ignoring the issue can leave the alliance damaged."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Communicating with carers",
+      "question": "A client's partner rings the clinic asking for an update because they are worried about recent mood changes. The client has not consented to sharing information with the partner. What should the psychologist do?",
+      "options": {
+        "A": "Leave a voicemail with broad details so the partner feels reassured.",
+        "B": "Confirm whether the partner is telling the truth before deciding.",
+        "C": "Give a general update because family concern is important.",
+        "D": "Share the client's diagnosis but not the treatment plan.",
+        "E": "Do not disclose client information and explain the confidentiality process."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Without consent or a lawful exception, information should not be disclosed to a partner.",
+      "distractor_explanations": {
+        "A": "Voicemail disclosure can still breach confidentiality.",
+        "B": "Verifying the caller does not create permission to disclose.",
+        "C": "Concern from a family member does not override privacy obligations.",
+        "D": "Partial disclosure is still disclosure and needs a lawful basis."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

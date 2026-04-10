@@ -7,7 +7,8 @@
     "generate:daily": "GENERATION_MODE=daily node generate-questions.js",
     "generate:fortnightly": "GENERATION_MODE=fortnightly node generate-questions.js",
     "generate:daily:dry": "GENERATION_MODE=daily DRY_RUN=true node generate-questions.js",
-    "generate:fortnightly:dry": "GENERATION_MODE=fortnightly DRY_RUN=true node generate-questions.js"
+    "generate:fortnightly:dry": "GENERATION_MODE=fortnightly DRY_RUN=true node generate-questions.js",
+    "audit:repetition": "node repetition-audit.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4"

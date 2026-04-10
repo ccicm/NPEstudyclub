@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-05",
+  "mode": "daily",
+  "generated_at": "2026-04-10T09:05:39.593Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Telehealth and scope",
+      "question": "During a regional telehealth session, a client says they are alone, distressed, and do not want to continue, but the psychologist cannot confirm their location. What should the psychologist prioritise?",
+      "options": {
+        "A": "End the call immediately and wait for the client to reconnect later.",
+        "B": "Switch to text messaging only and keep the session informal.",
+        "C": "Continue as normal because the client consented to telehealth.",
+        "D": "Ask a family member to join without speaking with the client first.",
+        "E": "Pause treatment content, verify location, and follow the telehealth emergency plan."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Telehealth requires an emergency plan and active location verification when risk emerges. Safety, not continuation of content, is the priority.",
+      "distractor_explanations": {
+        "A": "Ending without a plan may leave the client unsupported.",
+        "B": "Text-only communication is not an appropriate risk-management substitute.",
+        "C": "Telehealth consent does not remove the duty to manage emerging risk.",
+        "D": "Bringing others in without consent can damage trust unless there is urgent necessity."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Assessment fairness",
+      "question": "A recently arrived refugee client has limited English and asks whether they can bring an interpreter to a cognitive screening appointment. The psychologist is worried this could affect test validity. What is the best response?",
+      "options": {
+        "A": "Use family members as interpreters to reduce the risk of misunderstanding.",
+        "B": "Refuse the interpreter so the test results remain fully standardised.",
+        "C": "Delay the assessment until the client becomes fluent in English.",
+        "D": "Use a qualified interpreter where needed and choose instruments appropriate to the client's language background.",
+        "E": "Proceed in English only because that is how the instrument was normed."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Assessment should be fair and accessible, which may require an interpreter and cautious test selection.",
+      "distractor_explanations": {
+        "A": "Family interpreters can compromise accuracy, privacy, and clinical neutrality.",
+        "B": "Excluding interpretation can make the assessment invalid or unfair.",
+        "C": "Assessment should not be postponed unnecessarily if suitable adaptations are available.",
+        "E": "English-only testing may be inappropriate when language barriers are material."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Group therapy",
+      "question": "A provisional psychologist is co-facilitating a skills group. One participant starts giving detailed advice about another participant's personal situation. What is the best facilitator response?",
+      "options": {
+        "A": "Share the other participant's notes so the group can understand the context.",
+        "B": "Redirect to group rules, protect boundaries, and reinforce respectful participation.",
+        "C": "Ask the participant to leave without any explanation.",
+        "D": "Allow the discussion because peer support is always therapeutic.",
+        "E": "Ignore it because the group will self-correct over time."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Facilitators should maintain a safe and respectful group frame and reinforce boundaries.",
+      "distractor_explanations": {
+        "A": "Sharing another member's notes breaches privacy and trust.",
+        "C": "Removal may be disproportionate unless the disruption is serious and repeated.",
+        "D": "Peer support is useful, but uncontained advice can become harmful.",
+        "E": "Ignoring boundary issues can destabilise the group."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 7 — Collaboration and teamwork",
+        "APS Code of Ethics (2007, amended 2023), Principle A.1 — General Respect"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Report writing",
+      "question": "A provisional psychologist is drafting a report for a referrer. The client asked that a sensitive family issue not be mentioned, but it is relevant to the referral question. What is the most appropriate approach?",
+      "options": {
+        "A": "Send the raw notes instead of a formal report.",
+        "B": "Use vague language that hides the key information.",
+        "C": "Include everything in full detail because the referrer paid for the report.",
+        "D": "Omit the issue entirely so the client feels protected.",
+        "E": "Include only what is necessary, within the consent limits discussed with the client."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Reports should be relevant, proportionate, and consistent with consent and confidentiality limits.",
+      "distractor_explanations": {
+        "A": "Raw notes are not a substitute for a considered report.",
+        "B": "Vagueness can reduce clinical usefulness and accuracy.",
+        "C": "Reports should not include unnecessary sensitive detail.",
+        "D": "Omitting relevant material can make the report misleading."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

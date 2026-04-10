@@ -8,7 +8,10 @@ const path = require('path');
 
 const MODE = process.env.GENERATION_MODE || 'daily';
 const DRY_RUN = process.env.DRY_RUN === 'true';
+const DATE_SEED_OVERRIDE = (process.env.DATE_SEED || '').trim();
+const TEMPLATE_LOOKBACK_DAYS = Number(process.env.TEMPLATE_LOOKBACK_DAYS || '5');
 const STAGING_DIR = path.join(__dirname, '../seed/staging');
+const DAILY_DIR = path.join(__dirname, '../seed/daily');
 const SOURCE_BANK = JSON.parse(fs.readFileSync(path.join(__dirname, './source-bank.json'), 'utf8'));
 const SOURCE_CITATIONS = new Map();
 
@@ -53,6 +56,18 @@ function getAestDateSeed(now = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function getDateSeed() {
+  if (!DATE_SEED_OVERRIDE) {
+    return getAestDateSeed();
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(DATE_SEED_OVERRIDE)) {
+    throw new Error(`Invalid DATE_SEED: "${DATE_SEED_OVERRIDE}". Expected YYYY-MM-DD.`);
+  }
+
+  return DATE_SEED_OVERRIDE;
+}
+
 function formatDisplayDate(dateString) {
   const date = new Date(`${dateString}T00:00:00+10:00`);
   return new Intl.DateTimeFormat('en-GB', {
@@ -61,6 +76,54 @@ function formatDisplayDate(dateString) {
     year: 'numeric',
     timeZone: 'Australia/Brisbane',
   }).format(date);
+}
+
+function shiftDateSeed(dateSeed, deltaDays) {
+  const base = new Date(`${dateSeed}T00:00:00Z`);
+  if (Number.isNaN(base.getTime())) {
+    return null;
+  }
+  base.setUTCDate(base.getUTCDate() + deltaDays);
+  return base.toISOString().slice(0, 10);
+}
+
+function loadRecentSubdomainHistory(mode, dateSeed, lookbackDays) {
+  const recent = new Map();
+
+  if (mode !== 'daily' || lookbackDays <= 0) {
+    return recent;
+  }
+
+  for (let offset = 1; offset <= lookbackDays; offset += 1) {
+    const priorDate = shiftDateSeed(dateSeed, -offset);
+    if (!priorDate) {
+      continue;
+    }
+
+    const filePath = path.join(DAILY_DIR, `${mode}-${priorDate}.json`);
+    if (!fs.existsSync(filePath)) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      for (const question of parsed.questions || []) {
+        const domain = Number(question.domain);
+        const subdomain = String(question.subdomain || '').trim();
+        if (!domain || !subdomain) {
+          continue;
+        }
+
+        const set = recent.get(domain) || new Set();
+        set.add(subdomain.toLowerCase());
+        recent.set(domain, set);
+      }
+    } catch {
+      // Ignore malformed historical file and continue generation.
+    }
+  }
+
+  return recent;
 }
 
 function getSupabaseConfig() {
@@ -139,20 +202,28 @@ function makeQuestion(template, domain, domainLabel, mode, dateSeed, index) {
   const correctText = built.options[built.correct_answer];
   const optionEntries = Object.entries(built.options).map(([label, text]) => ({ label, text }));
   const shuffled = shuffle(rng, optionEntries);
-  const relocatedCorrect = shuffled.find((entry) => entry.text === correctText);
+  const answerLabels = ['A', 'B', 'C', 'D', 'E'];
+  const remappedOptions = {};
+  const remappedDistractors = {};
+  let relocatedCorrect = null;
+
+  shuffled.forEach((entry, idx) => {
+    const targetLabel = answerLabels[idx];
+    remappedOptions[targetLabel] = entry.text;
+
+    if (entry.text === correctText) {
+      relocatedCorrect = { label: targetLabel, text: entry.text };
+      return;
+    }
+
+    const sourceExplanation = built.distractor_explanations[entry.label];
+    if (sourceExplanation) {
+      remappedDistractors[targetLabel] = sourceExplanation;
+    }
+  });
 
   if (!relocatedCorrect) {
     throw new Error(`Could not place correct answer for domain ${domain}, question ${index}`);
-  }
-
-  const remappedOptions = Object.fromEntries(shuffled.map((entry) => [entry.label, entry.text]));
-  const remappedDistractors = {};
-  for (const [label, explanation] of Object.entries(built.distractor_explanations)) {
-    const sourceText = built.options[label];
-    const target = shuffled.find((entry) => entry.text === sourceText);
-    if (target) {
-      remappedDistractors[target.label] = explanation;
-    }
   }
 
   return validateQuestion(
@@ -687,15 +758,40 @@ function toLegacyQuestionRow(question, quizId, displayOrder) {
   };
 }
 
-async function generateForDomain(domainSpec, mode, offset, dateSeed) {
+async function generateForDomain(domainSpec, mode, offset, dateSeed, recentHistoryByDomain) {
   const bank = QUESTION_BANK[domainSpec.domain];
   if (!bank || !bank.length) {
     throw new Error(`No question bank configured for Domain ${domainSpec.domain}`);
   }
 
+  const templateRng = createSeededRng(`${mode}:${dateSeed}:domain:${domainSpec.domain}:templates`);
+  const recentlyUsed = new Set();
+  const recentlySeenSubdomains = recentHistoryByDomain.get(domainSpec.domain) || new Set();
   const questions = [];
   for (let index = 0; index < domainSpec.count; index += 1) {
-    const template = bank[(offset + index) % bank.length];
+    if (recentlyUsed.size === bank.length) {
+      recentlyUsed.clear();
+    }
+
+    let templateIndex = Math.floor(templateRng() * bank.length);
+    let guard = 0;
+    while (guard < bank.length * 3) {
+      const candidate = bank[templateIndex];
+      const candidateSubdomain = String(candidate.subdomain || '').toLowerCase();
+      const usedInSet = recentlyUsed.has(templateIndex);
+      const blockedByLookback = recentlySeenSubdomains.has(candidateSubdomain);
+
+      if (!usedInSet && !blockedByLookback) {
+        break;
+      }
+
+      templateIndex = Math.floor(templateRng() * bank.length);
+      guard += 1;
+    }
+
+    const template = bank[templateIndex];
+    recentlyUsed.add(templateIndex);
+    recentlySeenSubdomains.add(String(template.subdomain || '').toLowerCase());
     console.log(`Generating question ${index + 1}/${domainSpec.count} for Domain ${domainSpec.domain}: ${domainSpec.domain_label}...`);
     questions.push(makeQuestion(template, domainSpec.domain, domainSpec.domain_label, mode, dateSeed, offset + index));
   }
@@ -728,14 +824,15 @@ async function main() {
     throw new Error(`Unknown mode: ${MODE}`);
   }
 
-  const dateSeed = getAestDateSeed();
+  const dateSeed = getDateSeed();
+  const recentHistoryByDomain = loadRecentSubdomainHistory(MODE, dateSeed, TEMPLATE_LOOKBACK_DAYS);
   const generatedAt = new Date().toISOString();
   const setId = `${MODE}-${dateSeed}`;
 
   const allQuestions = [];
   let offset = 0;
   for (const domainSpec of distribution) {
-    const questions = await generateForDomain(domainSpec, MODE, offset, dateSeed);
+    const questions = await generateForDomain(domainSpec, MODE, offset, dateSeed, recentHistoryByDomain);
     allQuestions.push(...questions);
     offset += domainSpec.count;
   }

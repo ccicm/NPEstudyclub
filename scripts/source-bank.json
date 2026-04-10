@@ -120,6 +120,16 @@
       "url": "https://www.ahpra.gov.au/Resources/Guides/Guidelines-for-registered-health-practitioners.aspx",
       "domains": ["Ethics", "Assessment", "Interventions", "Communication"],
       "notes": "General AHPRA practice guidance used for safe, compliant professional conduct."
+    },
+    {
+      "id": "aps-intellectual-disability-guidelines",
+      "citation": "APS Guidelines for working with people who have intellectual disabilities",
+      "aliases": [
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "url": "https://psychology.org.au/for-members/publications/inpsych/2018/february-issue-1/intellectual-disability",
+      "domains": ["Assessment", "Communication"],
+      "notes": "Guidance for accessible and fair psychological practice with people who have intellectual disability."
     }
   ]
 }
