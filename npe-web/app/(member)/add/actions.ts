@@ -65,6 +65,10 @@ function classifyError(error: { message?: string; code?: string } | null | undef
     return "schema_not_ready";
   }
 
+  if (code === "PGRST204") {
+    return "schema_not_ready";
+  }
+
   if (
     code === "42703" &&
     !message.includes("modality") &&
@@ -96,19 +100,10 @@ function isMissingMetadataColumnError(error: { message?: string; code?: string }
     return true;
   }
 
-  if (
-    !lower.includes("undefined column") &&
-    !lower.includes("schema cache") &&
-    !(lower.includes("could not find the") && lower.includes("column"))
-  ) {
-    return false;
-  }
-
   return (
-    lower.includes("modality") ||
-    lower.includes("population") ||
-    lower.includes("content_type") ||
-    lower.includes("source")
+    lower.includes("undefined column") ||
+    lower.includes("schema cache") ||
+    (lower.includes("could not find the") && lower.includes("column"))
   );
 }
 
@@ -136,15 +131,18 @@ function getDbDiagnostic(error: { message?: string; code?: string; details?: str
     return { dbCode: code, dbHint: "not_null" };
   }
 
-  if (code === "42703" || message.includes("undefined column")) {
-    return { dbCode: code, dbHint: "missing_column" };
+  const match = `${message} ${details} ${hint}`.match(/column\s+['"]?([a-z_][a-z0-9_]*)['"]?/i);
+  const dbColumn = match?.[1] || "";
+
+  if (code === "42703" || code === "PGRST204" || message.includes("undefined column")) {
+    return { dbCode: code, dbHint: "missing_column", dbColumn };
   }
 
   if (code === "42P01" || message.includes("relation") || message.includes("does not exist")) {
     return { dbCode: code, dbHint: "missing_table" };
   }
 
-  return { dbCode: code, dbHint: "unknown" };
+  return { dbCode: code, dbHint: "unknown", dbColumn };
 }
 
 export async function addResourceAction(formData: FormData) {
@@ -235,6 +233,11 @@ export async function addResourceAction(formData: FormData) {
       uploaded_by: user.id,
       uploader_name: user.user_metadata?.full_name || user.email,
     },
+    {
+      title,
+      category,
+      uploaded_by: user.id,
+    },
   ];
 
   let error: { message?: string; code?: string } | null = null;
@@ -282,8 +285,10 @@ export async function addResourceAction(formData: FormData) {
     }
 
     const classified = classifyError(error);
-    const { dbCode, dbHint } = getDbDiagnostic(error);
-    redirect(`/add?error=${classified}&db_code=${encodeURIComponent(dbCode)}&db_hint=${encodeURIComponent(dbHint)}`);
+    const { dbCode, dbHint, dbColumn } = getDbDiagnostic(error);
+    redirect(
+      `/add?error=${classified}&db_code=${encodeURIComponent(dbCode)}&db_hint=${encodeURIComponent(dbHint)}&db_col=${encodeURIComponent(dbColumn)}`,
+    );
   }
 
   revalidatePath("/resources");

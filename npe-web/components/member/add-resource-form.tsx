@@ -16,6 +16,7 @@ type Props = {
   errorCode: string | null;
   dbCode: string | null;
   dbHint: string | null;
+  dbColumn: string | null;
 };
 
 type Category = "Exam Prep" | "Clinical Practice" | "";
@@ -66,7 +67,7 @@ function SelectWithOther({
   );
 }
 
-export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint }: Props) {
+export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint, dbColumn }: Props) {
   const [category, setCategory] = useState<Category>("");
   const [domain, setDomain] = useState("");
   const [modality, setModality] = useState("");
@@ -118,6 +119,7 @@ export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint }:
           {errorCode === "save_failed" && (dbCode || dbHint) ? (
             <p className="mt-2 text-xs text-destructive/90">
               Diagnostic: {dbCode || "unknown"} / {dbHint || "unknown"}
+              {dbColumn ? ` / column: ${dbColumn}` : ""}
             </p>
           ) : null}
         </div>

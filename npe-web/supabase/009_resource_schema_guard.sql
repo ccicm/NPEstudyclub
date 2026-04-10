@@ -22,6 +22,8 @@ alter table public.resources add column if not exists modality text;
 alter table public.resources add column if not exists population text;
 alter table public.resources add column if not exists content_type text;
 alter table public.resources add column if not exists source text;
+alter table public.resources add column if not exists file_type text;
+alter table public.resources add column if not exists domain text;
 alter table public.resources add column if not exists tags text[];
 alter table public.resources add column if not exists notes text;
 alter table public.resources add column if not exists file_path text;
