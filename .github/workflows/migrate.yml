@@ -11,6 +11,7 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
@@ -22,8 +23,15 @@ jobs:
 
       - name: Resolve database URL
         run: |
+          if [ -n "$SUPABASE_DB_URL" ]; then
+            DB_URL="$SUPABASE_DB_URL"
+            echo "Using SUPABASE_DB_URL override"
+            echo "RESOLVED_DB_URL=$DB_URL" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
           if [ -z "$SUPABASE_DB_PASSWORD" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
-            echo "Missing required secrets. Set SUPABASE_PROJECT_REF and SUPABASE_DB_PASSWORD." >&2
+            echo "Missing required secrets. Set SUPABASE_DB_URL, or SUPABASE_PROJECT_REF and SUPABASE_DB_PASSWORD." >&2
             exit 1
           fi
 
