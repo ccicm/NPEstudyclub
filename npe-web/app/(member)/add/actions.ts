@@ -32,11 +32,11 @@ function classifyError(message: string) {
   const lower = message.toLowerCase();
   if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
   if (
-    lower.includes("does not exist") ||
     lower.includes("undefined table") ||
     lower.includes("undefined column") ||
+    lower.includes("relation") && lower.includes("does not exist") ||
     lower.includes("schema cache") ||
-    lower.includes("column")
+    lower.includes("could not find the") && lower.includes("column")
   ) {
     return "schema_not_ready";
   }
@@ -45,7 +45,11 @@ function classifyError(message: string) {
 
 function isMissingMetadataColumnError(message: string) {
   const lower = message.toLowerCase();
-  if (!lower.includes("column") && !lower.includes("schema cache") && !lower.includes("does not exist")) {
+  if (
+    !lower.includes("undefined column") &&
+    !lower.includes("schema cache") &&
+    !(lower.includes("could not find the") && lower.includes("column"))
+  ) {
     return false;
   }
 
