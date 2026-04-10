@@ -8,7 +8,7 @@ export default async function ThreadDetailPage({
   searchParams,
 }: {
   params: Promise<{ threadId: string }>;
-  searchParams: Promise<{ reported?: string; moderated?: string; report_error?: string }>;
+  searchParams: Promise<{ reported?: string; moderated?: string; report_error?: string; error?: string }>;
 }) {
   const { threadId } = await params;
   const qs = await searchParams;
@@ -21,7 +21,7 @@ export default async function ThreadDetailPage({
 
   const { data: thread } = await supabase
     .from("forum_threads")
-    .select("id,title,body,tag,author_name,created_at,quiz_id,publish_at")
+    .select("id,title,body,tag,author_name,created_at,quiz_id,publish_at,moderator_note,moderator_note_pinned,moderator_note_updated_at")
     .eq("id", threadId)
     .maybeSingle();
 
@@ -55,7 +55,7 @@ export default async function ThreadDetailPage({
 
   const { data: replies } = await supabase
     .from("forum_replies")
-    .select("id,thread_id,parent_reply_id,body,author_name,created_at")
+    .select("id,thread_id,parent_reply_id,body,author_name,created_at,created_by,was_moderated,moderated_at,moderation_reason")
     .eq("thread_id", threadId)
     .order("created_at", { ascending: true });
 
@@ -102,6 +102,7 @@ export default async function ThreadDetailPage({
       reported={qs.reported === "1"}
       moderated={qs.moderated === "1"}
       reportError={qs.report_error || null}
+      errorCode={qs.error || null}
     />
   );
 }

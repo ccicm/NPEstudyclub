@@ -153,6 +153,8 @@ export function CommunityHub({
               ? "Please add both title and body before publishing."
               : errorCode === "schema_not_ready"
                 ? "Community tables are not ready in Supabase. Run migrations 001, 002, and 003."
+                : errorCode === "posting_restricted"
+                  ? "You are currently restricted from posting in community. Please contact a moderator if this should be reviewed."
                 : errorCode === "not_authorized"
                   ? "Your account does not currently have permission to post in community. Confirm approved member status."
                   : "Could not save this post. Please try again."}

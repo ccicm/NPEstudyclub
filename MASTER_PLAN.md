@@ -301,13 +301,17 @@ Implemented in app code:
 - Reporting flow scaffold added in UI and server actions for threads/replies.
 - New migration scaffold added: `supabase/012_content_reports.sql`.
 - Initial moderator controls added in thread detail (admin delete thread/reply).
+- Moderator controls expanded in thread detail:
+   - Pin/clear moderator note on a thread
+   - Edit/redact replies with an "edited by moderator" marker
+   - Restrict member posting for a moderation period
+- New migration scaffold added: `supabase/014_clinical_safeguarding_moderation.sql`.
 
 Still pending:
-- Moderator edit-with-marker capability.
-- Moderator note pinning for content concerns.
-- Member posting suspension/ban controls.
+- Moderator unsuspend/lift control in UI.
 - Email notification on report submission.
 - Production execution of migration `012_content_reports.sql`.
+- Production execution of migration `014_clinical_safeguarding_moderation.sql`.
 
 This section defines mandatory parameters for the community/forum feature. The forum exists for exam preparation discussion among provisional psychologists. It must not become a clinical supervision space or a venue where client information is shared.
 

@@ -32,6 +32,7 @@ In `.env.local`:
 - Optional: Run `supabase/011_bulk_onboard_members.sql` to quickly approve known members
 - Optional: Run `supabase/012_content_reports.sql` to enable community post/reply reporting scaffold
 - If `/resources` shows `42501 permission denied for table users`, run `supabase/013_resources_policy_hard_reset.sql`
+- Optional: Run `supabase/014_clinical_safeguarding_moderation.sql` for moderator notes, redaction markers, and posting restrictions
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`
@@ -116,6 +117,7 @@ Once DNS propagates and SSL is active:
 - [ ] Approved user can access `/dashboard`
 - [ ] Resource upload works and file opens via signed URL
 - [ ] Community posting, replies, and upvotes work
+- [ ] Moderator note/redaction/posting-restriction controls work in thread detail (admin account)
 - [ ] Quiz attempt saves to history
 - [ ] Study plan onboarding and log-time flow work
 

@@ -45,10 +45,16 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
   - Report flow scaffold in thread detail for both threads and replies.
   - Initial moderator controls in thread detail (admin delete thread/reply).
   - New migration scaffold: `supabase/012_content_reports.sql`.
+  - Moderator controls expansion in thread detail:
+    - Pin/clear moderator note on thread
+    - Edit/redact replies with "edited by moderator" marker
+    - Restrict member posting for a duration
+  - New migration scaffold: `supabase/014_clinical_safeguarding_moderation.sql`.
 - Pending:
   - Apply migration `012_content_reports.sql` in production.
+  - Apply migration `014_clinical_safeguarding_moderation.sql` in production.
   - Wire report email notifications.
-  - Add remaining moderator controls (edit with marker, moderator note pinning, suspension/ban).
+  - Add moderator unsuspend/lift control in UI (restriction write exists; lift control still pending).
 
 ## P3.5 Bulk Onboarding
 
