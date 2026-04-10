@@ -263,7 +263,7 @@ export default async function DashboardPage() {
             <ul className="mt-3 space-y-3 text-sm">
               {recentResources.map((resource) => (
                 <li key={resource.id}>
-                  <Link href="/resources" className="flex items-center gap-3 rounded-xl bg-muted/40 p-3 hover:bg-muted/60">
+                  <Link href={`/resources?id=${resource.id}`} className="flex items-center gap-3 rounded-xl bg-muted/40 p-3 hover:bg-muted/60">
                     <span className={`rounded-full px-2 py-1 text-xs font-semibold ${fileTypeColor(resource.file_type)}`}>
                       {(resource.file_type || "file").toUpperCase()}
                     </span>
@@ -332,7 +332,7 @@ export default async function DashboardPage() {
 
                   return (
                     <div key={domain.domain} className={`rounded-lg px-3 py-2 text-sm font-semibold ${getColor(domain.avg)}`}>
-                      {domain.domain} - {domain.avg}% ({domain.count})
+                      {domain.domain} · {domain.avg}% avg · {domain.count} attempts
                     </div>
                   );
                 })}
@@ -351,11 +351,19 @@ export default async function DashboardPage() {
 
         <section className="rounded-2xl border bg-card p-6">
           <h2 className="text-2xl">Community Activity</h2>
-          <p className="mt-2 text-sm">Threads I started: {threadsStarted || 0}</p>
-          <p className="mt-1 text-sm">Replies posted: {repliesCount || 0}</p>
           {!(threadsStarted || 0) && !(repliesCount || 0) ? (
-            <p className="mt-2 text-sm text-muted-foreground">No posts yet. Jump into Community to start a thread.</p>
-          ) : null}
+            <div className="mt-3 rounded-xl border bg-muted/30 p-4">
+              <p className="text-sm">You haven&apos;t posted yet.</p>
+              <Link href="/community" className="mt-2 inline-block text-sm font-semibold underline">
+                Start a thread in Community -&gt;
+              </Link>
+            </div>
+          ) : (
+            <>
+              <p className="mt-2 text-sm">Threads I started: {threadsStarted || 0}</p>
+              <p className="mt-1 text-sm">Replies posted: {repliesCount || 0}</p>
+            </>
+          )}
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href="/community?author=me" className="text-sm underline">
               View my posts

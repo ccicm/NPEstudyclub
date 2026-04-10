@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, Circle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { toggleResourceComplete } from "@/app/(member)/resources/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,8 @@ function fileBadgeColor(fileType: string | null) {
 }
 
 export function ResourceLibraryClient({ resources }: Props) {
+  const searchParams = useSearchParams();
+  const selectedResourceId = searchParams.get("id");
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<(typeof RESOURCE_CATEGORIES)[number]>("All");
@@ -60,6 +63,21 @@ export function ResourceLibraryClient({ resources }: Props) {
     Object.fromEntries(resources.map((resource) => [resource.id, resource.completed])),
   );
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!selectedResourceId) {
+      return;
+    }
+
+    const selected = resources.find((resource) => resource.id === selectedResourceId);
+    if (!selected) {
+      return;
+    }
+
+    if (selected.category === "Exam Prep" || selected.category === "Clinical Practice") {
+      setActiveCategory(selected.category);
+    }
+  }, [selectedResourceId, resources]);
 
   const debouncedSetQuery = (value: string) => {
     setSearchInput(value);
@@ -123,6 +141,17 @@ export function ResourceLibraryClient({ resources }: Props) {
     resources,
     searchQuery,
   ]);
+
+  useEffect(() => {
+    if (!selectedResourceId) {
+      return;
+    }
+
+    const target = document.getElementById(`resource-${selectedResourceId}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [selectedResourceId, filtered.length]);
 
   const clearFilters = () => {
     setDomainFilter("");
@@ -282,8 +311,13 @@ export function ResourceLibraryClient({ resources }: Props) {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((resource) => {
             const done = completionMap[resource.id] ?? false;
+            const isSelected = selectedResourceId === resource.id;
             return (
-              <article key={resource.id} className="rounded-3xl border bg-card p-5">
+              <article
+                key={resource.id}
+                id={`resource-${resource.id}`}
+                className={`rounded-3xl border bg-card p-5 ${isSelected ? "ring-2 ring-primary" : ""}`}
+              >
                 <div className="flex items-center justify-between gap-3">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${fileBadgeColor(resource.file_type)}`}>
                     {(resource.file_type ?? "file").toUpperCase()}
