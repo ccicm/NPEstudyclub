@@ -27,12 +27,7 @@ jobs:
           DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
 
           if [ -z "$DB_URL" ] && [ -n "$SUPABASE_DB_PASSWORD" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
-            ENCODED_PASSWORD=$(python3 - <<'PY'
-import os
-import urllib.parse
-print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))
-PY
-)
+            ENCODED_PASSWORD=$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')
             DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres?sslmode=require"
           fi
 
