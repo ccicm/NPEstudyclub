@@ -51,6 +51,7 @@ alter table public.resources enable row level security;
 drop policy if exists "Authenticated users can read resources" on public.resources;
 drop policy if exists "Users can insert resources" on public.resources;
 drop policy if exists "Users can delete own resources" on public.resources;
+drop policy if exists "resources_insert_approved" on public.resources;
 
 create policy "Authenticated users can read resources"
 on public.resources for select

@@ -28,6 +28,7 @@ In `.env.local`:
 - Run `supabase/007_noticeboard_publish_windows.sql` in SQL Editor
 - Run `supabase/008_study_plan_enhancements.sql` in SQL Editor
 - Run `supabase/009_resource_schema_guard.sql` in SQL Editor
+- Run `supabase/010_resources_policy_cleanup.sql` in SQL Editor
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`

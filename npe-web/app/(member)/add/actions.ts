@@ -31,7 +31,8 @@ function fromSelectWithOther(formData: FormData, key: string) {
 function classifyError(error: { message?: string; code?: string } | null | undefined) {
   const message = String(error?.message || "").toLowerCase();
   const code = String(error?.code || "").toUpperCase();
-  const errorObj = error as any || {};
+  const errorObj =
+    (error as { code?: string; details?: string; hint?: string } | null | undefined) || {};
   const details = String(errorObj.details || "").toLowerCase();
   const hint = String(errorObj.hint || "").toLowerCase();
 
