@@ -37,6 +37,7 @@ declare
   created_thread uuid;
   question_quiz_id uuid;
   publish_after timestamptz;
+  min_votes int;
 begin
   select count(distinct user_id) into takers
   from public.user_responses
@@ -51,8 +52,16 @@ begin
   where qq.id = p_question_id;
 
   publish_after := public.quiz_noticeboard_publish_at();
+  min_votes := coalesce(
+    (select value::int from public.quiz_settings where key = 'explanation_min_votes'),
+    5
+  );
 
   ratio := case when takers > 0 then flags::numeric / takers::numeric else 0 end;
+
+  if takers < min_votes then
+    return;
+  end if;
 
   if ratio <= 0.01 then
     return;
@@ -108,6 +117,7 @@ declare
   threshold constant numeric(6,4) := 0.20;
   question_quiz_id uuid;
   publish_after timestamptz;
+  min_votes int;
 begin
   select
     count(*) filter (where vote = 'down'),
@@ -121,8 +131,16 @@ begin
   where qq.id = p_question_id;
 
   publish_after := public.quiz_noticeboard_publish_at();
+  min_votes := coalesce(
+    (select value::int from public.quiz_settings where key = 'explanation_min_votes'),
+    5
+  );
 
   down_ratio := case when total_count > 0 then down_count::numeric / total_count::numeric else 0 end;
+
+  if total_count < min_votes then
+    return;
+  end if;
 
   if down_ratio <= threshold then
     return;

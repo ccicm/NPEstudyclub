@@ -28,6 +28,13 @@ values (
 )
 on conflict (key) do nothing;
 
+insert into public.quiz_settings (key, value)
+values (
+  'explanation_min_votes',
+  to_jsonb(5)
+)
+on conflict (key) do nothing;
+
 create or replace function public.get_quiz_setting_ratio(p_key text, p_default numeric)
 returns numeric
 language sql
@@ -85,6 +92,7 @@ declare
   existing_thread uuid;
   created_thread uuid;
   threshold numeric(6,4);
+  min_votes int;
 begin
   select
     count(*) filter (where vote = 'down'),
@@ -94,7 +102,15 @@ begin
   where question_id = p_question_id;
 
   threshold := public.get_quiz_setting_ratio('explanation_downvote_threshold', 0.20);
+  min_votes := coalesce(
+    (select value::int from public.quiz_settings where key = 'explanation_min_votes'),
+    5
+  );
   down_ratio := case when total_count > 0 then down_count::numeric / total_count::numeric else 0 end;
+
+  if total_count < min_votes then
+    return;
+  end if;
 
   if down_ratio <= threshold then
     return;
