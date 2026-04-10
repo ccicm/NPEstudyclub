@@ -11,6 +11,13 @@ type QuizQuestion = {
   options: Array<{ label: string; text: string }>;
   correct_index: number;
   explanation: string | null;
+  citations?: Array<{
+    source: string;
+    clause?: string | null;
+    external_url?: string | null;
+    resource_id?: string | null;
+  }> | null;
+  wrong_answer_rationales?: Record<string, string> | null;
 };
 
 type Stage = "intro" | "question" | "results";
@@ -35,7 +42,9 @@ export function QuizRunner({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
   const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
+  const [checkedSources, setCheckedSources] = useState<Record<string, boolean>>({});
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -105,6 +114,12 @@ export function QuizRunner({
   }
 
   if (stage === "results") {
+    const reviewQuestion = questions[reviewIndex];
+    const reviewAnswer = answers[reviewIndex];
+    const voted = reviewQuestion ? feedbackVotes[reviewQuestion.id] : undefined;
+    const ratedCount = questions.filter((question) => Boolean(feedbackVotes[question.id])).length;
+    const allRated = ratedCount === questions.length;
+
     return (
       <div className="space-y-4">
         <div className="rounded-2xl border bg-card p-6">
@@ -131,6 +146,10 @@ export function QuizRunner({
                 setSelectedIndex(null);
                 setRevealed(false);
                 setAnswers([]);
+                setReviewIndex(0);
+                setFeedbackVotes({});
+                setCheckedSources({});
+                setFeedbackMessage(null);
               }}
             >
               Retake
@@ -149,51 +168,149 @@ export function QuizRunner({
         </div>
 
         <div className="rounded-2xl border bg-card p-6">
-          <h2 className="text-2xl">Question breakdown</h2>
+          <h2 className="text-2xl">Question review</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Rate each explanation to unlock the next question.
+          </p>
           {feedbackMessage ? <p className="mt-2 text-xs text-muted-foreground">{feedbackMessage}</p> : null}
-          <div className="mt-3 space-y-2">
-            {questions.map((question, questionIndex) => {
-              const answer = answers[questionIndex];
-              const correct = answer?.selected === answer?.correct;
-              const voted = feedbackVotes[question.id];
-              return (
-                <details key={question.id} className="rounded-lg border bg-background p-3">
-                  <summary className="cursor-pointer text-sm font-semibold">
-                    Q{questionIndex + 1} · {correct ? "Correct" : "Incorrect"}
-                  </summary>
-                  <p className="mt-2 text-sm">{question.question_text}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Your answer: {question.options[answer?.selected ?? 0]?.label || "-"} · Correct: {question.options[answer?.correct ?? 0]?.label}
+
+          {reviewQuestion ? (
+            <div className="mt-4 rounded-xl border bg-background p-4">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                Question {reviewIndex + 1} of {questions.length}
+              </p>
+              <p className="mt-2 text-sm">{reviewQuestion.question_text}</p>
+
+              <div className="mt-3 grid gap-2 rounded-lg border bg-card p-3 text-sm">
+                <p>
+                  <span className="font-semibold">Your answer:</span>{" "}
+                  {reviewQuestion.options[reviewAnswer?.selected ?? -1]?.label || "-"}. {reviewQuestion.options[reviewAnswer?.selected ?? -1]?.text || "No answer"}
+                </p>
+                <p>
+                  <span className="font-semibold">Correct answer:</span>{" "}
+                  {reviewQuestion.options[reviewAnswer?.correct ?? reviewQuestion.correct_index]?.label}. {reviewQuestion.options[reviewAnswer?.correct ?? reviewQuestion.correct_index]?.text}
+                </p>
+              </div>
+
+              {reviewQuestion.explanation ? (
+                <div className="mt-3 rounded-lg border bg-card p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">AI explanation</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{reviewQuestion.explanation}</p>
+                </div>
+              ) : null}
+
+              {reviewQuestion.citations?.length ? (
+                <div className="mt-3 rounded-lg border bg-card p-3 text-xs text-muted-foreground">
+                  <p className="font-semibold text-foreground">Sources</p>
+                  <div className="mt-2 space-y-1">
+                    {reviewQuestion.citations.map((citation, citationIndex) => (
+                      <p key={`${reviewQuestion.id}-citation-${citationIndex}`}>
+                        {citation.clause ? `${citation.source} - ${citation.clause}` : citation.source}
+                        {citation.resource_id ? (
+                          <Link href={`/resources?id=${citation.resource_id}`} className="ml-1 underline">
+                            View resource
+                          </Link>
+                        ) : citation.external_url ? (
+                          <a href={citation.external_url} target="_blank" rel="noreferrer" className="ml-1 underline">
+                            External link
+                          </a>
+                        ) : null}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-muted-foreground">Was this explanation helpful?</span>
+                <button
+                  type="button"
+                  onClick={() => submitFeedbackVote(reviewQuestion.id, "up")}
+                  className={`rounded-md border px-2 py-1 ${
+                    voted === "up" ? "border-green-600 bg-green-50" : "bg-card"
+                  }`}
+                >
+                  Thumb up
+                </button>
+                <button
+                  type="button"
+                  onClick={() => submitFeedbackVote(reviewQuestion.id, "down")}
+                  className={`rounded-md border px-2 py-1 ${
+                    voted === "down" ? "border-red-600 bg-red-50" : "bg-card"
+                  }`}
+                >
+                  Thumb down
+                </button>
+              </div>
+
+              {voted === "down" ? (
+                <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+                  <p className="font-medium">Need a human review?</p>
+                  <p className="mt-1 text-xs">
+                    If you have reviewed the explanation and sources and still disagree, open a community review thread.
                   </p>
-                  {question.explanation ? (
-                    <>
-                      <p className="mt-1 text-sm text-muted-foreground">{question.explanation}</p>
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground">Was this explanation helpful?</span>
-                        <button
-                          type="button"
-                          onClick={() => submitFeedbackVote(question.id, "up")}
-                          className={`rounded-md border px-2 py-1 ${
-                            voted === "up" ? "border-green-600 bg-green-50" : "bg-card"
-                          }`}
-                        >
-                          Thumb up
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => submitFeedbackVote(question.id, "down")}
-                          className={`rounded-md border px-2 py-1 ${
-                            voted === "down" ? "border-red-600 bg-red-50" : "bg-card"
-                          }`}
-                        >
-                          Thumb down
-                        </button>
-                      </div>
-                    </>
-                  ) : null}
-                </details>
-              );
-            })}
+                  <label className="mt-2 flex items-center gap-2 text-xs">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(checkedSources[reviewQuestion.id])}
+                      onChange={(event) =>
+                        setCheckedSources((previous) => ({
+                          ...previous,
+                          [reviewQuestion.id]: event.target.checked,
+                        }))
+                      }
+                    />
+                    I checked the source
+                  </label>
+                  <Link href="/community" className="mt-2 inline-block text-xs underline">
+                    Open community review board
+                  </Link>
+
+                  <div className="mt-3 rounded-md border bg-white/70 p-2 text-xs text-amber-950">
+                    <p className="font-medium">Incorrect option review</p>
+                    <div className="mt-1 space-y-1">
+                      {reviewQuestion.options
+                        .filter((_, optionIndex) => optionIndex !== reviewQuestion.correct_index)
+                        .map((option) => (
+                          <p key={`${reviewQuestion.id}-${option.label}`}>
+                            {option.label}. {option.text} - {reviewQuestion.wrong_answer_rationales?.[option.label] || "Does not match the keyed answer for this question."}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-3 text-sm">
+            <p>
+              {ratedCount} of {questions.length} rated
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setReviewIndex((value) => Math.max(0, value - 1))}
+                disabled={reviewIndex === 0}
+                className="rounded-md border px-3 py-2 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              {!allRated ? (
+                <button
+                  type="button"
+                  onClick={() => setReviewIndex((value) => Math.min(questions.length - 1, value + 1))}
+                  disabled={!voted || reviewIndex === questions.length - 1}
+                  className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground disabled:opacity-50"
+                >
+                  Next
+                </button>
+              ) : (
+                <Link href="/quizzes" className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground">
+                  Done
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

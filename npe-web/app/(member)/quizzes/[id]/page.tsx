@@ -29,13 +29,36 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  const { data: questions } = await supabase
+  let questionsData: Array<{
+    id: string;
+    question_text: string;
+    options: unknown;
+    correct_index: number;
+    explanation: string | null;
+    display_order: number;
+    citations?: unknown;
+    wrong_answer_rationales?: unknown;
+  }> | null = null;
+
+  const withOptionalFields = await supabase
     .from("quiz_questions")
-    .select("id,question_text,options,correct_index,explanation,display_order")
+    .select("id,question_text,options,correct_index,explanation,display_order,citations,wrong_answer_rationales")
     .eq("quiz_id", id)
     .order("display_order", { ascending: true });
 
-  const preparedQuestions = (questions ?? []).map((question) => ({
+  if (withOptionalFields.error) {
+    const fallback = await supabase
+      .from("quiz_questions")
+      .select("id,question_text,options,correct_index,explanation,display_order")
+      .eq("quiz_id", id)
+      .order("display_order", { ascending: true });
+
+    questionsData = (fallback.data as typeof questionsData) ?? [];
+  } else {
+    questionsData = (withOptionalFields.data as typeof questionsData) ?? [];
+  }
+
+  const preparedQuestions = (questionsData ?? []).map((question) => ({
     id: question.id,
     question_text: question.question_text,
     options: Array.isArray(question.options)
@@ -45,6 +68,18 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
       : [],
     correct_index: question.correct_index,
     explanation: question.explanation,
+    citations: Array.isArray(question.citations)
+      ? (question.citations as Array<{
+          source: string;
+          clause?: string | null;
+          external_url?: string | null;
+          resource_id?: string | null;
+        }>).filter((citation) => citation && typeof citation.source === "string")
+      : [],
+    wrong_answer_rationales:
+      question.wrong_answer_rationales && typeof question.wrong_answer_rationales === "object"
+        ? (question.wrong_answer_rationales as Record<string, string>)
+        : null,
   }));
 
   return <QuizRunner quiz={quiz} questions={preparedQuestions} />;

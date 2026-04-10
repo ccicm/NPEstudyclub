@@ -24,6 +24,9 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Dashboard account card label softened to "Member access".
 	- Quiz list now includes a consistent AI-generated disclosure callout.
 	- Quiz runner now includes AI-generated disclosure copy in intro and results.
+	- Quiz runner results now use sequential per-question review and require explanation rating before advancing.
+	- Downvote flow now exposes follow-up review guidance and community review-board CTA.
+	- Quiz detail loading now supports optional citations/wrong-answer rationales with schema-safe fallback.
 	- Calendar export study blocks now use UTC-safe AEST-aligned times.
 	- Schedule filter controls now include `Exam windows` and conditional `My exam window` views.
 - In progress:

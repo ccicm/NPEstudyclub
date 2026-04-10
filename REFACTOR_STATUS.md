@@ -73,6 +73,8 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Dashboard account chip label softened to "Member access"
 - Quiz list now includes a clear AI-generated disclosure banner
 - Quiz runner now shows AI-generated disclosure copy on intro and results stages
+- Quiz runner results now use sequential per-question review with required explanation rating before advancing
+- Quiz detail page now loads optional citations/rationale fields with schema-safe fallback
 - Calendar export study blocks now use UTC-safe timing aligned to 7:00pm AEST defaults
 - Schedule filter now supports exam windows and my exam window views
 - Profile stale progress section removed
