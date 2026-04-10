@@ -28,23 +28,40 @@ function fromSelectWithOther(formData: FormData, key: string) {
   return otherValue || null;
 }
 
-function classifyError(message: string) {
-  const lower = message.toLowerCase();
-  if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
+function classifyError(error: { message?: string; code?: string } | null | undefined) {
+  const message = String(error?.message || "").toLowerCase();
+  const code = String(error?.code || "").toUpperCase();
+
+  if (code === "42501" || message.includes("row-level security") || message.includes("permission denied")) {
+    return "not_authorized";
+  }
+
+  if (code === "42P01" || code === "42703" || code === "PGRST204") {
+    return "schema_not_ready";
+  }
+
   if (
-    lower.includes("undefined table") ||
-    lower.includes("undefined column") ||
-    lower.includes("relation") && lower.includes("does not exist") ||
-    lower.includes("schema cache") ||
-    lower.includes("could not find the") && lower.includes("column")
+    message.includes("undefined table") ||
+    message.includes("undefined column") ||
+    (message.includes("relation") && message.includes("does not exist")) ||
+    message.includes("schema cache") ||
+    (message.includes("could not find the") && message.includes("column"))
   ) {
     return "schema_not_ready";
   }
-  return null;
+
+  return "save_failed";
 }
 
-function isMissingMetadataColumnError(message: string) {
+function isMissingMetadataColumnError(error: { message?: string; code?: string } | null | undefined) {
+  const message = String(error?.message || "");
   const lower = message.toLowerCase();
+  const code = String(error?.code || "").toUpperCase();
+
+  if (code === "42703" || code === "PGRST204") {
+    return true;
+  }
+
   if (
     !lower.includes("undefined column") &&
     !lower.includes("schema cache") &&
@@ -111,6 +128,7 @@ export async function addResourceAction(formData: FormData) {
   const baseInsert = {
     title,
     category,
+    domain,
     notes,
     tags: tags.length ? tags : null,
     file_path: storagePath,
@@ -119,19 +137,40 @@ export async function addResourceAction(formData: FormData) {
     uploader_name: user.user_metadata?.full_name || user.email,
   };
 
-  const { error: firstInsertError } = await supabase.from("resources").insert({
-    ...baseInsert,
-    domain,
-    modality,
-    population,
-    content_type: contentType,
-    source,
-  });
+  const insertAttempts: Array<Record<string, unknown>> = [
+    {
+      ...baseInsert,
+      modality,
+      population,
+      content_type: contentType,
+      source,
+    },
+    baseInsert,
+    {
+      title,
+      category,
+      file_path: storagePath,
+      file_type: fileType,
+      uploaded_by: user.id,
+      uploader_name: user.user_metadata?.full_name || user.email,
+    },
+  ];
 
-  const error =
-    firstInsertError && isMissingMetadataColumnError(firstInsertError.message || "")
-      ? (await supabase.from("resources").insert(baseInsert)).error
-      : firstInsertError;
+  let error: { message?: string; code?: string } | null = null;
+
+  for (const payload of insertAttempts) {
+    const { error: attemptError } = await supabase.from("resources").insert(payload);
+    if (!attemptError) {
+      error = null;
+      break;
+    }
+
+    error = attemptError;
+
+    if (!isMissingMetadataColumnError(attemptError)) {
+      break;
+    }
+  }
 
   if (error) {
     await deleteResourceObject({
@@ -139,11 +178,8 @@ export async function addResourceAction(formData: FormData) {
       objectKey: storagePath,
     });
 
-    const classified = classifyError(error.message || "");
-    if (classified) {
-      redirect(`/add?error=${classified}`);
-    }
-    redirect("/add?error=save_failed");
+    const classified = classifyError(error);
+    redirect(`/add?error=${classified}`);
   }
 
   revalidatePath("/resources");
