@@ -38,6 +38,39 @@ async function getPostingRestrictionReason(userId: string) {
   return data.reason || "Posting is temporarily restricted by a moderator.";
 }
 
+async function notifyReportSubmission(payload: {
+  threadId: string | null;
+  replyId: string | null;
+  reporterId: string;
+  reason: string;
+  returnTo: string;
+}) {
+  const webhookUrl = String(process.env.REPORT_WEBHOOK_URL || "").trim();
+  if (!webhookUrl) {
+    return;
+  }
+
+  try {
+    await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        event: "content_report_submitted",
+        submitted_at: new Date().toISOString(),
+        thread_id: payload.threadId,
+        reply_id: payload.replyId,
+        reporter_id: payload.reporterId,
+        reason: payload.reason,
+        return_to: payload.returnTo,
+      }),
+    });
+  } catch {
+    // Best effort notification only. Reporting must still succeed without webhook delivery.
+  }
+}
+
 export async function createThreadAction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
@@ -224,6 +257,14 @@ export async function reportContentAction(formData: FormData) {
     redirect(`${returnTo}?report_error=save_failed`);
   }
 
+  await notifyReportSubmission({
+    threadId: payload.thread_id,
+    replyId: payload.reply_id,
+    reporterId: user.id,
+    reason: payload.reason,
+    returnTo,
+  });
+
   revalidatePath("/community");
   if (threadId) {
     revalidatePath(`/community/${threadId}`);
@@ -386,6 +427,35 @@ export async function restrictMemberPostingAsAdminAction(formData: FormData) {
       expires_at: expiresAt,
       created_by: session.user.id,
     });
+
+  revalidatePath("/community");
+  revalidatePath(`/community/${threadId}`);
+  redirect(`/community/${threadId}?moderated=1`);
+}
+
+export async function liftMemberPostingRestrictionAsAdminAction(formData: FormData) {
+  const userId = String(formData.get("user_id") || "").trim();
+  const threadId = String(formData.get("thread_id") || "").trim();
+
+  if (!userId || !threadId) {
+    return;
+  }
+
+  const session = await getAdminSession();
+  if (!session.isAdmin || !session.user) {
+    return;
+  }
+
+  const admin = createAdminClient();
+  await admin
+    .from("forum_posting_restrictions")
+    .update({
+      is_active: false,
+      lifted_by: session.user.id,
+      lifted_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .eq("is_active", true);
 
   revalidatePath("/community");
   revalidatePath(`/community/${threadId}`);

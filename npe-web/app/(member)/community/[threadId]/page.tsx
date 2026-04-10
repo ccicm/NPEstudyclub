@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { CommunityThreadDetail } from "@/components/member/community-thread-detail";
 import { getAdminSession } from "@/lib/admin-access";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ThreadDetailPage({
@@ -94,6 +95,22 @@ export default async function ThreadDetailPage({
     upvoted_by_me: replyUpvotedByMe.has(reply.id),
   }));
 
+  const replyAuthorIds = Array.from(new Set(preparedReplies.map((reply) => reply.created_by).filter(Boolean))) as string[];
+  let restrictedUserIds: string[] = [];
+
+  if (adminSession.isAdmin && replyAuthorIds.length) {
+    const admin = createAdminClient();
+    const { data: activeRestrictions } = await admin
+      .from("forum_posting_restrictions")
+      .select("user_id,expires_at")
+      .in("user_id", replyAuthorIds)
+      .eq("is_active", true);
+
+    restrictedUserIds = (activeRestrictions ?? [])
+      .filter((row) => !row.expires_at || new Date(row.expires_at).getTime() > Date.now())
+      .map((row) => row.user_id);
+  }
+
   return (
     <CommunityThreadDetail
       thread={{ ...thread, upvote_count: threadUpvoteCount, upvoted_by_me: threadUpvotedByMe }}
@@ -103,6 +120,7 @@ export default async function ThreadDetailPage({
       moderated={qs.moderated === "1"}
       reportError={qs.report_error || null}
       errorCode={qs.error || null}
+      restrictedUserIds={restrictedUserIds}
     />
   );
 }

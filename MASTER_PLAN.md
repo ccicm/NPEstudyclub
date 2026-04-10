@@ -308,8 +308,7 @@ Implemented in app code:
 - New migration scaffold added: `supabase/014_clinical_safeguarding_moderation.sql`.
 
 Still pending:
-- Moderator unsuspend/lift control in UI.
-- Email notification on report submission.
+- Configure production webhook endpoint for report notifications (`REPORT_WEBHOOK_URL`).
 - Production execution of migration `012_content_reports.sql`.
 - Production execution of migration `014_clinical_safeguarding_moderation.sql`.
 

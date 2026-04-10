@@ -10,6 +10,7 @@ import {
   deleteThreadAsAdminAction,
   redactReplyAsAdminAction,
   reportContentAction,
+  liftMemberPostingRestrictionAsAdminAction,
   restrictMemberPostingAsAdminAction,
   setThreadModeratorNoteAction,
   toggleReplyUpvoteAction,
@@ -68,6 +69,7 @@ export function CommunityThreadDetail({
   moderated = false,
   reportError = null,
   errorCode = null,
+  restrictedUserIds = [],
 }: {
   thread: Thread;
   replies: Reply[];
@@ -76,6 +78,7 @@ export function CommunityThreadDetail({
   moderated?: boolean;
   reportError?: string | null;
   errorCode?: string | null;
+  restrictedUserIds?: string[];
 }) {
   const [replyTarget, setReplyTarget] = useState<string | null>(null);
   const [pendingVote, setPendingVote] = useState<string | null>(null);
@@ -288,6 +291,15 @@ export function CommunityThreadDetail({
                       <input name="days" type="number" min={1} defaultValue={7} className="h-9 w-20 rounded-md border bg-background px-2 text-xs" />
                       <button type="submit" className="rounded-md border bg-background px-3 py-1.5 text-xs text-destructive">
                         Restrict posting
+                      </button>
+                    </form>
+                  ) : null}
+                  {reply.created_by && restrictedUserIds.includes(reply.created_by) ? (
+                    <form action={liftMemberPostingRestrictionAsAdminAction}>
+                      <input type="hidden" name="user_id" value={reply.created_by} />
+                      <input type="hidden" name="thread_id" value={thread.id} />
+                      <button type="submit" className="rounded-md border bg-background px-3 py-1.5 text-xs">
+                        Lift restriction
                       </button>
                     </form>
                   ) : null}

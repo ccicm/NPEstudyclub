@@ -53,8 +53,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Pending:
   - Apply migration `012_content_reports.sql` in production.
   - Apply migration `014_clinical_safeguarding_moderation.sql` in production.
-  - Wire report email notifications.
-  - Add moderator unsuspend/lift control in UI (restriction write exists; lift control still pending).
+  - Configure `REPORT_WEBHOOK_URL` in production for report notifications (webhook scaffold is implemented).
 
 ## P3.5 Bulk Onboarding
 

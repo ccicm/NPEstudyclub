@@ -89,6 +89,7 @@ Test these flows:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_SITE_URL` = `https://npestudyclub.online`
+- Optional: `REPORT_WEBHOOK_URL` for server-side content report notifications
 
 **Deploy** → Copy production URL
 
