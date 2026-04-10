@@ -7,6 +7,17 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const supabase = await createClient();
 
+  type QuizQuestionRow = {
+    id: string;
+    question_text: string;
+    options: unknown;
+    correct_index: number;
+    explanation: string | null;
+    display_order: number;
+    citations?: unknown;
+    wrong_answer_rationales?: unknown;
+  };
+
   const { data: quiz } = await supabase
     .from("quizzes")
     .select("id,title,domain,description,delivery_mode,published_at")
@@ -29,16 +40,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  let questionsData: Array<{
-    id: string;
-    question_text: string;
-    options: unknown;
-    correct_index: number;
-    explanation: string | null;
-    display_order: number;
-    citations?: unknown;
-    wrong_answer_rationales?: unknown;
-  }> | null = null;
+  let questionsData: QuizQuestionRow[] = [];
 
   const withOptionalFields = await supabase
     .from("quiz_questions")
@@ -53,12 +55,12 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
       .eq("quiz_id", id)
       .order("display_order", { ascending: true });
 
-    questionsData = (fallback.data as typeof questionsData) ?? [];
+    questionsData = (fallback.data as QuizQuestionRow[] | null) ?? [];
   } else {
-    questionsData = (withOptionalFields.data as typeof questionsData) ?? [];
+    questionsData = (withOptionalFields.data as QuizQuestionRow[] | null) ?? [];
   }
 
-  const preparedQuestions = (questionsData ?? []).map((question) => ({
+  const preparedQuestions = questionsData.map((question) => ({
     id: question.id,
     question_text: question.question_text,
     options: Array.isArray(question.options)
