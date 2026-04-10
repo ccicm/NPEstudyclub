@@ -112,6 +112,41 @@ function isMissingMetadataColumnError(error: { message?: string; code?: string }
   );
 }
 
+function getDbDiagnostic(error: { message?: string; code?: string; details?: string; hint?: string }) {
+  const code = String(error.code || "unknown").toUpperCase();
+  const message = String(error.message || "").toLowerCase();
+  const details = String(error.details || "").toLowerCase();
+  const hint = String(error.hint || "").toLowerCase();
+
+  if (
+    code === "42501" ||
+    message.includes("row-level") ||
+    message.includes("permission denied") ||
+    details.includes("policy") ||
+    hint.includes("policy")
+  ) {
+    return { dbCode: code, dbHint: "rls_policy" };
+  }
+
+  if (code === "23503" || message.includes("foreign key")) {
+    return { dbCode: code, dbHint: "foreign_key" };
+  }
+
+  if (code === "23502" || message.includes("null value")) {
+    return { dbCode: code, dbHint: "not_null" };
+  }
+
+  if (code === "42703" || message.includes("undefined column")) {
+    return { dbCode: code, dbHint: "missing_column" };
+  }
+
+  if (code === "42P01" || message.includes("relation") || message.includes("does not exist")) {
+    return { dbCode: code, dbHint: "missing_table" };
+  }
+
+  return { dbCode: code, dbHint: "unknown" };
+}
+
 export async function addResourceAction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const category = String(formData.get("category") || "").trim();
@@ -247,7 +282,8 @@ export async function addResourceAction(formData: FormData) {
     }
 
     const classified = classifyError(error);
-    redirect(`/add?error=${classified}`);
+    const { dbCode, dbHint } = getDbDiagnostic(error);
+    redirect(`/add?error=${classified}&db_code=${encodeURIComponent(dbCode)}&db_hint=${encodeURIComponent(dbHint)}`);
   }
 
   revalidatePath("/resources");

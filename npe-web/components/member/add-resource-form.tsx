@@ -14,6 +14,8 @@ type Props = {
   action: (formData: FormData) => Promise<void>;
   uploaded: boolean;
   errorCode: string | null;
+  dbCode: string | null;
+  dbHint: string | null;
 };
 
 type Category = "Exam Prep" | "Clinical Practice" | "";
@@ -64,7 +66,7 @@ function SelectWithOther({
   );
 }
 
-export function AddResourceForm({ action, uploaded, errorCode }: Props) {
+export function AddResourceForm({ action, uploaded, errorCode, dbCode, dbHint }: Props) {
   const [category, setCategory] = useState<Category>("");
   const [domain, setDomain] = useState("");
   const [modality, setModality] = useState("");
@@ -97,8 +99,9 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
       ) : null}
 
       {errorCode ? (
-        <p className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          {errorCode === "missing_required"
+        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <p>
+            {errorCode === "missing_required"
             ? "Please complete title, category, and file before uploading."
             : errorCode === "storage_not_ready"
               ? "Storage bucket is not ready. Create a private 'resources' bucket in Supabase or configure external storage first."
@@ -111,7 +114,13 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
                   : errorCode === "save_failed"
                     ? "File upload completed but resource metadata could not be saved. Confirm your account is approved and database policies are active."
                   : "Upload failed. If using DigitalOcean Spaces, check endpoint/region/key/bucket values and retry."}
-        </p>
+          </p>
+          {errorCode === "save_failed" && (dbCode || dbHint) ? (
+            <p className="mt-2 text-xs text-destructive/90">
+              Diagnostic: {dbCode || "unknown"} / {dbHint || "unknown"}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <form action={action} className="rounded-3xl border bg-card p-6 shadow-sm">
