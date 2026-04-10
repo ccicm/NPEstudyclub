@@ -1,106 +1,100 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
 import { EXAM_WINDOWS, windowToDates } from "@/lib/exam-windows";
 
-type CountdownState = {
-  label: string;
-  reg: string;
-  status: "upcoming" | "open" | "none";
-  diffMs: number;
-};
-
-function getCountdownState(now: Date): CountdownState {
-  for (const window of EXAM_WINDOWS) {
+function getTimelineWindow(now: Date) {
+  const current = EXAM_WINDOWS.find((window) => {
     const { start, end } = windowToDates(window);
+    return now >= start && now <= end;
+  });
 
-    if (now < start) {
-      return {
-        label: window.label,
-        reg: window.reg,
-        status: "upcoming",
-        diffMs: start.getTime() - now.getTime(),
-      };
-    }
-
-    if (now >= start && now <= end) {
-      return {
-        label: window.label,
-        reg: window.reg,
-        status: "open",
-        diffMs: end.getTime() - now.getTime(),
-      };
-    }
+  if (current) {
+    return { window: current, status: "open" as const };
   }
 
-  return {
-    label: "No upcoming window",
-    reg: "Watch for updated exam dates",
-    status: "none",
-    diffMs: 0,
-  };
+  const upcoming = EXAM_WINDOWS.find((window) => {
+    const registrationOpen = new Date(window.registrationOpen[0], window.registrationOpen[1] - 1, window.registrationOpen[2]);
+    return now < registrationOpen;
+  });
+
+  if (upcoming) {
+    return { window: upcoming, status: "upcoming" as const };
+  }
+
+  const lastWindow = EXAM_WINDOWS[EXAM_WINDOWS.length - 1] ?? null;
+  if (!lastWindow) {
+    return { window: null, status: "none" as const };
+  }
+
+  return { window: lastWindow, status: "past" as const };
 }
 
-function parts(diffMs: number) {
-  const totalMinutes = Math.max(0, Math.floor(diffMs / 60000));
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
-  return { days, hours, minutes };
+function formatDate(date: Date) {
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export function ExamCountdown() {
-  const [now, setNow] = useState<Date>(new Date());
+  const now = new Date();
+  const timeline = getTimelineWindow(now);
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setNow(new Date());
-    }, 60000);
+  if (!timeline.window) {
+    return (
+      <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-sm md:p-6">
+        <h1 className="text-3xl">NPE Timeline</h1>
+        <p className="mt-2 text-sm text-primary-foreground/90">No exam windows are configured yet.</p>
+      </section>
+    );
+  }
 
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const state = useMemo(() => getCountdownState(now), [now]);
-  const remaining = parts(state.diffMs);
+  const registrationOpen = new Date(
+    timeline.window.registrationOpen[0],
+    timeline.window.registrationOpen[1] - 1,
+    timeline.window.registrationOpen[2],
+  );
+  const { start, end } = windowToDates(timeline.window);
 
   return (
     <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-sm md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-            {state.label}
+            {timeline.window.label}
           </span>
-          <h1 className="mt-3 text-3xl">NPE Countdown</h1>
-          <p className="mt-1 text-sm text-primary-foreground/90">{state.reg}</p>
+          <h1 className="mt-3 text-3xl">NPE Timeline</h1>
+          <p className="mt-1 text-sm text-primary-foreground/90">Key dates for planning, not a countdown clock.</p>
         </div>
         <Link href="/schedule" className="text-sm underline underline-offset-4">
           View in schedule
         </Link>
       </div>
 
-      {state.status === "none" ? (
-        <p className="mt-4 text-sm">No upcoming exam windows scheduled.</p>
-      ) : (
-        <div className="mt-5 grid grid-cols-3 gap-3 text-center md:max-w-md">
-          <div className="rounded-xl bg-white/15 p-3">
-            <p className="text-2xl font-semibold">{remaining.days}</p>
-            <p className="text-xs uppercase tracking-wide text-primary-foreground/85">Days</p>
-          </div>
-          <div className="rounded-xl bg-white/15 p-3">
-            <p className="text-2xl font-semibold">{remaining.hours}</p>
-            <p className="text-xs uppercase tracking-wide text-primary-foreground/85">Hours</p>
-          </div>
-          <div className="rounded-xl bg-white/15 p-3">
-            <p className="text-2xl font-semibold">{remaining.minutes}</p>
-            <p className="text-xs uppercase tracking-wide text-primary-foreground/85">Minutes</p>
-          </div>
+      <div className="mt-5 grid gap-3 text-sm md:max-w-2xl">
+        <div className="grid grid-cols-[170px_1fr] items-center rounded-xl bg-white/15 px-4 py-3">
+          <p className="font-semibold">Registrations open</p>
+          <p>{formatDate(registrationOpen)}</p>
         </div>
-      )}
+        <div className="grid grid-cols-[170px_1fr] items-center rounded-xl bg-white/15 px-4 py-3">
+          <p className="font-semibold">Exam window opens</p>
+          <p>{formatDate(start)}</p>
+        </div>
+        <div className="grid grid-cols-[170px_1fr] items-center rounded-xl bg-white/15 px-4 py-3">
+          <p className="font-semibold">Exam window closes</p>
+          <p>{formatDate(end)}</p>
+        </div>
+      </div>
 
-      {state.status === "open" ? (
-        <p className="mt-3 text-sm font-medium">NPE window is open now.</p>
-      ) : null}
+      {timeline.status === "open" ? (
+        <p className="mt-3 text-sm font-medium">The current exam sitting window is open.</p>
+      ) : timeline.status === "upcoming" ? (
+        <p className="mt-3 text-sm font-medium">This is the next scheduled exam window.</p>
+      ) : (
+        <p className="mt-3 text-sm font-medium">This is the latest configured exam window. Update dates as new windows are published.</p>
+      )}
     </section>
   );
 }

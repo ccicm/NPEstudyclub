@@ -1,28 +1,28 @@
 export type ExamWindow = {
   label: string;
+  registrationOpen: [number, number, number];
   start: [number, number, number];
   end: [number, number, number];
-  reg: string;
 };
 
 export const EXAM_WINDOWS: ExamWindow[] = [
   {
     label: "May 2026 Window",
+    registrationOpen: [2026, 2, 1],
     start: [2026, 5, 1],
     end: [2026, 5, 31],
-    reg: "Registration usually closes in April 2026",
   },
   {
     label: "October 2026 Window",
+    registrationOpen: [2026, 7, 1],
     start: [2026, 10, 1],
     end: [2026, 10, 31],
-    reg: "Registration usually closes in September 2026",
   },
   {
     label: "March 2027 Window",
+    registrationOpen: [2026, 12, 1],
     start: [2027, 3, 1],
     end: [2027, 3, 31],
-    reg: "Registration usually closes in February 2027",
   },
 ];
 

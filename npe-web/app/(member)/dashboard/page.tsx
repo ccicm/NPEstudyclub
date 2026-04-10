@@ -160,6 +160,24 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      {showOnboarding ? (
+        <section className="rounded-2xl border bg-card p-6">
+          <p className="text-2xl">Welcome to NPE Study Club</p>
+          <p className="mt-2 text-sm text-muted-foreground">You are in. Here is a simple way to get started.</p>
+          <ol className="mt-4 space-y-2 text-sm">
+            <li>1. Browse the resource library.</li>
+            <li>2. Set up your study plan.</li>
+            <li>3. Introduce yourself in Community.</li>
+          </ol>
+          <Link
+            href="/study-plan"
+            className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            Start plan
+          </Link>
+        </section>
+      ) : null}
+
       {isAdmin ? (
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -181,24 +199,6 @@ export default async function DashboardPage() {
               Preview mode is on. For normal member behavior, turn bypass off once sign-in is stable.
             </p>
           ) : null}
-        </section>
-      ) : null}
-
-      {showOnboarding ? (
-        <section className="rounded-2xl border bg-card p-6">
-          <p className="text-2xl">Welcome to NPE Study Club</p>
-          <p className="mt-2 text-sm text-muted-foreground">You are in. Here is a simple way to get started.</p>
-          <ol className="mt-4 space-y-2 text-sm">
-            <li>1. Browse the resource library.</li>
-            <li>2. Set up your study plan.</li>
-            <li>3. Introduce yourself in Community.</li>
-          </ol>
-          <Link
-            href="/study-plan"
-            className="mt-4 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-          >
-            Start plan
-          </Link>
         </section>
       ) : null}
 

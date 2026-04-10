@@ -44,7 +44,7 @@ type DayEvent =
       kind: "window";
       id: string;
       label: string;
-      reg: string;
+      registrationInfo: string;
     };
 
 function monthMatrix(viewDate: Date) {
@@ -155,13 +155,18 @@ export function ScheduleCalendar({
 
     EXAM_WINDOWS.forEach((window) => {
       const { start, end } = windowToDates(window);
+      const registrationOpen = new Date(window.registrationOpen[0], window.registrationOpen[1] - 1, window.registrationOpen[2]);
       const cursor = new Date(start);
       while (cursor <= end) {
         addEvent(dateKey(cursor), {
           kind: "window",
           id: `${window.label}-${dateKey(cursor)}`,
           label: window.label,
-          reg: window.reg,
+          registrationInfo: `Registrations open ${registrationOpen.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}`,
         });
         cursor.setDate(cursor.getDate() + 1);
       }
@@ -331,7 +336,7 @@ export function ScheduleCalendar({
                 {event.kind === "window" ? (
                   <>
                     <p className="font-semibold">NPE {event.label} window open</p>
-                    <p className="text-sm text-muted-foreground">{event.reg}</p>
+                    <p className="text-sm text-muted-foreground">{event.registrationInfo}</p>
                     <a href="https://www.ahpra.gov.au" target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm underline">
                       APS/AHPRA exam info
                     </a>

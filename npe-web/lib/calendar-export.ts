@@ -121,13 +121,18 @@ export async function generateUserCalendarIcs(args: {
     const { start, end } = windowToDates(window);
     const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
     const endExclusive = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
+    const registrationOpen = new Date(window.registrationOpen[0], window.registrationOpen[1] - 1, window.registrationOpen[2]);
 
     cal.createEvent({
       start: startDay,
       end: endExclusive,
       allDay: true,
       summary: `NPE ${window.label} exam window`,
-      description: window.reg,
+      description: `Registrations open ${registrationOpen.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })}`,
     });
   });
 

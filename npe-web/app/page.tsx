@@ -1,18 +1,36 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { QUICK_LINKS } from "@/lib/quick-links";
+import { EXAM_WINDOWS, windowToDates } from "@/lib/exam-windows";
 import { createClient } from "@/lib/supabase/server";
 
-const EXAM_WINDOW_OPEN = new Date("2026-05-04T00:00:00+10:00");
+function getTimelineWindow(now: Date) {
+  const active = EXAM_WINDOWS.find((window) => {
+    const { start, end } = windowToDates(window);
+    return now >= start && now <= end;
+  });
 
-function getDaysRemaining() {
-  const now = new Date();
-  const ms = EXAM_WINDOW_OPEN.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+  if (active) {
+    return active;
+  }
+
+  const upcoming = EXAM_WINDOWS.find((window) => {
+    const registrationOpen = new Date(window.registrationOpen[0], window.registrationOpen[1] - 1, window.registrationOpen[2]);
+    return now < registrationOpen;
+  });
+
+  return upcoming ?? EXAM_WINDOWS[EXAM_WINDOWS.length - 1] ?? null;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export default async function Home() {
-  const daysRemaining = getDaysRemaining();
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,10 +48,22 @@ export default async function Home() {
     isApproved = Boolean(data?.length);
   }
 
+  const now = new Date();
+  const timelineWindow = getTimelineWindow(now);
+
   const memberDestination = isApproved ? "/dashboard" : "/auth/login";
-  const resourcesDestination = isApproved ? "/resources" : "/auth/login";
-  const scheduleDestination = isApproved ? "/schedule" : "/auth/login";
-  const communityDestination = isApproved ? "/community" : "/auth/login";
+  const resourcesDestination = isApproved ? "/resources" : "/auth/request";
+  const scheduleDestination = isApproved ? "/schedule" : "/auth/request";
+  const communityDestination = isApproved ? "/community" : "/auth/request";
+
+  const registrationOpen = timelineWindow
+    ? new Date(
+        timelineWindow.registrationOpen[0],
+        timelineWindow.registrationOpen[1] - 1,
+        timelineWindow.registrationOpen[2],
+      )
+    : null;
+  const windowDates = timelineWindow ? windowToDates(timelineWindow) : null;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-8 md:px-8">
@@ -44,10 +74,7 @@ export default async function Home() {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link href="/auth/request">Request access</Link>
-          </Button>
-          <Button asChild>
-            <Link href={memberDestination}>{isApproved ? "Open dashboard" : "Member sign in"}</Link>
+            <Link href="/auth/login">Sign in</Link>
           </Button>
         </div>
       </header>
@@ -65,23 +92,24 @@ export default async function Home() {
                 <Link href={isApproved ? "/dashboard" : "/auth/request"}>{isApproved ? "Go to dashboard" : "Apply for membership"}</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href={memberDestination}>{isApproved ? "Open member area" : "Already approved? Sign in"}</Link>
+                <Link href={memberDestination}>{isApproved ? "Open member area" : "Already a member? Sign in"}</Link>
               </Button>
             </div>
           </div>
           <div className="rounded-2xl bg-accent p-6">
             <p className="text-sm font-semibold uppercase tracking-wide text-accent-foreground">
-              Countdown
+              NPE Timeline
             </p>
-            <p className="mt-2 text-5xl font-bold text-accent-foreground">{daysRemaining}</p>
-            <p className="mt-1 text-sm text-accent-foreground/80">
-              days until May 2026 NPE window opens
-            </p>
-            <p className="mt-4 text-sm text-accent-foreground/70">
-              Access is approved manually by the owner. Membership is limited to
-              trusted contacts and provisional psychologists registered with
-              AHPRA.
-            </p>
+            {timelineWindow && registrationOpen && windowDates ? (
+              <div className="mt-3 space-y-2 text-sm text-accent-foreground/90">
+                <p className="font-medium">{timelineWindow.label}</p>
+                <p>Registrations open: {formatDate(registrationOpen)}</p>
+                <p>Exam window opens: {formatDate(windowDates.start)}</p>
+                <p>Exam window closes: {formatDate(windowDates.end)}</p>
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-accent-foreground/90">Exam dates will appear here once configured.</p>
+            )}
           </div>
         </div>
       </section>
@@ -94,7 +122,7 @@ export default async function Home() {
               Curated PDFs, protocols, and exam prep materials organised by topic, with private file access for members.
             </p>
             <p className="mt-3 text-sm font-semibold text-primary">
-              {isApproved ? "Open resources -&gt;" : "Sign in to open -&gt;"}
+              {isApproved ? "Open resources -&gt;" : "Request access -&gt;"}
             </p>
           </article>
         </Link>
@@ -105,7 +133,7 @@ export default async function Home() {
               Shared calendar with weekly sessions, ad-hoc meetups, and exam window markers.
             </p>
             <p className="mt-3 text-sm font-semibold text-primary">
-              {isApproved ? "Open schedule -&gt;" : "Sign in to open -&gt;"}
+              {isApproved ? "Open schedule -&gt;" : "Request access -&gt;"}
             </p>
           </article>
         </Link>
@@ -116,7 +144,7 @@ export default async function Home() {
               Private noticeboard/forum for announcements, questions, resource requests, and replies.
             </p>
             <p className="mt-3 text-sm font-semibold text-primary">
-              {isApproved ? "Open community -&gt;" : "Sign in to open -&gt;"}
+              {isApproved ? "Open community -&gt;" : "Request access -&gt;"}
             </p>
           </article>
         </Link>
@@ -146,7 +174,10 @@ export default async function Home() {
       <section className="mt-10 rounded-3xl border bg-card p-8">
         <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div>
-            <h2 className="mt-2 text-3xl">Approved members get in. Everyone else requests access.</h2>
+            <h2 className="mt-2 text-3xl">A private study space for a small cohort of peers.</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              If you have been told about this space, you are probably in the right place.
+            </p>
           </div>
           <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
             <div className="rounded-2xl bg-muted p-4">

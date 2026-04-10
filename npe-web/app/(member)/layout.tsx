@@ -19,7 +19,6 @@ export default async function MemberLayout({
   }
 
   const baseLinks = [
-    { href: "/", label: "Home" },
     { href: "/dashboard", label: "Dashboard" },
     { href: "/resources", label: "Resources" },
     { href: "/quizzes", label: "Quizzes" },
