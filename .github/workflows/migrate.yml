@@ -11,8 +11,6 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
@@ -22,42 +20,41 @@ jobs:
         with:
           version: latest
 
-      - name: Validate database URL secret
+      - name: Resolve database URL
         run: |
-          DB_URL=""
-          SOURCE=""
-
-          # Prefer deriving the DSN from project ref + password because this safely URL-encodes
-          # special characters that often break raw pasted connection strings.
-          if [ -n "$SUPABASE_DB_PASSWORD" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
-            ENCODED_PASSWORD=$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')
-            DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres?sslmode=require"
-            SOURCE="derived"
-          else
-            DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
-            SOURCE="secret"
-          fi
-
-          if [ -z "$DB_URL" ]; then
-            echo "Missing DB connection settings. Provide SUPABASE_DB_URL/DATABASE_URL, or SUPABASE_PROJECT_REF + SUPABASE_DB_PASSWORD." >&2
+          if [ -z "$SUPABASE_DB_PASSWORD" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
+            echo "Missing required secrets. Set SUPABASE_PROJECT_REF and SUPABASE_DB_PASSWORD." >&2
             exit 1
           fi
+
+          RAW_REF="$SUPABASE_PROJECT_REF"
+          # Accept project ref, project URL, or db host and normalize to plain project ref.
+          RAW_REF="${RAW_REF#https://}"
+          RAW_REF="${RAW_REF#http://}"
+          RAW_REF="${RAW_REF#db.}"
+          RAW_REF="${RAW_REF%.supabase.co}"
+          RAW_REF="${RAW_REF%%/*}"
+
+          PROJECT_REF="$RAW_REF"
+
+          if [ -z "$PROJECT_REF" ]; then
+            echo "Could not parse SUPABASE_PROJECT_REF. Use project ref like ngzsnkzryqzdkkcmujrf." >&2
+            exit 1
+          fi
+
+          ENCODED_PASSWORD=$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')
+          DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${PROJECT_REF}.supabase.co:5432/postgres?sslmode=require"
 
           case "$DB_URL" in
             postgres://*|postgresql://*)
               ;;
             *)
-              echo "Invalid database URL secret. Provide a Postgres DSN like postgres://user:password@host:5432/postgres?sslmode=require." >&2
+              echo "Failed to build a valid Postgres DSN." >&2
               exit 1
               ;;
           esac
 
-          if echo "$DB_URL" | grep -q '\[YOUR-PASSWORD\]'; then
-            echo "Database URL still contains [YOUR-PASSWORD]. Replace it with the real DB password." >&2
-            exit 1
-          fi
-
-          echo "DB_URL is set (source: $SOURCE)"
+          echo "DB_URL resolved for project ref $PROJECT_REF"
           echo "RESOLVED_DB_URL=$DB_URL" >> "$GITHUB_ENV"
 
       - name: Push migrations
