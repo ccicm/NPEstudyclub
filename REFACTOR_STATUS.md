@@ -22,6 +22,8 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
   - `supabase/010_resources_policy_cleanup.sql`
 - Bulk onboard helper migration was added:
   - `supabase/011_bulk_onboard_members.sql`
+- Resource policy hard-reset migration was added for production policy drift:
+  - `supabase/013_resources_policy_hard_reset.sql`
 - Remaining follow-up: verify uploaded resources are consistently visible in `/resources` for production users.
 
 ## Active Verification Focus

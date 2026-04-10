@@ -31,6 +31,7 @@ In `.env.local`:
 - Run `supabase/010_resources_policy_cleanup.sql` in SQL Editor
 - Optional: Run `supabase/011_bulk_onboard_members.sql` to quickly approve known members
 - Optional: Run `supabase/012_content_reports.sql` to enable community post/reply reporting scaffold
+- If `/resources` shows `42501 permission denied for table users`, run `supabase/013_resources_policy_hard_reset.sql`
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`
