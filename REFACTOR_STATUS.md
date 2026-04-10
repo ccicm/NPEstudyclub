@@ -31,7 +31,8 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Git-based DB rollout is now scaffolded:
   - `supabase/migrations/20260410000015_escalation_min_votes.sql`
   - `.github/workflows/migrate.yml`
-- Pending setup: add GitHub Actions secret `SUPABASE_DB_URL` so migrations apply on push to `main`.
+- Pending setup: ensure GitHub Actions secret `SUPABASE_DB_URL` is a valid Session pooler Postgres URI.
+- Tonight note: migration rollout is intentionally paused after repeated CI connection failures to direct DB host; resume next session from workflow run verification.
 - Verify moderation behavior after migration: one downvote cannot escalate; ratio checks only run after minimum vote count.
 - Confirm migrations `001` through `011` have been applied in production (still pending from live production SQL access).
 - Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production (still pending from live production account/session).

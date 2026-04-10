@@ -1,25 +1,45 @@
 # Next Agent Handoff
 
-Last updated: 2026-04-10
+Last updated: 2026-04-10 (end-of-day deferred migration update)
 
 Use [MASTER_PLAN.md](MASTER_PLAN.md) as the source of truth. This file is a quick execution plan for the next session.
 
 ## Current state snapshot
 
-- UX audit is in progress.
-- Request-status state rendering is complete.
-- Major user-facing technical error copy has been simplified on core member/auth/community/admin surfaces.
-- Resource list cap is raised to 1000 on resources page.
-- Dashboard timeline now uses study-plan exam date when available.
-- Profile stale progress section is removed.
-- Schedule now prompts users to create a study plan when missing.
+- UX + copy: in progress.
+- Auth/member UX completed items:
+  - Request-status state rendering is complete.
+  - Major user-facing technical error copy has been simplified on core member/auth/community/admin surfaces.
+  - Profile stale progress section is removed.
+- Resources + schedule completed items:
+  - Resource list cap is raised to 1000 on resources page.
+  - Dashboard timeline now uses study-plan exam date when available.
+  - Schedule now prompts users to create a study plan when missing.
+- Quizzes completed items:
+  - Quiz review flow now enforces sequential explanation rating before completion.
+  - Min-vote escalation guard is implemented in SQL files and migration file.
+- Migration CI status:
+  - Migration GitHub Action exists but rollout is deferred tonight pending verified pooler DB URL secret.
 
 ## Next agent plan (ordered)
 
-1. Complete remaining UX P2/P3 cleanup pass.
-2. Finish production-facing copy consistency pass.
+1. Unblock migration workflow using verified Session pooler `SUPABASE_DB_URL` and run min-vote migration.
+2. Verify quiz moderation behavior after migration (single downvote must not escalate).
 3. Run targeted regression checks on changed routes.
-4. Update docs/status after each completed block.
+4. Complete remaining UX P2/P3 cleanup pass.
+5. Finish production-facing copy consistency pass.
+6. Update docs/status after each completed block.
+
+## 1) Quiz moderation rollout (P1)
+
+- Apply min-vote guard SQL changes in environment(s):
+  - `npe-web/supabase/006_explanation_feedback_settings.sql`
+  - `npe-web/supabase/007_noticeboard_publish_windows.sql`
+  - `supabase/migrations/20260410000015_escalation_min_votes.sql`
+- Verify quiz behavior after migration:
+  - One downvote cannot escalate.
+  - Ratio checks run only after minimum vote count.
+  - Existing explanation vote flow still records feedback successfully.
 
 ## 1) UX P2/P3 cleanup (implementation)
 
@@ -33,11 +53,8 @@ Use [MASTER_PLAN.md](MASTER_PLAN.md) as the source of truth. This file is a quic
 
 ## 2) High-priority infra/product follow-up
 
-- Apply the min-vote escalation guard SQL changes in environment(s) before relying on moderation thresholds:
-  - `npe-web/supabase/006_explanation_feedback_settings.sql`
-  - `npe-web/supabase/007_noticeboard_publish_windows.sql`
 - The GitHub Actions secret must be a full Postgres DSN (`postgres://...` or `postgresql://...`), not the Supabase API URL.
-- Verify: one downvote cannot escalate; ratio checks run only after minimum vote count.
+- For this runner/network setup, the secret should use a Session pooler host, not direct `db.<ref>.supabase.co`.
 - Keep resources page at limit 1000 for now; add follow-up task for server-side pagination/filtering.
 - Prepare and execute a controlled bulk resource upload run once storage verification is green.
 - Capture batch upload outcomes (success/failure counts and retry list) in status docs.

@@ -21,6 +21,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - **Clinical safeguarding status:** Started in code (guidelines page, thread disclaimer banner, report flow scaffold, initial moderator delete controls). Remaining moderator controls and production migration execution still pending.
 - **Generator polish status:** Started. Repetition audit baseline completed and initial generator variation fixes applied; diversity/rotation hardening remains in progress.
 - **UX audit status:** In progress. P1 request-status state rendering and organiser-note removal are complete; user-facing technical error copy has been simplified across key member surfaces. Recent UX cleanup completed: resource search placeholder simplified, resource file action verb standardised to "View file", add-resource category helper text added, request-access PSY copy relabeled to AHPRA registration number wording, admin self-approval copy clarified, AI-generated disclosure callouts added to quiz list + runner intro/results, calendar export study blocks switched to UTC-safe AEST timing, schedule filter controls now include exam windows/my exam window states, and quiz results now enforce a sequential explanation-rating review flow before completion. Remaining UX follow-ups are now narrowed to unresolved taxonomy/channel and deeper flow items.
+- **Migration CI status:** In progress. GitHub Action + migration file are committed, but rollout is blocked by connection endpoint/secret mismatch. This is deferred for tonight and resumes next session with pooler URL verification.
 
 ---
 
@@ -52,7 +53,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 Code changes are complete in repository SQL files, but escalation behavior is unchanged in live environments until SQL is applied.
 
-**GitHub Actions secret required:** `SUPABASE_DB_URL` or `DATABASE_URL`, containing a full Postgres DSN such as `postgres://user:password@host:5432/postgres?sslmode=require`.
+**GitHub Actions secret required:** `SUPABASE_DB_URL`, containing a full Postgres DSN. For this project's runner environment, use a Supabase Session pooler URI.
 
 **What must be applied:**
 1. `npe-web/supabase/006_explanation_feedback_settings.sql` (adds `explanation_min_votes` default and guard in explanation escalation)
@@ -61,6 +62,8 @@ Code changes are complete in repository SQL files, but escalation behavior is un
 **Acceptance check:**
 1. A single downvote must not create a review thread.
 2. Escalation should only evaluate ratio after `explanation_min_votes` (default 5) is reached.
+
+**Tonight status:** deferred after repeated runner connectivity failures to direct DB host. Next session starts by validating `SUPABASE_DB_URL` points to pooler host and rerunning migration workflow.
 
 ### 1. Resource storage verification and visibility follow-up
 
