@@ -31,10 +31,30 @@ function fromSelectWithOther(formData: FormData, key: string) {
 function classifyError(message: string) {
   const lower = message.toLowerCase();
   if (lower.includes("row-level security") || lower.includes("permission denied")) return "not_authorized";
-  if (lower.includes("does not exist") || lower.includes("undefined table") || lower.includes("undefined column")) {
+  if (
+    lower.includes("does not exist") ||
+    lower.includes("undefined table") ||
+    lower.includes("undefined column") ||
+    lower.includes("schema cache") ||
+    lower.includes("column")
+  ) {
     return "schema_not_ready";
   }
   return null;
+}
+
+function isMissingMetadataColumnError(message: string) {
+  const lower = message.toLowerCase();
+  if (!lower.includes("column") && !lower.includes("schema cache") && !lower.includes("does not exist")) {
+    return false;
+  }
+
+  return (
+    lower.includes("modality") ||
+    lower.includes("population") ||
+    lower.includes("content_type") ||
+    lower.includes("source")
+  );
 }
 
 export async function addResourceAction(formData: FormData) {
@@ -84,21 +104,30 @@ export async function addResourceAction(formData: FormData) {
     .map((value) => value.trim())
     .filter(Boolean);
 
-  const { error } = await supabase.from("resources").insert({
+  const baseInsert = {
     title,
     category,
-    domain,
-    modality,
-    population,
-    content_type: contentType,
-    source,
     notes,
     tags: tags.length ? tags : null,
     file_path: storagePath,
     file_type: fileType,
     uploaded_by: user.id,
     uploader_name: user.user_metadata?.full_name || user.email,
+  };
+
+  const { error: firstInsertError } = await supabase.from("resources").insert({
+    ...baseInsert,
+    domain,
+    modality,
+    population,
+    content_type: contentType,
+    source,
   });
+
+  const error =
+    firstInsertError && isMissingMetadataColumnError(firstInsertError.message || "")
+      ? (await supabase.from("resources").insert(baseInsert)).error
+      : firstInsertError;
 
   if (error) {
     await deleteResourceObject({
