@@ -28,6 +28,9 @@ export default async function Page() {
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm space-y-4">
         <LoginForm />
+        <p className="text-center text-sm text-muted-foreground">
+          Don&apos;t have access yet? <Link href="/auth/request" className="text-primary underline">Request membership</Link>.
+        </p>
         {user && isApproved ? (
           <Button asChild className="w-full">
             <Link href="/dashboard">Proceed to member dashboard</Link>

@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/logout-button";
+import { MemberNav } from "@/components/member/member-nav";
 import { isApprovedMember } from "@/lib/access";
 
 export default async function MemberLayout({
@@ -48,13 +48,7 @@ export default async function MemberLayout({
           </div>
           <LogoutButton />
         </div>
-        <nav className="mt-4 flex flex-wrap gap-2">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-full border px-3 py-1.5 text-sm transition-colors hover:bg-muted">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <MemberNav links={links} />
         {bypassed ? (
           <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
             Preview mode is active. Some actions (like saving a study plan) require a real email sign-in session.

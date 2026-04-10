@@ -16,7 +16,7 @@ async function submitAccessRequest(formData: FormData) {
     consented_at: consentGiven ? new Date().toISOString() : null,
   };
 
-  if (!payload.full_name || !payload.email || !payload.reason || !consentGiven) {
+  if (!payload.full_name || !payload.email || !consentGiven) {
     redirect("/auth/request?error=missing_fields");
   }
 
@@ -37,7 +37,7 @@ export default function RequestAccessPage({
 }) {
   const errorMessage =
     searchParams?.error === "missing_fields"
-      ? "Please fill in your name, email, reason, and consent before submitting."
+      ? "Please fill in your name, email, and consent before submitting."
       : searchParams?.error === "submission_failed"
         ? "We could not save your request. Please try again."
         : null;
@@ -76,13 +76,20 @@ export default function RequestAccessPage({
             placeholder="Email"
             className="w-full rounded-md border bg-background px-3 py-2 text-sm"
           />
-          <input
-            name="psy_number"
-            pattern="PSY[0-9]{10}"
-            placeholder="PSY0001234567"
-            title="Enter a PSY number in the format PSY followed by 10 digits"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-          />
+          <div className="space-y-1">
+            <label htmlFor="psy_number" className="block text-sm font-medium">
+              PSY number (if registered with AHPRA)
+            </label>
+            <input
+              id="psy_number"
+              name="psy_number"
+              pattern="PSY[0-9]{10}"
+              placeholder="PSY0001234567"
+              title="Enter a PSY number in the format PSY followed by 10 digits"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+            />
+            <p className="text-xs text-muted-foreground">e.g. PSY0001234567</p>
+          </div>
           <input
             name="relationship_note"
             placeholder="How we know you / referral (optional)"
@@ -90,7 +97,6 @@ export default function RequestAccessPage({
           />
           <textarea
             name="reason"
-            required
             placeholder="Why you want access"
             className="min-h-28 w-full rounded-md border bg-background px-3 py-2 text-sm"
           />
@@ -114,9 +120,11 @@ export default function RequestAccessPage({
           Already approved? <Link className="text-primary underline" href="/auth/login">Use member sign in</Link>.
         </p>
 
-        <p className="mt-2 text-sm text-muted-foreground">
-          Preview mode on? <Link className="text-primary underline" href="/dashboard?admin=1">Open app now</Link>.
-        </p>
+        {process.env.NODE_ENV === "development" ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Preview mode on? <Link className="text-primary underline" href="/dashboard?admin=1">Open app now</Link>.
+          </p>
+        ) : null}
       </div>
     </div>
   );
