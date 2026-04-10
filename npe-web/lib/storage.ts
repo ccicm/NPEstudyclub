@@ -1,4 +1,4 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -28,6 +28,11 @@ type SignedUrlArgs = {
   supabase: SupabaseClient;
   objectKey: string;
   expiresInSeconds: number;
+};
+
+type DeleteArgs = {
+  supabase: SupabaseClient;
+  objectKey: string;
 };
 
 type DoSpacesConfig = {
@@ -278,4 +283,37 @@ export async function createResourceSignedUrl({
 
   const { data } = await supabase.storage.from("resources").createSignedUrl(objectKey, expiresInSeconds);
   return data?.signedUrl ?? null;
+}
+
+export async function deleteResourceObject({
+  supabase,
+  objectKey,
+}: DeleteArgs): Promise<void> {
+  const storageMode = getStorageMode();
+
+  if (storageMode === "do-spaces") {
+    const config = getDoSpacesConfig();
+    if (!config) {
+      return;
+    }
+
+    const clients = [createDoSpacesClient(config), createDoSpacesClientWithStyle(config, false)];
+    for (const client of clients) {
+      try {
+        await client.send(
+          new DeleteObjectCommand({
+            Bucket: config.bucket,
+            Key: objectKey,
+          }),
+        );
+        return;
+      } catch {
+        // Try the next style client. This rollback is best-effort.
+      }
+    }
+
+    return;
+  }
+
+  await supabase.storage.from("resources").remove([objectKey]);
 }

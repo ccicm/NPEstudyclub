@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { deleteResourceObject } from "@/lib/storage";
 import { uploadResourceObject } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 
@@ -100,6 +101,11 @@ export async function addResourceAction(formData: FormData) {
   });
 
   if (error) {
+    await deleteResourceObject({
+      supabase,
+      objectKey: storagePath,
+    });
+
     const classified = classifyError(error.message || "");
     if (classified) {
       redirect(`/add?error=${classified}`);

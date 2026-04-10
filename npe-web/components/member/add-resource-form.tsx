@@ -108,6 +108,8 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
                 ? "Resource tables are not ready in Supabase. Run migrations 001, 002, and 003."
                 : errorCode === "not_authorized"
                   ? "Your account does not currently have permission to upload resources. Confirm your approved member status."
+                  : errorCode === "save_failed"
+                    ? "File upload completed but resource metadata could not be saved. Confirm your account is approved and database policies are active."
                   : "Upload failed. If using DigitalOcean Spaces, check endpoint/region/key/bucket values and retry."}
         </p>
       ) : null}
