@@ -29,6 +29,7 @@ In `.env.local`:
 - Run `supabase/008_study_plan_enhancements.sql` in SQL Editor
 - Run `supabase/009_resource_schema_guard.sql` in SQL Editor
 - Run `supabase/010_resources_policy_cleanup.sql` in SQL Editor
+- Optional: Run `supabase/011_bulk_onboard_members.sql` to quickly approve known members
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`
