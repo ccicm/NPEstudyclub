@@ -1,57 +1,37 @@
 # UX Refactor Implementation Status
 
-Last updated: April 9, 2026
+Last updated: April 10, 2026
 
-This file tracks current state only (not historical debugging notes).
+This file tracks implementation status only. `MASTER_PLAN.md` remains the source of truth.
 
 ## Current State
 
-- Production app is accessible and member login is active.
-- Auth flow is password-first for member sign-in.
-- Request + admin approval flow is in place.
-- Member-gated RLS policies were tightened to require approved users.
-- Dashboard, study plan, schedule, community, quizzes, and profile are all present.
+- Production app is accessible and password-based member login is active.
+- Request + admin approval flow is in place with approved-user gating.
+- Member nav active state and dashboard-first member navigation are implemented.
+- Landing page Phase 2 UX/copy updates are implemented.
+- Dashboard Phase 3 UX updates are implemented (resource deep-linking, clarified quiz domain labels, community zero-state CTA).
+- Study plan reliability protections are implemented (upsert plan create/update, regenerate safeguards, richer study logs).
 
-## Recently Completed
+## Storage + Resource Upload
 
-- Request form validation feedback and clearer PSY input.
-- Public bypass env cleanup from runtime logic.
-- Password-based login flow and sign-up/password creation path.
-- Admin-only controls section in profile.
-- Public landing page updated to better match dashboard style.
-- Study plan onboarding now returns clearer error codes/messages.
+- DigitalOcean Spaces integration is implemented in app code (with Supabase Storage fallback mode).
+- Resource insert flow now has schema/RLS-aware diagnostics and fallback payload attempts.
+- Resource policy/schema cleanup migrations were added:
+  - `supabase/009_resource_schema_guard.sql`
+  - `supabase/010_resources_policy_cleanup.sql`
+- Bulk onboard helper migration was added:
+  - `supabase/011_bulk_onboard_members.sql`
+- Remaining follow-up: verify uploaded resources are consistently visible in `/resources` for production users.
 
-## Active Cleanup / QA Focus
+## Active Verification Focus
 
-- Verify Supabase migrations are fully applied in each environment:
-  - `supabase/001_npe_schema.sql`
-  - `supabase/002_feature_upgrade.sql`
-  - `supabase/003_p1_refactor.sql`
-- Confirm study-plan onboarding/save works for approved non-admin users.
-- Tighten copy consistency across app screens (public vs member wording).
-- Reduce stale docs/spec overlap in root-level markdown files.
-- Improve the question generator so daily sets stop repeating the same hardcoded stems and distractors.
-- Track that work in [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md).
+- Confirm migrations `001` through `011` have been applied in production.
+- Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production.
+- Confirm study-plan save/regenerate/log flows for approved non-admin users in production.
 
-## Deferred To Tomorrow
+## Not Started
 
-- Resource storage setup is the first task: use [RESOURCE_SETUP_TOMORROW.md](RESOURCE_SETUP_TOMORROW.md).
-- Finish the generator polish pass with a fresh agent after reviewing real output.
-- Keep the work documentation-led for now; do not add more implementation changes before that review.
-- Use [QUESTION_GENERATOR_PLAN.md](QUESTION_GENERATOR_PLAN.md) as the starting point for the handoff.
-
-## Ready To Test
-
-- Quiz upload and CSV template now expect five options (`A-E`) instead of four.
-- Study-plan saving should preserve the existing plan if regeneration fails, instead of dropping the current weeks first.
-- Study-plan logging now accepts topics covered, quiz insight, and notes in addition to hours.
-- Resource progress now appears on the dashboard instead of the profile page.
-- Profile now links back to the dashboard progress overview.
-
-## Still Not Started
-
-- Saved resources/bookmarks
-- Delete account flow
-- Notification preferences + in-app/email notifications
-- Expanded admin operations beyond access approvals
-- AI-assisted content generation/moderation pipeline
+- Clinical safeguarding implementation (guidelines page, thread disclaimer, report flow, moderation controls)
+- Question generator repetition audit and diversity controls
+- Deferred backlog items listed in `MASTER_PLAN.md`

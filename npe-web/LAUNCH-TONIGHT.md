@@ -42,7 +42,7 @@ In `.env.local`:
 - Create private bucket named `resources`
 
 **Auth:**
-- Enable Email provider (magic-link sign-in)
+- Enable Email provider (email/password sign-in and password reset)
 - URL Configuration:
   - **Site URL:** `https://npestudyclub.online`
   - **Redirect URLs:**
@@ -62,7 +62,7 @@ npm run dev
 
 Test these flows:
 - [ ] `/auth/request` — submit request, redirected to `/auth/request-status`
-- [ ] `/auth/login` — request magic link, receive email (or use `?admin=1` bypass)
+- [ ] `/auth/login` — sign in with approved email + password
 - [ ] `/dashboard` — approved user can access
 - [ ] `/resources` — member-only page
 - [ ] `/community` — member-only page
@@ -110,16 +110,16 @@ Once DNS propagates and SSL is active:
 - [ ] Open https://npestudyclub.online
 - [ ] Landing page loads
 - [ ] Request access form works
-- [ ] Magic-link sign-in flow works
+- [ ] Password sign-in flow works for approved member
 - [ ] Approved user can access `/dashboard`
 - [ ] Resource upload works and file opens via signed URL
 - [ ] Community posting, replies, and upvotes work
 - [ ] Quiz attempt saves to history
 - [ ] Study plan onboarding and log-time flow work
 
-## Emergency Bypass (if Email Rate-Limits)
+## Emergency Bypass (if Auth Email Flows Rate-Limit)
 
-If Supabase email throttling blocks login:
+If Supabase email throttling blocks sign-up/reset or session recovery:
 
 **Quick Fix (8-hour bypass):**
 1. Open `https://npestudyclub.online/dashboard?admin=1` once
@@ -146,9 +146,9 @@ If Supabase email throttling blocks login:
 
 ## Troubleshooting
 
-**Magic link says "otp_expired":**
-- OTP tokens expire in ~15 min
-- Request a fresh link
+**Password reset/confirm link says "otp_expired":**
+- Recovery and confirmation tokens expire quickly
+- Request a fresh reset/confirm email
 - Check that Supabase redirect URLs match production domain
 - If rate-limited, use emergency bypass above
 
@@ -162,14 +162,20 @@ If Supabase email throttling blocks login:
 - Check that environment variables are set in Production
 
 **File uploads fail:**
-- Verify `resources` bucket exists and is private
-- Check Supabase API key has Storage permissions
+- If using Supabase Storage mode: verify `resources` bucket exists and is private
+- If using DigitalOcean Spaces mode: verify `DO_SPACES_*` vars and `RESOURCE_STORAGE_MODE=do-spaces`
 - Verify user is authenticated and approved
 
 ## Storage
 
 - **App code:** Vercel (serverless)
 - **Database:** Supabase PostgreSQL (included)
-- **File uploads:** Supabase Storage — `resources` bucket (private, with signed URLs for members)
+- **File uploads:** DigitalOcean Spaces (preferred) or Supabase Storage fallback
 
-Supabase Storage quota: sufficient for a study club (gigabytes). See pricing for additional capacity.
+For DigitalOcean mode, set:
+- `DO_SPACES_KEY`
+- `DO_SPACES_SECRET`
+- `DO_SPACES_REGION`
+- `DO_SPACES_BUCKET`
+- `DO_SPACES_ENDPOINT`
+- `RESOURCE_STORAGE_MODE=do-spaces`

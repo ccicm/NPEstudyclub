@@ -12,6 +12,17 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 ---
 
+## Delivery Status Snapshot (2026-04-10)
+
+- **P1 status:** Complete in code.
+- **P2 status:** Complete in code.
+- **P3 status:** Complete in code except production migration/state verification and bulk-onboarding execution.
+- **Storage status:** Upload pipeline to DigitalOcean Spaces is now connected and returning success. Remaining follow-up is visibility of newly uploaded resources in `/resources` for production users.
+- **Clinical safeguarding status:** Not started (guidelines page, thread disclaimer, moderation/reporting features still pending).
+- **Generator polish status:** Not started (repetition audit and diversity controls still pending).
+
+---
+
 ## Current State (as of 2026-04-10)
 
 **Working in production:**
@@ -24,25 +35,33 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - NPE quiz pipeline: seeded JSON question sets, weekday daily availability, delayed moderator review threads
 - Schedule calendar: exam window markers, ad-hoc sessions
 - Community: channels, thread detail, nested replies, upvotes
-- Resource library: filtering, completion tracking (signed URLs — currently broken pending storage setup)
+- Resource library: filtering, completion tracking, deep-link support (`/resources?id=...`), signed URL generation
 - Admin: user management, access approvals
 
 **Known broken / incomplete:**
-- Resource file storage not connected (DigitalOcean Spaces env vars not configured — uploads have no backend)
-- No active state on member nav links
-- "Preview mode on? Open app now" link exposed on public request access page
-- Form data wiped on validation failure (server-side redirect)
-- Exam countdown is hardcoded to a single date and will show 0 after May 2026
+- Uploads can succeed while newly uploaded items are not immediately visible in library for some production attempts (follow-up debug item)
+- Clinical safeguarding features from this plan are not implemented yet
+- Generator repetition-audit/polish work has not started
 
 ---
 
-## Hard Blockers — Do First
+## Hard Blockers — Current
 
-### 1. Resource storage setup
+### 1. Resource storage verification and visibility follow-up
 
-Resource file access is the primary unblocked feature. Nothing else in this area should be touched until storage is confirmed working end-to-end. Connor wants to upload 1 PDF and 1 Word doc as the first test.
+Resource upload/storage wiring is now implemented. The remaining blocker is confirming production visibility and download for newly uploaded items.
 
-**Decision: pick one mode and validate it fully before moving on.**
+**Current mode support in code:**
+- DigitalOcean Spaces (preferred): `RESOURCE_STORAGE_MODE=do-spaces`
+- Supabase Storage fallback: `RESOURCE_STORAGE_MODE=supabase`
+- Auto-detect mode if `RESOURCE_STORAGE_MODE` is not set.
+
+**Immediate verification checklist:**
+1. Confirm production has run migrations `001` through `011` (especially `009` and `010` for resources schema/policy cleanup).
+2. Upload 1 PDF + 1 Word doc from `/add`.
+3. Confirm rows exist in `public.resources` for those uploads.
+4. Confirm items appear in `/resources` and open via signed URLs.
+5. If item still does not appear, capture the exact URL with diagnostic params (`db_code`, `db_hint`, `db_col`) and debug from that point.
 
 **Option A — Supabase bucket (fastest unblock)**
 1. Confirm private bucket `resources` exists in Supabase.
@@ -68,6 +87,8 @@ Resource file access is the primary unblocked feature. Nothing else in this area
 ---
 
 ## Phase 1 — Fix Immediately (P1)
+
+**Status:** Completed in code. Keep this section as acceptance criteria for regression checks.
 
 These are live bugs or significant friction points. Address in a single focused pass.
 
@@ -121,6 +142,8 @@ Use `usePathname()` (or pass pathname via server component) to compare `link.hre
 ---
 
 ## Phase 2 — High Impact, Straightforward (P2)
+
+**Status:** Completed in code. Keep this section as acceptance criteria for regression checks.
 
 ### 2.1 Collapse member nav "Home" into "Dashboard"
 
@@ -177,6 +200,8 @@ When `showOnboarding` is true (no study plan, no dismiss), the onboarding card s
 ---
 
 ## Phase 3 — Medium Priority (P3)
+
+**Status:** Implemented in code for 3.1, 3.2, 3.3; operational verification remains for 3.4; helper SQL added for 3.5 and awaits execution in production.
 
 ### 3.1 Deep-link dashboard resources to individual items
 
@@ -376,12 +401,12 @@ Before each deploy, verify:
 **Read this file first, then check REFACTOR_STATUS.md for current state.**
 
 **Do first:**
-1. Resource storage (Section: Hard Blockers). This is the only hard dependency. Nothing else ships without it.
-2. P1 fixes (Section: Phase 1). Four small, low-risk changes. Deployable together.
+1. Production verification pass for storage and migrations (Section: Hard Blockers — Current).
+2. Resolve upload-visibility follow-up if reproducible after migration verification.
 
 **Then:**
-3. P2 improvements (Section: Phase 2) — one focused pass.
-4. Clinical safeguarding implementation (Section: Clinical Safeguarding) — community guidelines page + thread creation banner + moderator controls. Can be done in parallel with P2.
+3. Clinical safeguarding implementation (Section: Clinical Safeguarding) — guidelines page, thread disclaimer, moderation/reporting features.
+4. Generator repetition audit and diversity controls (Section: Question Generator).
 
 **Generator work:**
 5. Run repetition audit before writing any generator code (Section: Question Generator).
