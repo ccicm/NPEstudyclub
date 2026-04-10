@@ -156,6 +156,9 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
 
         {category === "Exam Prep" ? (
           <div className="mt-4 grid gap-4 rounded-xl border bg-muted/30 p-4 md:grid-cols-2">
+            <p className="md:col-span-2 text-xs text-muted-foreground">
+              Exam Prep selected: add domain and content details so members can find this in exam filters.
+            </p>
             <SelectWithOther
               name="domain"
               label="Domain / Subtopic"
@@ -179,6 +182,9 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
 
         {category === "Clinical Practice" ? (
           <div className="mt-4 grid gap-4 rounded-xl border bg-muted/30 p-4 md:grid-cols-2">
+            <p className="md:col-span-2 text-xs text-muted-foreground">
+              Clinical Practice selected: add modality and population to support case-based browsing.
+            </p>
             <SelectWithOther
               name="modality"
               label="Modality"

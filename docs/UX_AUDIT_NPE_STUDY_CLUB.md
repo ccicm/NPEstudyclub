@@ -16,15 +16,17 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Dashboard now uses study-plan exam date in the timeline card when available.
 	- Resource library fetch limit raised to 1000 (interim mitigation before pagination).
 	- Several empty states now include direct action links (resources, quizzes, community).
+	- Resource search placeholder simplified to "Search resources...".
+	- Resource file action button copy standardised to "View file".
+	- Add-resource form now includes helper text when category-specific metadata sections appear.
+	- Request-access PSY-focused label/copy renamed to "AHPRA registration number" wording.
+	- Admin self-approval helper copy and button label clarified.
+	- Dashboard account card label softened to "Member access".
 - In progress:
 	- Replace remaining developer-facing error strings with user-safe copy across all surfaces.
-	- Standardise file action verbs to `View` or `Download`.
+	- Confirm remaining resource actions across non-library surfaces retain consistent "View"/"Download" language.
 - Pending:
-	- Simplify resource search placeholder.
-	- Add helper text for conditional upload metadata sections.
-	- Rename PSY label to AHPRA registration number.
-	- Rename ambiguous community channel labels.
-	- Clarify admin approval helper copy.
+	- Rename ambiguous community channel labels (if any non-canonical labels remain in seeded/community data).
 
 ### P1 — Critical
 - Conditionally render `/auth/request-status` based on auth + approval state.

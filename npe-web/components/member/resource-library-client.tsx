@@ -214,7 +214,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
       const signedUrl = await getResourceDownloadUrlAction(resourceId);
       window.open(signedUrl, "_blank", "noopener,noreferrer");
     } catch {
-      setDownloadError("Could not open this file. Please refresh and try again.");
+      setDownloadError("Could not view this file. Please refresh and try again.");
     } finally {
       setDownloadPendingId(null);
     }
@@ -244,7 +244,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
       <input
         value={searchInput}
         onChange={(event) => debouncedSetQuery(event.target.value)}
-        placeholder="Search by title, notes, domain, tags, type, category, uploader"
+        placeholder="Search resources..."
         className="h-10 w-full rounded-md border bg-card px-3 text-sm"
       />
 
@@ -425,7 +425,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
                       onClick={() => openFile(resource.id)}
                       disabled={downloadPendingId === resource.id}
                     >
-                      {downloadPendingId === resource.id ? "Opening..." : "Open file"}
+                      {downloadPendingId === resource.id ? "Opening..." : "View file"}
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">No file attached</span>

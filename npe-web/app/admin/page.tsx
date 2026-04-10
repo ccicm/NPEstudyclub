@@ -186,7 +186,8 @@ export default async function AdminPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">Admin</p>
         <h1 className="mt-2 text-3xl">User management</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-            Signed in as {user?.email || "preview mode"}. Use the button below to approve your own access and open the member area.
+          Signed in as {user?.email || "preview mode"}. If this is your first login, approve your own access once,
+          then open the member area.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link href="/auth/login" className="rounded-md border px-3 py-2 text-sm">
@@ -200,7 +201,7 @@ export default async function AdminPage() {
               type="submit"
               className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
             >
-              Approve me now
+              Approve my member access
             </button>
           </form>
         </div>
@@ -210,8 +211,8 @@ export default async function AdminPage() {
         <section className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-900">
           <p className="text-base font-semibold">Preview mode only</p>
           <p className="mt-2 text-sm">
-            You do not need a Supabase service key to keep going. Use the button above to approve your own access and
-            jump straight into the app.
+            You do not need a Supabase service key to keep going. Use the button above to approve your own member
+            access, then continue in the app.
           </p>
         </section>
       ) : null}

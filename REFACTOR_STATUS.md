@@ -65,6 +65,12 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - UX audit refactor block (captured in `docs/UX_AUDIT_NPE_STUDY_CLUB.md`)
 - P1 request-status state rendering is complete (state-based CTAs, organiser note removed)
 - User-facing technical copy cleanup is in progress across member/admin surfaces
+- Resource search placeholder simplified to "Search resources..."
+- Resource file action copy standardised to "View file"
+- Add-resource form now shows category-specific helper text when conditional metadata fields appear
+- Request-access copy now uses "AHPRA registration number" wording (replacing PSY-focused label copy)
+- Admin self-approval helper text and button label clarified
+- Dashboard account chip label softened to "Member access"
 - Profile stale progress section removed
 - Schedule now shows a dependency prompt when no study plan exists
 - Resource library fetch cap raised from 200 to 1000 (pagination still pending)

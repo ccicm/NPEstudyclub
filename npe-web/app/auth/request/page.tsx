@@ -47,13 +47,13 @@ export default function RequestAccessPage({
       <div className="w-full rounded-2xl border bg-card p-8">
         <h1 className="text-3xl">Request access</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Membership is manually approved. Include your PSY number if relevant.
+          Membership is manually approved. Include your AHPRA registration number if relevant.
         </p>
 
         <p className="mt-3 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-          Your PSY number is collected to help verify your provisional psychologist status. It is stored securely and
-          is not shared with third parties. You can request correction or deletion of your information by contacting
-          the organiser.
+          Your AHPRA registration number is collected to help verify your provisional psychologist status. It is stored
+          securely and is not shared with third parties. You can request correction or deletion of your information by
+          contacting the organiser.
         </p>
 
         {errorMessage ? (
@@ -78,17 +78,17 @@ export default function RequestAccessPage({
           />
           <div className="space-y-1">
             <label htmlFor="psy_number" className="block text-sm font-medium">
-              PSY number (if registered with AHPRA)
+              AHPRA registration number (if registered)
             </label>
             <input
               id="psy_number"
               name="psy_number"
               pattern="PSY[0-9]{10}"
               placeholder="PSY0001234567"
-              title="Enter a PSY number in the format PSY followed by 10 digits"
+              title="Enter an AHPRA registration number in the format PSY followed by 10 digits"
               className="w-full rounded-md border bg-background px-3 py-2 text-sm"
             />
-            <p className="text-xs text-muted-foreground">e.g. PSY0001234567</p>
+            <p className="text-xs text-muted-foreground">Format: PSY followed by 10 digits (for example, PSY0001234567).</p>
           </div>
           <input
             name="relationship_note"
@@ -104,8 +104,8 @@ export default function RequestAccessPage({
             <input name="consent_privacy" type="checkbox" required className="mt-0.5" />
             <span>
               I agree to the <Link className="underline" href="/privacy">Privacy Policy</Link> and consent to my
-              personal information, including my PSY number, being stored for membership verification and participation
-              in NPE Study Club.
+              personal information, including my AHPRA registration number, being stored for membership verification
+              and participation in NPE Study Club.
             </span>
           </label>
           <button

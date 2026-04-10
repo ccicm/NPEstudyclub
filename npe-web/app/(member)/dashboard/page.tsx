@@ -151,7 +151,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="rounded-2xl bg-accent p-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground">Account</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground">Member access</p>
             <p className="mt-2 break-all text-sm text-accent-foreground/90">{user?.email}</p>
             <p className="mt-3 text-sm text-accent-foreground/80">
               Signed in and approved for member features.
