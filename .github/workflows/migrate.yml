@@ -13,6 +13,8 @@ jobs:
     env:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,8 +25,19 @@ jobs:
       - name: Validate database URL secret
         run: |
           DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
+
+          if [ -z "$DB_URL" ] && [ -n "$SUPABASE_DB_PASSWORD" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
+            ENCODED_PASSWORD=$(python3 - <<'PY'
+import os
+import urllib.parse
+print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))
+PY
+)
+            DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres?sslmode=require"
+          fi
+
           if [ -z "$DB_URL" ]; then
-            echo "Missing Supabase database URL secret. Set SUPABASE_DB_URL or DATABASE_URL in GitHub Actions secrets." >&2
+            echo "Missing DB connection settings. Provide SUPABASE_DB_URL/DATABASE_URL, or SUPABASE_PROJECT_REF + SUPABASE_DB_PASSWORD." >&2
             exit 1
           fi
 
@@ -37,9 +50,14 @@ jobs:
               ;;
           esac
 
+          if echo "$DB_URL" | grep -q '\[YOUR-PASSWORD\]'; then
+            echo "Database URL still contains [YOUR-PASSWORD]. Replace it with the real DB password." >&2
+            exit 1
+          fi
+
           echo "DB_URL is set"
+          echo "RESOLVED_DB_URL=$DB_URL" >> "$GITHUB_ENV"
 
       - name: Push migrations
         run: |
-          DB_URL="${SUPABASE_DB_URL:-$DATABASE_URL}"
-          supabase db push --db-url "$DB_URL"
+          supabase db push --db-url "$RESOLVED_DB_URL"
