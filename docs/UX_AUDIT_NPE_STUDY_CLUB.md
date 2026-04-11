@@ -17,7 +17,7 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Resource library fetch limit raised to 1000 (interim mitigation before pagination).
 	- Several empty states now include direct action links (resources, quizzes, community).
 	- Resource search placeholder simplified to "Search resources…".
-	- Resource file action button copy standardised to "View resource".
+	- Resource file action button copy standardised to "View file".
 	- Add-resource form now includes helper text when category-specific metadata sections appear.
 	- Request-access PSY-focused label/copy renamed to "AHPRA registration number" wording.
 	- Admin self-approval helper copy and button label clarified.

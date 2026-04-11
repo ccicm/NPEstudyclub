@@ -73,7 +73,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - P1 request-status state rendering is complete (state-based CTAs, organiser note removed)
 - User-facing technical copy cleanup is in progress across member/admin surfaces
 - Resource search placeholder simplified to "Search resources…"
-- Resource file action copy standardised to "View resource"
+- Resource file action copy standardised to "View file"
 - Add-resource form now shows category-specific helper text when conditional metadata fields appear
 - Request-access copy now uses "AHPRA registration number" wording (replacing PSY-focused label copy)
 - Admin self-approval helper text and button label clarified

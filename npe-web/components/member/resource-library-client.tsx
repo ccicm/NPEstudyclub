@@ -425,7 +425,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
                       onClick={() => openFile(resource.id)}
                       disabled={downloadPendingId === resource.id}
                     >
-                      {downloadPendingId === resource.id ? "Opening..." : "View resource"}
+                      {downloadPendingId === resource.id ? "Opening..." : "View file"}
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">No file attached</span>
