@@ -22,6 +22,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey);
 async function deleteOldQuizzes() {
   console.log('🗑️  Deleting old auto-generated quizzes...');
   
+  // First get the old quiz IDs
   const { data: oldQuizzes, error: fetchError } = await supabase
     .from('quizzes')
     .select('id')
@@ -29,6 +30,7 @@ async function deleteOldQuizzes() {
 
   if (fetchError) {
     console.error('❌ Failed to fetch old quizzes:', fetchError.message);
+    console.error('Full error:', fetchError);
     return false;
   }
 
@@ -37,23 +39,67 @@ async function deleteOldQuizzes() {
     return true;
   }
 
-  const { error: deleteError } = await supabase
+  const quizIds = oldQuizzes.map(q => q.id);
+  console.log(`Found ${quizIds.length} old quizzes to delete...`);
+
+  // 1. Delete quiz_results
+  await supabase.from('quiz_results').delete().in('quiz_id', quizIds);
+  console.log(`✓ Deleted quiz results`);
+
+  // 2. Get quiz_question IDs and delete explanation feedback first
+  const { data: questions } = await supabase
+    .from('quiz_questions')
+    .select('id')
+    .in('quiz_id', quizIds);
+  
+  if (questions?.length > 0) {
+    const questionIds = questions.map(q => q.id);
+    await supabase.from('explanation_feedback').delete().in('question_id', questionIds);
+    console.log(`✓ Deleted explanation feedback`);
+
+    // 3. Delete forum_threads that reference questions via explanation_review_thread_id
+    const { data: threadsWithExplanation } = await supabase
+      .from('forum_threads')
+      .select('id')
+      .in('explanation_review_thread_id', questionIds);
+
+    if (threadsWithExplanation?.length > 0) {
+      const threadIds = threadsWithExplanation.map(t => t.id);
+      // Delete any nested forum posts first
+      await supabase.from('forum_posts').delete().in('thread_id', threadIds);
+      // Then delete the threads
+      await supabase.from('forum_threads').delete().in('id', threadIds);
+      console.log(`✓ Deleted explanation forum threads`);
+    }
+  }
+
+  // 4. Delete forum_threads linked to the quiz
+  await supabase.from('forum_posts').delete().in('thread_id', (await supabase.from('forum_threads').select('id').in('quiz_id', quizIds)).data?.map(t => t.id) || []);
+  await supabase.from('forum_threads').delete().in('quiz_id', quizIds);
+  console.log(`✓ Deleted forum threads`);
+
+  // 5. Delete quiz_questions
+  await supabase.from('quiz_questions').delete().in('quiz_id', quizIds);
+  console.log(`✓ Deleted quiz questions`);
+
+  // 6. Now delete the quizzes
+  const { error: deleteQuizzesError } = await supabase
     .from('quizzes')
     .delete()
     .eq('author_name', 'NPE Quiz Bot');
 
-  if (deleteError) {
-    console.error('❌ Failed to delete old quizzes:', deleteError.message);
+  if (deleteQuizzesError) {
+    console.error('❌ Failed to delete old quizzes:', deleteQuizzesError.message);
     return false;
   }
 
-  console.log(`✓ Deleted ${oldQuizzes.length} old quiz records`);
+  console.log(`✓ Deleted ${quizIds.length} old quiz records`);
   return true;
 }
 
 function generateForDate(dateSeed) {
   return new Promise((resolve, reject) => {
-    const env = { ...process.env, DATE_SEED_OVERRIDE: dateSeed, GENERATION_MODE: 'daily' };
+    const env = { ...process.env, DATE_SEED: dateSeed, GENERATION_MODE: 'daily' };
     
     const proc = spawn('node', [path.join(__dirname, './generate-questions.js')], {
       cwd: path.join(__dirname, '../'),

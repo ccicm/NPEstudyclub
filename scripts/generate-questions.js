@@ -826,7 +826,7 @@ async function main() {
 
   const dateSeed = getDateSeed();
   const recentHistoryByDomain = loadRecentSubdomainHistory(MODE, dateSeed, TEMPLATE_LOOKBACK_DAYS);
-  const generatedAt = new Date().toISOString();
+  const generatedAt = `${dateSeed}T00:00:00Z`;
   const setId = `${MODE}-${dateSeed}`;
 
   const allQuestions = [];
