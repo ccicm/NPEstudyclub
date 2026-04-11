@@ -106,7 +106,24 @@ export function QuizzesBrowser({
       </div>
 
       {!filtered.length ? (
-        <p className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">No quiz sets match these filters.</p>
+        <div className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">
+          <p>No quiz sets match these filters.</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setTab("All");
+                setDomain("");
+              }}
+              className="underline"
+            >
+              Clear filters
+            </button>
+            <Link href="/quizzes/add" className="underline">
+              Add a quiz
+            </Link>
+          </div>
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((quiz) => (

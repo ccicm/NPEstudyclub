@@ -72,7 +72,17 @@ export default async function QuizResultsPage() {
       </div>
 
       {!rows.length ? (
-        <p className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">No quiz attempts yet.</p>
+        <div className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">
+          <p>No quiz attempts yet.</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <Link href="/quizzes" className="underline">
+              Browse quizzes
+            </Link>
+            <Link href="/quizzes/add" className="underline">
+              Add a quiz
+            </Link>
+          </div>
+        </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border bg-card">
           <table className="min-w-full text-left text-sm">

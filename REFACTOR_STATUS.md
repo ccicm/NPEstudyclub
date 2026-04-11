@@ -94,6 +94,8 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Schedule now shows a dependency prompt when no study plan exists
 - Resource library fetch cap raised from 200 to 1000 (pagination still pending)
 - Dashboard now passes study-plan exam date into timeline card
+- Quizzes and quiz-history empty states now include direct next-step CTAs (clear filters, browse, add quiz)
+- Dashboard key-references empty state now routes members to resources/community instead of a dead end
 - Dashboard and resource-library empty states are being converted to actionable CTAs
 
 ## Generator Polish (Started)

@@ -287,7 +287,9 @@ export default async function DashboardPage() {
       <section className="rounded-2xl border bg-card p-6">
         <h2 className="text-2xl">Key References</h2>
         {!keyReferences?.length ? (
-          <p className="mt-2 text-sm text-muted-foreground">No key references published yet.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            No key references published yet. In the meantime, browse the <Link href="/resources" className="underline">resource library</Link> or ask for specific references in <Link href="/community" className="underline">Community</Link>.
+          </p>
         ) : (
           <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {keyReferences.map((reference) => (
