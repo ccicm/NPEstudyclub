@@ -1,34 +1,34 @@
 {
-  "set_id": "daily-2026-04-10",
+  "set_id": "daily-2026-04-03",
   "mode": "daily",
-  "generated_at": "2026-04-10T00:00:00Z",
+  "generated_at": "2026-04-03T00:00:00Z",
   "question_count": 4,
   "questions": [
     {
       "domain": 1,
       "domain_label": "Ethics",
       "subdomain": "Duty of care and boundaries",
-      "question": "A provisional psychologist in a university clinic notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "question": "A provisional psychologist in a community health service notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
       "options": {
-        "A": "Document the presentation and assume the client will rebook if needed.",
-        "B": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
-        "C": "Send a text asking the client to confirm they are safe and stop there.",
-        "D": "Wait until the next booked session so the client can settle.",
-        "E": "Contact the police immediately without any further assessment."
+        "A": "Send a text asking the client to confirm they are safe and stop there.",
+        "B": "Contact the police immediately without any further assessment.",
+        "C": "Document the presentation and assume the client will rebook if needed.",
+        "D": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "E": "Wait until the next booked session so the client can settle."
       },
-      "correct_answer": "B",
+      "correct_answer": "D",
       "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
       "distractor_explanations": {
-        "A": "Documentation is necessary but not a substitute for active risk management.",
-        "C": "A text alone is not an adequate risk management response.",
-        "D": "Delaying follow-up may miss a potentially acute risk window.",
-        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+        "A": "A text alone is not an adequate risk management response.",
+        "B": "Police contact is not the automatic first step unless immediate danger is clearly present.",
+        "C": "Documentation is necessary but not a substitute for active risk management.",
+        "E": "Delaying follow-up may miss a potentially acute risk window."
       },
       "citations": [
         "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
         "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
       ],
-      "difficulty_seed": "challenging",
+      "difficulty_seed": "standard",
       "difficulty_score": null,
       "flagged": false
     },
@@ -38,19 +38,19 @@
       "subdomain": "Collateral and test interpretation",
       "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
       "options": {
-        "A": "Conclude it is behavioural rather than cognitive based on the school report alone.",
-        "B": "Delay testing until all informants agree on the reason for referral.",
-        "C": "Rely on the parent report because they are the legal guardian.",
-        "D": "Use only a self-report symptom checklist to avoid bias from the school.",
-        "E": "Gather collateral information from multiple sources and interpret results in context."
+        "A": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "B": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "C": "Gather collateral information from multiple sources and interpret results in context.",
+        "D": "Rely on the parent report because they are the legal guardian.",
+        "E": "Delay testing until all informants agree on the reason for referral."
       },
-      "correct_answer": "E",
+      "correct_answer": "C",
       "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
       "distractor_explanations": {
-        "A": "A school report alone is not sufficient to conclude the underlying cause.",
-        "B": "Perfect agreement is not required before proceeding with assessment.",
-        "C": "Legal guardianship does not make one informant sufficient for a fair assessment.",
-        "D": "A single self-report tool is not enough for a complex developmental concern."
+        "A": "A single self-report tool is not enough for a complex developmental concern.",
+        "B": "A school report alone is not sufficient to conclude the underlying cause.",
+        "D": "Legal guardianship does not make one informant sufficient for a fair assessment.",
+        "E": "Perfect agreement is not required before proceeding with assessment."
       },
       "citations": [
         "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
@@ -67,24 +67,24 @@
       "question": "A client with a trauma history freezes and goes silent when asked to describe a recent assault. The psychologist wants a full timeline for treatment planning. What is the best approach?",
       "options": {
         "A": "Push for details so the client learns not to avoid the memory.",
-        "B": "Keep asking the same question until the client answers clearly.",
+        "B": "Terminate the session because the client is not ready for therapy.",
         "C": "Slow the pace, stabilise, and use trauma-informed choice and grounding.",
-        "D": "Terminate the session because the client is not ready for therapy.",
-        "E": "Switch to confrontation because silence is non-compliance."
+        "D": "Switch to confrontation because silence is non-compliance.",
+        "E": "Keep asking the same question until the client answers clearly."
       },
       "correct_answer": "C",
       "correct_explanation": "A trauma-informed response prioritises emotional safety, choice, and pacing.",
       "distractor_explanations": {
         "A": "Forcing disclosure can increase distress and reduce safety.",
-        "B": "Repetition without attunement can intensify freezing and harm rapport.",
-        "D": "A trauma response does not mean treatment must stop entirely.",
-        "E": "Confrontation is likely to escalate shame or shutdown."
+        "B": "A trauma response does not mean treatment must stop entirely.",
+        "D": "Confrontation is likely to escalate shame or shutdown.",
+        "E": "Repetition without attunement can intensify freezing and harm rapport."
       },
       "citations": [
         "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
         "AHPRA Guidelines for registered health practitioners (2014)"
       ],
-      "difficulty_seed": "challenging",
+      "difficulty_seed": "standard",
       "difficulty_score": null,
       "flagged": false
     },
@@ -94,25 +94,25 @@
       "subdomain": "Interpreter-assisted communication",
       "question": "A psychologist is explaining assessment results to a client who prefers to speak through an interpreter. The client is visibly uncomfortable when family members offer to translate instead. What is the best choice?",
       "options": {
-        "A": "Use the family members because they know the client best.",
-        "B": "Give the client a written summary only and end the session early.",
+        "A": "Ask the family to leave the room and proceed without communication support.",
+        "B": "Use a qualified interpreter and maintain the client's privacy and control.",
         "C": "Skip the interpreter and speak more slowly in English.",
-        "D": "Use a qualified interpreter and maintain the client's privacy and control.",
-        "E": "Ask the family to leave the room and proceed without communication support."
+        "D": "Give the client a written summary only and end the session early.",
+        "E": "Use the family members because they know the client best."
       },
-      "correct_answer": "D",
+      "correct_answer": "B",
       "correct_explanation": "Interpreter-assisted communication should prioritise accuracy, confidentiality, and client autonomy.",
       "distractor_explanations": {
-        "A": "Family translators can compromise privacy and accuracy.",
-        "B": "Written summaries alone may not be enough for nuanced feedback.",
+        "A": "Removing support without replacing it can leave the client unable to engage.",
         "C": "Slowing down English does not solve the language barrier.",
-        "E": "Removing support without replacing it can leave the client unable to engage."
+        "D": "Written summaries alone may not be enough for nuanced feedback.",
+        "E": "Family translators can compromise privacy and accuracy."
       },
       "citations": [
         "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
         "AHPRA Guidelines for registered health practitioners (2014)"
       ],
-      "difficulty_seed": "challenging",
+      "difficulty_seed": "standard",
       "difficulty_score": null,
       "flagged": false
     }
