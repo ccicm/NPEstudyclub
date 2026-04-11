@@ -3,22 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Bot } from "lucide-react";
-
-// ── Domain colours (matches quiz-runner.tsx) ────────────────────────────────
-const DOMAIN_COLOURS: Record<string, { bg: string; text: string; border: string; stripe: string }> = {
-  ethics:        { bg: "bg-purple-50",  text: "text-purple-700",  border: "border-purple-200",  stripe: "bg-purple-400"  },
-  assessment:    { bg: "bg-blue-50",    text: "text-blue-700",    border: "border-blue-200",    stripe: "bg-blue-400"    },
-  interventions: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", stripe: "bg-emerald-400" },
-  communication: { bg: "bg-orange-50",  text: "text-orange-700",  border: "border-orange-200",  stripe: "bg-orange-400"  },
-};
-
-// NPE quiz domains — distinct from the resource taxonomy in resource-options.ts
-const NPE_QUIZ_DOMAINS = ["Ethics", "Assessment", "Interventions", "Communication"] as const;
-
-function domainColour(label: string | null | undefined) {
-  const key = (label || "").toLowerCase().trim();
-  return DOMAIN_COLOURS[key] ?? { bg: "bg-muted", text: "text-muted-foreground", border: "border-border", stripe: "bg-border" };
-}
+import { NPE_DOMAINS, domainColour } from "@/lib/npe-taxonomy";
 
 // ── Delivery mode display ────────────────────────────────────────────────────
 const MODE_LABELS: Record<string, { label: string; time: string }> = {
@@ -117,7 +102,7 @@ export function QuizzesBrowser({
         >
           All domains
         </button>
-        {NPE_QUIZ_DOMAINS.map((d) => {
+        {NPE_DOMAINS.map(({ label: d }) => {
           const dc = domainColour(d);
           const active = domain === d;
           return (

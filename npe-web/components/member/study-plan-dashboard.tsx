@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { NPE_DOMAINS } from "@/lib/resource-options";
-import { STUDY_TIPS } from "@/lib/study-plan";
+import { NPE_DOMAINS, DOMAIN_STUDY_TIPS, domainId } from "@/lib/npe-taxonomy";
 
 type WeekItem = {
   id: string;
@@ -72,7 +71,7 @@ export function StudyPlanDashboard({
   const currentResource = currentWeek ? resources.find((item) => item.id === currentWeek.suggested_resource_id) : null;
   const currentQuiz = currentWeek ? quizzes.find((item) => item.id === currentWeek.suggested_quiz_id) : null;
 
-  const domainHours = NPE_DOMAINS.map((domain) => {
+  const domainHours = NPE_DOMAINS.map(({ label: domain }) => {
     const domainWeeks = weeks.filter((week) => week.domain_focus === domain);
     const allocatedPercent = weeks.length ? Math.round((domainWeeks.length / weeks.length) * 100) : 0;
     const completePercent = domainWeeks.length
@@ -81,8 +80,9 @@ export function StudyPlanDashboard({
     return { domain, allocatedPercent, completePercent };
   });
 
-  const tipDomain = currentWeek?.domain_focus || NPE_DOMAINS[0];
-  const weeklyTip = STUDY_TIPS[tipDomain] || "Focus on active recall and spaced revision this week.";
+  const tipDomain = currentWeek?.domain_focus || NPE_DOMAINS[0].label;
+  const tipDomainId = domainId(tipDomain);
+  const weeklyTip = (tipDomainId && DOMAIN_STUDY_TIPS[tipDomainId]) || "Focus on active recall and spaced revision this week.";
   const errorMessage = !errorCode
     ? null
     : errorCode === "auth_required"
@@ -256,7 +256,7 @@ export function StudyPlanDashboard({
           <div className="md:col-span-2">
             <p className="text-sm font-medium">Domain priorities</p>
             <div className="mt-2 grid gap-2 md:grid-cols-2">
-              {NPE_DOMAINS.map((domain) => (
+              {NPE_DOMAINS.map(({ label: domain }) => (
                 <label key={domain} className="flex items-center justify-between rounded-md border bg-background px-3 py-2 text-sm">
                   <span>{domain}</span>
                   <select

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { domainId } from "@/lib/npe-taxonomy";
 
 type DraftQuestion = {
   question_text: string;
@@ -311,15 +312,7 @@ export async function flagQuestionForReviewAction(input: {
 
     const domainLabel = questionRow.domain_label || "General";
     const subdomain = questionRow.subdomain || "General";
-    const canonicalTag = normalizeDomainKey(domainLabel).includes("ethic")
-      ? "ethics"
-      : normalizeDomainKey(domainLabel).includes("assessment")
-        ? "assessment"
-        : normalizeDomainKey(domainLabel).includes("intervention")
-          ? "interventions"
-          : normalizeDomainKey(domainLabel).includes("communication")
-            ? "communication"
-            : "quiz-review";
+    const canonicalTag = domainId(domainLabel) ?? "quiz-review";
 
     const threadTitle = `Peer review: ${domainLabel} - ${subdomain}`;
     const threadBody = [

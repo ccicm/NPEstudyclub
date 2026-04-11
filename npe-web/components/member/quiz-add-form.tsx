@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { EXAM_PREP_DOMAINS } from "@/lib/resource-options";
+import { NPE_DOMAINS } from "@/lib/npe-taxonomy";
 
 type DraftQuestion = {
   question_text: string;
@@ -126,7 +126,7 @@ export function QuizAddForm({
               <span>Domain *</span>
               <select value={domain} onChange={(event) => setDomain(event.target.value)} className="h-10 rounded-md border bg-background px-3">
                 <option value="">Select domain</option>
-                {EXAM_PREP_DOMAINS.filter((item) => item !== "Other").map((item) => (
+                {NPE_DOMAINS.map(({ label: item }) => (
                   <option key={item} value={item}>
                     {item}
                   </option>

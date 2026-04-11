@@ -11,6 +11,7 @@ import {
   submitQuizOverallFeedbackAction,
   voteExplanationAction,
 } from "@/app/(member)/quizzes/actions";
+import { domainColour } from "@/lib/npe-taxonomy";
 
 type QuizQuestion = {
   id: string;
@@ -46,18 +47,6 @@ type ReviewPair = {
   answer: AnswerRecord;
 };
 
-// Domain 1=Ethics, 2=Assessment, 3=Interventions, 4=Communication
-const DOMAIN_COLOURS: Record<string, { bg: string; text: string; border: string }> = {
-  ethics:        { bg: 'bg-purple-50',  text: 'text-purple-700',  border: 'border-purple-200'  },
-  assessment:    { bg: 'bg-blue-50',    text: 'text-blue-700',    border: 'border-blue-200'    },
-  interventions: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  communication: { bg: 'bg-orange-50',  text: 'text-orange-700',  border: 'border-orange-200'  },
-};
-
-function domainColour(label: string | null | undefined) {
-  const key = (label || '').toLowerCase().trim();
-  return DOMAIN_COLOURS[key] ?? { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border' };
-}
 
 const PAGE_SIZE = 5;
 

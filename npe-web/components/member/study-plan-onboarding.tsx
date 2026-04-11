@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { EXAM_WINDOWS } from "@/lib/exam-windows";
-import { NPE_DOMAINS } from "@/lib/resource-options";
+import { NPE_DOMAINS } from "@/lib/npe-taxonomy";
 
 type Step = 1 | 2 | 3;
 
@@ -20,7 +20,7 @@ export function StudyPlanOnboarding({
   const [hoursPerWeek, setHoursPerWeek] = useState(5);
   const [preferredDays, setPreferredDays] = useState<string[]>([]);
   const [domainPriorities, setDomainPriorities] = useState<Record<string, number>>(
-    Object.fromEntries(NPE_DOMAINS.map((domain) => [domain, 2])),
+    Object.fromEntries(NPE_DOMAINS.map(({ label: domain }) => [domain, 2])),
   );
   const [prioritiesReviewed, setPrioritiesReviewed] = useState(false);
 
@@ -135,7 +135,7 @@ export function StudyPlanOnboarding({
           <div className="space-y-3 rounded-xl border bg-muted/20 p-4">
             <p className="text-sm">Rate each domain from 1 (confident) to 3 (need work).</p>
             <div className="space-y-2">
-              {NPE_DOMAINS.map((domain) => (
+              {NPE_DOMAINS.map(({ label: domain }) => (
                 <div key={domain} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background p-2">
                   <p className="text-sm">{domain}</p>
                   <div className="flex gap-2">
