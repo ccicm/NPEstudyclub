@@ -1,0 +1,344 @@
+{
+  "set_id": "targeted-d3-2026-04-11",
+  "mode": "targeted",
+  "generated_at": "2026-04-11T00:00:00Z",
+  "question_count": 12,
+  "questions": [
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "CBT treatment planning",
+      "question": "A client with panic symptoms wants a psychologist to \"just tell me what to do\" and expects reassurance during every anxious spike. Which intervention choice best fits an evidence-based CBT approach?",
+      "options": {
+        "A": "Change the topic whenever the client reports bodily symptoms.",
+        "B": "Tell the client to think positively whenever anxiety appears.",
+        "C": "Use psychoeducation, monitoring, and graduated exposure with collaboratively set goals.",
+        "D": "Provide reassurance at every session and avoid homework to keep the client calm.",
+        "E": "Focus only on childhood causes before teaching any coping skills."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "CBT for panic commonly uses psychoeducation, symptom monitoring, and graded exposure.",
+      "distractor_explanations": {
+        "A": "Avoiding symptom discussion undermines treatment and learning.",
+        "B": "Positive thinking alone is not a full CBT intervention.",
+        "D": "Constant reassurance can reinforce avoidance and dependence.",
+        "E": "Historical factors can matter, but intervention should still be active and skills-based."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Group therapy",
+      "question": "A provisional psychologist is co-facilitating a skills group. One participant starts giving detailed advice about another participant's personal situation. What is the best facilitator response?",
+      "options": {
+        "A": "Ignore it because the group will self-correct over time.",
+        "B": "Share the other participant's notes so the group can understand the context.",
+        "C": "Redirect to group rules, protect boundaries, and reinforce respectful participation.",
+        "D": "Allow the discussion because peer support is always therapeutic.",
+        "E": "Ask the participant to leave without any explanation."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Facilitators should maintain a safe and respectful group frame and reinforce boundaries.",
+      "distractor_explanations": {
+        "A": "Ignoring boundary issues can destabilise the group.",
+        "B": "Sharing another member's notes breaches privacy and trust.",
+        "D": "Peer support is useful, but uncontained advice can become harmful.",
+        "E": "Removal may be disproportionate unless the disruption is serious and repeated."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 7 — Collaboration and teamwork",
+        "APS Code of Ethics (2007, amended 2023), Principle A.1 — General Respect"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "B": "Ignore the comment and move straight to the next agenda item.",
+        "C": "Apologise only if the client explicitly asks for it.",
+        "D": "Defend the intervention because the psychologist is the expert.",
+        "E": "End therapy because the client is being resistant."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "B": "Ignoring the issue can leave the alliance damaged.",
+        "C": "Repair often needs direct discussion, not just passive apology.",
+        "D": "Defensiveness usually worsens the rupture.",
+        "E": "A single rupture does not justify dropping a willing client."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Trauma-informed practice",
+      "question": "A client with a trauma history freezes and goes silent when asked to describe a recent assault. The psychologist wants a full timeline for treatment planning. What is the best approach?",
+      "options": {
+        "A": "Slow the pace, stabilise, and use trauma-informed choice and grounding.",
+        "B": "Terminate the session because the client is not ready for therapy.",
+        "C": "Push for details so the client learns not to avoid the memory.",
+        "D": "Keep asking the same question until the client answers clearly.",
+        "E": "Switch to confrontation because silence is non-compliance."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "A trauma-informed response prioritises emotional safety, choice, and pacing.",
+      "distractor_explanations": {
+        "B": "A trauma response does not mean treatment must stop entirely.",
+        "C": "Forcing disclosure can increase distress and reduce safety.",
+        "D": "Repetition without attunement can intensify freezing and harm rapport.",
+        "E": "Confrontation is likely to escalate shame or shutdown."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "End therapy because the client is being resistant.",
+        "B": "Ignore the comment and move straight to the next agenda item.",
+        "C": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "D": "Defend the intervention because the psychologist is the expert.",
+        "E": "Apologise only if the client explicitly asks for it."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "A": "A single rupture does not justify dropping a willing client.",
+        "B": "Ignoring the issue can leave the alliance damaged.",
+        "D": "Defensiveness usually worsens the rupture.",
+        "E": "Repair often needs direct discussion, not just passive apology."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "B": "Ignore the comment and move straight to the next agenda item.",
+        "C": "End therapy because the client is being resistant.",
+        "D": "Defend the intervention because the psychologist is the expert.",
+        "E": "Apologise only if the client explicitly asks for it."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "B": "Ignoring the issue can leave the alliance damaged.",
+        "C": "A single rupture does not justify dropping a willing client.",
+        "D": "Defensiveness usually worsens the rupture.",
+        "E": "Repair often needs direct discussion, not just passive apology."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "CBT treatment planning",
+      "question": "A client with panic symptoms wants a psychologist to \"just tell me what to do\" and expects reassurance during every anxious spike. Which intervention choice best fits an evidence-based CBT approach?",
+      "options": {
+        "A": "Use psychoeducation, monitoring, and graduated exposure with collaboratively set goals.",
+        "B": "Tell the client to think positively whenever anxiety appears.",
+        "C": "Focus only on childhood causes before teaching any coping skills.",
+        "D": "Provide reassurance at every session and avoid homework to keep the client calm.",
+        "E": "Change the topic whenever the client reports bodily symptoms."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "CBT for panic commonly uses psychoeducation, symptom monitoring, and graded exposure.",
+      "distractor_explanations": {
+        "B": "Positive thinking alone is not a full CBT intervention.",
+        "C": "Historical factors can matter, but intervention should still be active and skills-based.",
+        "D": "Constant reassurance can reinforce avoidance and dependence.",
+        "E": "Avoiding symptom discussion undermines treatment and learning."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "CBT treatment planning",
+      "question": "A client with panic symptoms wants a psychologist to \"just tell me what to do\" and expects reassurance during every anxious spike. Which intervention choice best fits an evidence-based CBT approach?",
+      "options": {
+        "A": "Use psychoeducation, monitoring, and graduated exposure with collaboratively set goals.",
+        "B": "Tell the client to think positively whenever anxiety appears.",
+        "C": "Focus only on childhood causes before teaching any coping skills.",
+        "D": "Provide reassurance at every session and avoid homework to keep the client calm.",
+        "E": "Change the topic whenever the client reports bodily symptoms."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "CBT for panic commonly uses psychoeducation, symptom monitoring, and graded exposure.",
+      "distractor_explanations": {
+        "B": "Positive thinking alone is not a full CBT intervention.",
+        "C": "Historical factors can matter, but intervention should still be active and skills-based.",
+        "D": "Constant reassurance can reinforce avoidance and dependence.",
+        "E": "Avoiding symptom discussion undermines treatment and learning."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "B": "Ignore the comment and move straight to the next agenda item.",
+        "C": "Defend the intervention because the psychologist is the expert.",
+        "D": "End therapy because the client is being resistant.",
+        "E": "Apologise only if the client explicitly asks for it."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "B": "Ignoring the issue can leave the alliance damaged.",
+        "C": "Defensiveness usually worsens the rupture.",
+        "D": "A single rupture does not justify dropping a willing client.",
+        "E": "Repair often needs direct discussion, not just passive apology."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "CBT treatment planning",
+      "question": "A client with panic symptoms wants a psychologist to \"just tell me what to do\" and expects reassurance during every anxious spike. Which intervention choice best fits an evidence-based CBT approach?",
+      "options": {
+        "A": "Tell the client to think positively whenever anxiety appears.",
+        "B": "Provide reassurance at every session and avoid homework to keep the client calm.",
+        "C": "Use psychoeducation, monitoring, and graduated exposure with collaboratively set goals.",
+        "D": "Focus only on childhood causes before teaching any coping skills.",
+        "E": "Change the topic whenever the client reports bodily symptoms."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "CBT for panic commonly uses psychoeducation, symptom monitoring, and graded exposure.",
+      "distractor_explanations": {
+        "A": "Positive thinking alone is not a full CBT intervention.",
+        "B": "Constant reassurance can reinforce avoidance and dependence.",
+        "D": "Historical factors can matter, but intervention should still be active and skills-based.",
+        "E": "Avoiding symptom discussion undermines treatment and learning."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Beck et al. (1979), Cognitive Therapy of Depression"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "B": "Defend the intervention because the psychologist is the expert.",
+        "C": "Ignore the comment and move straight to the next agenda item.",
+        "D": "End therapy because the client is being resistant.",
+        "E": "Apologise only if the client explicitly asks for it."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "B": "Defensiveness usually worsens the rupture.",
+        "C": "Ignoring the issue can leave the alliance damaged.",
+        "D": "A single rupture does not justify dropping a willing client.",
+        "E": "Repair often needs direct discussion, not just passive apology."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Rupture repair",
+      "question": "A client becomes annoyed after the psychologist gently challenges an avoidance pattern and says the session felt \"judgy\". The client is otherwise engaged and wants to keep attending. What is the best next step?",
+      "options": {
+        "A": "Acknowledge the rupture, explore the impact, and repair collaboratively.",
+        "B": "End therapy because the client is being resistant.",
+        "C": "Defend the intervention because the psychologist is the expert.",
+        "D": "Ignore the comment and move straight to the next agenda item.",
+        "E": "Apologise only if the client explicitly asks for it."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Therapeutic rupture repair is part of good care and helps preserve the alliance.",
+      "distractor_explanations": {
+        "B": "A single rupture does not justify dropping a willing client.",
+        "C": "Defensiveness usually worsens the rupture.",
+        "D": "Ignoring the issue can leave the alliance damaged.",
+        "E": "Repair often needs direct discussion, not just passive apology."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

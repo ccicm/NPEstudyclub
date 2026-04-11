@@ -1,0 +1,344 @@
+{
+  "set_id": "targeted-d4-2026-04-11",
+  "mode": "targeted",
+  "generated_at": "2026-04-11T00:00:00Z",
+  "question_count": 12,
+  "questions": [
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Communicating with carers",
+      "question": "A client's partner rings the clinic asking for an update because they are worried about recent mood changes. The client has not consented to sharing information with the partner. What should the psychologist do?",
+      "options": {
+        "A": "Leave a voicemail with broad details so the partner feels reassured.",
+        "B": "Confirm whether the partner is telling the truth before deciding.",
+        "C": "Do not disclose client information and explain the confidentiality process.",
+        "D": "Give a general update because family concern is important.",
+        "E": "Share the client's diagnosis but not the treatment plan."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Without consent or a lawful exception, information should not be disclosed to a partner.",
+      "distractor_explanations": {
+        "A": "Voicemail disclosure can still breach confidentiality.",
+        "B": "Verifying the caller does not create permission to disclose.",
+        "D": "Concern from a family member does not override privacy obligations.",
+        "E": "Partial disclosure is still disclosure and needs a lawful basis."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Ignore the subpoena unless the client asks about it.",
+        "B": "Release everything immediately without checking the scope.",
+        "C": "Seek legal/supervisory advice and review what must be disclosed under the order.",
+        "D": "Destroy the notes before the hearing date.",
+        "E": "Refuse to comply because third-party material is always protected."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Ignoring a subpoena can create legal risk.",
+        "B": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "D": "Destroying records is inappropriate and potentially unlawful.",
+        "E": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Interpreter-assisted communication",
+      "question": "A psychologist is explaining assessment results to a client who prefers to speak through an interpreter. The client is visibly uncomfortable when family members offer to translate instead. What is the best choice?",
+      "options": {
+        "A": "Use the family members because they know the client best.",
+        "B": "Use a qualified interpreter and maintain the client's privacy and control.",
+        "C": "Give the client a written summary only and end the session early.",
+        "D": "Skip the interpreter and speak more slowly in English.",
+        "E": "Ask the family to leave the room and proceed without communication support."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Interpreter-assisted communication should prioritise accuracy, confidentiality, and client autonomy.",
+      "distractor_explanations": {
+        "A": "Family translators can compromise privacy and accuracy.",
+        "C": "Written summaries alone may not be enough for nuanced feedback.",
+        "D": "Slowing down English does not solve the language barrier.",
+        "E": "Removing support without replacing it can leave the client unable to engage."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Report writing",
+      "question": "A provisional psychologist is drafting a report for a referrer. The client asked that a sensitive family issue not be mentioned, but it is relevant to the referral question. What is the most appropriate approach?",
+      "options": {
+        "A": "Use vague language that hides the key information.",
+        "B": "Include only what is necessary, within the consent limits discussed with the client.",
+        "C": "Include everything in full detail because the referrer paid for the report.",
+        "D": "Omit the issue entirely so the client feels protected.",
+        "E": "Send the raw notes instead of a formal report."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Reports should be relevant, proportionate, and consistent with consent and confidentiality limits.",
+      "distractor_explanations": {
+        "A": "Vagueness can reduce clinical usefulness and accuracy.",
+        "C": "Reports should not include unnecessary sensitive detail.",
+        "D": "Omitting relevant material can make the report misleading.",
+        "E": "Raw notes are not a substitute for a considered report."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Release everything immediately without checking the scope.",
+        "B": "Ignore the subpoena unless the client asks about it.",
+        "C": "Destroy the notes before the hearing date.",
+        "D": "Refuse to comply because third-party material is always protected.",
+        "E": "Seek legal/supervisory advice and review what must be disclosed under the order."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "B": "Ignoring a subpoena can create legal risk.",
+        "C": "Destroying records is inappropriate and potentially unlawful.",
+        "D": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Release everything immediately without checking the scope.",
+        "B": "Destroy the notes before the hearing date.",
+        "C": "Ignore the subpoena unless the client asks about it.",
+        "D": "Refuse to comply because third-party material is always protected.",
+        "E": "Seek legal/supervisory advice and review what must be disclosed under the order."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "B": "Destroying records is inappropriate and potentially unlawful.",
+        "C": "Ignoring a subpoena can create legal risk.",
+        "D": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Interpreter-assisted communication",
+      "question": "A psychologist is explaining assessment results to a client who prefers to speak through an interpreter. The client is visibly uncomfortable when family members offer to translate instead. What is the best choice?",
+      "options": {
+        "A": "Skip the interpreter and speak more slowly in English.",
+        "B": "Use the family members because they know the client best.",
+        "C": "Give the client a written summary only and end the session early.",
+        "D": "Ask the family to leave the room and proceed without communication support.",
+        "E": "Use a qualified interpreter and maintain the client's privacy and control."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Interpreter-assisted communication should prioritise accuracy, confidentiality, and client autonomy.",
+      "distractor_explanations": {
+        "A": "Slowing down English does not solve the language barrier.",
+        "B": "Family translators can compromise privacy and accuracy.",
+        "C": "Written summaries alone may not be enough for nuanced feedback.",
+        "D": "Removing support without replacing it can leave the client unable to engage."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Interpreter-assisted communication",
+      "question": "A psychologist is explaining assessment results to a client who prefers to speak through an interpreter. The client is visibly uncomfortable when family members offer to translate instead. What is the best choice?",
+      "options": {
+        "A": "Skip the interpreter and speak more slowly in English.",
+        "B": "Use the family members because they know the client best.",
+        "C": "Give the client a written summary only and end the session early.",
+        "D": "Ask the family to leave the room and proceed without communication support.",
+        "E": "Use a qualified interpreter and maintain the client's privacy and control."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Interpreter-assisted communication should prioritise accuracy, confidentiality, and client autonomy.",
+      "distractor_explanations": {
+        "A": "Slowing down English does not solve the language barrier.",
+        "B": "Family translators can compromise privacy and accuracy.",
+        "C": "Written summaries alone may not be enough for nuanced feedback.",
+        "D": "Removing support without replacing it can leave the client unable to engage."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.2 — Propriety",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Report writing",
+      "question": "A provisional psychologist is drafting a report for a referrer. The client asked that a sensitive family issue not be mentioned, but it is relevant to the referral question. What is the most appropriate approach?",
+      "options": {
+        "A": "Send the raw notes instead of a formal report.",
+        "B": "Use vague language that hides the key information.",
+        "C": "Omit the issue entirely so the client feels protected.",
+        "D": "Include everything in full detail because the referrer paid for the report.",
+        "E": "Include only what is necessary, within the consent limits discussed with the client."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Reports should be relevant, proportionate, and consistent with consent and confidentiality limits.",
+      "distractor_explanations": {
+        "A": "Raw notes are not a substitute for a considered report.",
+        "B": "Vagueness can reduce clinical usefulness and accuracy.",
+        "C": "Omitting relevant material can make the report misleading.",
+        "D": "Reports should not include unnecessary sensitive detail."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Refuse to comply because third-party material is always protected.",
+        "B": "Destroy the notes before the hearing date.",
+        "C": "Release everything immediately without checking the scope.",
+        "D": "Ignore the subpoena unless the client asks about it.",
+        "E": "Seek legal/supervisory advice and review what must be disclosed under the order."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Third-party material may need careful handling, but it does not automatically nullify the subpoena.",
+        "B": "Destroying records is inappropriate and potentially unlawful.",
+        "C": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "D": "Ignoring a subpoena can create legal risk."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Release everything immediately without checking the scope.",
+        "B": "Ignore the subpoena unless the client asks about it.",
+        "C": "Refuse to comply because third-party material is always protected.",
+        "D": "Destroy the notes before the hearing date.",
+        "E": "Seek legal/supervisory advice and review what must be disclosed under the order."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "B": "Ignoring a subpoena can create legal risk.",
+        "C": "Third-party material may need careful handling, but it does not automatically nullify the subpoena.",
+        "D": "Destroying records is inappropriate and potentially unlawful."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Report writing",
+      "question": "A provisional psychologist is drafting a report for a referrer. The client asked that a sensitive family issue not be mentioned, but it is relevant to the referral question. What is the most appropriate approach?",
+      "options": {
+        "A": "Send the raw notes instead of a formal report.",
+        "B": "Include everything in full detail because the referrer paid for the report.",
+        "C": "Use vague language that hides the key information.",
+        "D": "Omit the issue entirely so the client feels protected.",
+        "E": "Include only what is necessary, within the consent limits discussed with the client."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Reports should be relevant, proportionate, and consistent with consent and confidentiality limits.",
+      "distractor_explanations": {
+        "A": "Raw notes are not a substitute for a considered report.",
+        "B": "Reports should not include unnecessary sensitive detail.",
+        "C": "Vagueness can reduce clinical usefulness and accuracy.",
+        "D": "Omitting relevant material can make the report misleading."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

@@ -1,0 +1,344 @@
+{
+  "set_id": "targeted-d1-2026-04-11",
+  "mode": "targeted",
+  "generated_at": "2026-04-11T00:00:00Z",
+  "question_count": 12,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Record keeping and supervision",
+      "question": "A provisional psychologist realises they forgot to update the file after a complex session involving a boundary concern and a treatment change. Their supervisor is off-site and the client is not due back for two weeks. What is the best action?",
+      "options": {
+        "A": "Write a vague note later so the boundary issue is less obvious.",
+        "B": "Leave the note out because the client will not remember the details anyway.",
+        "C": "Complete an accurate contemporaneous note and flag the issue for supervision.",
+        "D": "Wait until the next supervision meeting before updating the record.",
+        "E": "Delete the session plan so the record looks cleaner."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Record keeping should be accurate and timely, especially when the session involved a clinical change or boundary issue.",
+      "distractor_explanations": {
+        "A": "Vagueness can be misleading and does not meet documentation standards.",
+        "B": "Omitting relevant information weakens continuity of care and accountability.",
+        "D": "Delaying updates risks loss of detail and weakens the clinical record.",
+        "E": "Deleting records is inappropriate and compromises integrity."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a private practice, a 31-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Give a verbal family update because it is routine practice.",
+        "B": "Provide a brief summary because the parent is funding therapy.",
+        "C": "Share the notes but leave out the most sensitive details.",
+        "D": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "E": "Ask the parent to sign a form and then disclose the information."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "A": "Routine updates still require client consent and attention to privacy limits.",
+        "B": "Payment for treatment does not create a right to private clinical information.",
+        "C": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "E": "A form signed by the parent alone does not authorise disclosure."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Telehealth and scope",
+      "question": "During a after-hours video session, a client says they are alone, distressed, and do not want to continue, but the psychologist cannot confirm their location. What should the psychologist prioritise?",
+      "options": {
+        "A": "Switch to text messaging only and keep the session informal.",
+        "B": "Continue as normal because the client consented to telehealth.",
+        "C": "End the call immediately and wait for the client to reconnect later.",
+        "D": "Pause treatment content, verify location, and follow the telehealth emergency plan.",
+        "E": "Ask a family member to join without speaking with the client first."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Telehealth requires an emergency plan and active location verification when risk emerges. Safety, not continuation of content, is the priority.",
+      "distractor_explanations": {
+        "A": "Text-only communication is not an appropriate risk-management substitute.",
+        "B": "Telehealth consent does not remove the duty to manage emerging risk.",
+        "C": "Ending without a plan may leave the client unsupported.",
+        "E": "Bringing others in without consent can damage trust unless there is urgent necessity."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Duty of care and boundaries",
+      "question": "A provisional psychologist in a university clinic notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "options": {
+        "A": "Document the presentation and assume the client will rebook if needed.",
+        "B": "Send a text asking the client to confirm they are safe and stop there.",
+        "C": "Wait until the next booked session so the client can settle.",
+        "D": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "E": "Contact the police immediately without any further assessment."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
+      "distractor_explanations": {
+        "A": "Documentation is necessary but not a substitute for active risk management.",
+        "B": "A text alone is not an adequate risk management response.",
+        "C": "Delaying follow-up may miss a potentially acute risk window.",
+        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a private practice, a 19-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Share the notes but leave out the most sensitive details.",
+        "B": "Give a verbal family update because it is routine practice.",
+        "C": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "D": "Provide a brief summary because the parent is funding therapy.",
+        "E": "Ask the parent to sign a form and then disclose the information."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "A": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "B": "Routine updates still require client consent and attention to privacy limits.",
+        "D": "Payment for treatment does not create a right to private clinical information.",
+        "E": "A form signed by the parent alone does not authorise disclosure."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Duty of care and boundaries",
+      "question": "A provisional psychologist in a private practice notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "options": {
+        "A": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "B": "Document the presentation and assume the client will rebook if needed.",
+        "C": "Send a text asking the client to confirm they are safe and stop there.",
+        "D": "Wait until the next booked session so the client can settle.",
+        "E": "Contact the police immediately without any further assessment."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
+      "distractor_explanations": {
+        "B": "Documentation is necessary but not a substitute for active risk management.",
+        "C": "A text alone is not an adequate risk management response.",
+        "D": "Delaying follow-up may miss a potentially acute risk window.",
+        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a community service, a 19-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Ask the parent to sign a form and then disclose the information.",
+        "B": "Provide a brief summary because the parent is funding therapy.",
+        "C": "Give a verbal family update because it is routine practice.",
+        "D": "Share the notes but leave out the most sensitive details.",
+        "E": "Decline disclosure, explain confidentiality limits, and seek supervision if needed."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "A": "A form signed by the parent alone does not authorise disclosure.",
+        "B": "Payment for treatment does not create a right to private clinical information.",
+        "C": "Routine updates still require client consent and attention to privacy limits.",
+        "D": "Partial disclosure is still disclosure if there is no consent or legal basis."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Duty of care and boundaries",
+      "question": "A provisional psychologist in a community health service notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "options": {
+        "A": "Document the presentation and assume the client will rebook if needed.",
+        "B": "Wait until the next booked session so the client can settle.",
+        "C": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "D": "Send a text asking the client to confirm they are safe and stop there.",
+        "E": "Contact the police immediately without any further assessment."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
+      "distractor_explanations": {
+        "A": "Documentation is necessary but not a substitute for active risk management.",
+        "B": "Delaying follow-up may miss a potentially acute risk window.",
+        "D": "A text alone is not an adequate risk management response.",
+        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Telehealth and scope",
+      "question": "During a regional telehealth session, a client says they are alone, distressed, and do not want to continue, but the psychologist cannot confirm their location. What should the psychologist prioritise?",
+      "options": {
+        "A": "Switch to text messaging only and keep the session informal.",
+        "B": "Pause treatment content, verify location, and follow the telehealth emergency plan.",
+        "C": "Continue as normal because the client consented to telehealth.",
+        "D": "Ask a family member to join without speaking with the client first.",
+        "E": "End the call immediately and wait for the client to reconnect later."
+      },
+      "correct_answer": "B",
+      "correct_explanation": "Telehealth requires an emergency plan and active location verification when risk emerges. Safety, not continuation of content, is the priority.",
+      "distractor_explanations": {
+        "A": "Text-only communication is not an appropriate risk-management substitute.",
+        "C": "Telehealth consent does not remove the duty to manage emerging risk.",
+        "D": "Bringing others in without consent can damage trust unless there is urgent necessity.",
+        "E": "Ending without a plan may leave the client unsupported."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a private practice, a 24-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Provide a brief summary because the parent is funding therapy.",
+        "B": "Give a verbal family update because it is routine practice.",
+        "C": "Ask the parent to sign a form and then disclose the information.",
+        "D": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "E": "Share the notes but leave out the most sensitive details."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "A": "Payment for treatment does not create a right to private clinical information.",
+        "B": "Routine updates still require client consent and attention to privacy limits.",
+        "C": "A form signed by the parent alone does not authorise disclosure.",
+        "E": "Partial disclosure is still disclosure if there is no consent or legal basis."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Telehealth and scope",
+      "question": "During a remote review, a client says they are alone, distressed, and do not want to continue, but the psychologist cannot confirm their location. What should the psychologist prioritise?",
+      "options": {
+        "A": "End the call immediately and wait for the client to reconnect later.",
+        "B": "Switch to text messaging only and keep the session informal.",
+        "C": "Pause treatment content, verify location, and follow the telehealth emergency plan.",
+        "D": "Continue as normal because the client consented to telehealth.",
+        "E": "Ask a family member to join without speaking with the client first."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Telehealth requires an emergency plan and active location verification when risk emerges. Safety, not continuation of content, is the priority.",
+      "distractor_explanations": {
+        "A": "Ending without a plan may leave the client unsupported.",
+        "B": "Text-only communication is not an appropriate risk-management substitute.",
+        "D": "Telehealth consent does not remove the duty to manage emerging risk.",
+        "E": "Bringing others in without consent can damage trust unless there is urgent necessity."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 2 — Person-centred practice",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Confidentiality and safety",
+      "question": "In a community service, a 31-year-old client says they do not want their parent informed about session content. The parent later requests an update because they are paying for treatment. The client has not consented to any disclosure. What should the psychologist do next?",
+      "options": {
+        "A": "Decline disclosure, explain confidentiality limits, and seek supervision if needed.",
+        "B": "Give a verbal family update because it is routine practice.",
+        "C": "Share the notes but leave out the most sensitive details.",
+        "D": "Provide a brief summary because the parent is funding therapy.",
+        "E": "Ask the parent to sign a form and then disclose the information."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Funding treatment does not override confidentiality. The safest response is to decline disclosure without consent and clarify the limits of privacy with the client.",
+      "distractor_explanations": {
+        "B": "Routine updates still require client consent and attention to privacy limits.",
+        "C": "Partial disclosure is still disclosure if there is no consent or legal basis.",
+        "D": "Payment for treatment does not create a right to private clinical information.",
+        "E": "A form signed by the parent alone does not authorise disclosure."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 5 — Confidentiality",
+        "Privacy Act 1988 (Cth), Australian Privacy Principle 6"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}

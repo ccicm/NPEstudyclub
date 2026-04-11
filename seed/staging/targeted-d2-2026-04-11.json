@@ -1,0 +1,344 @@
+{
+  "set_id": "targeted-d2-2026-04-11",
+  "mode": "targeted",
+  "generated_at": "2026-04-11T00:00:00Z",
+  "question_count": 12,
+  "questions": [
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Suicide risk assessment",
+      "question": "A 27-year-old client describes poor sleep, low mood, and says they feel like a burden. They deny a current plan but admit having thought about not waking up. Which assessment action is most appropriate next?",
+      "options": {
+        "A": "Document the symptoms and schedule the next routine appointment.",
+        "B": "Focus only on depression severity and avoid asking more about suicide.",
+        "C": "Refer the client elsewhere without discussing risk in the current session.",
+        "D": "Tell the client to contact emergency services if their thoughts worsen and end the session.",
+        "E": "Conduct a structured suicide risk assessment including intent, means, and protective factors."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Suicidal ideation requires a structured risk assessment, even when there is no current plan.",
+      "distractor_explanations": {
+        "A": "Routine scheduling without risk assessment is insufficient.",
+        "B": "Avoiding direct suicide questions can miss important risk details.",
+        "C": "Referral alone does not discharge the current duty of care.",
+        "D": "Advice may be part of management, but it is not a substitute for assessment."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Assessment fairness",
+      "question": "A recently arrived refugee client has limited English and asks whether they can bring an interpreter to a cognitive screening appointment. The psychologist is worried this could affect test validity. What is the best response?",
+      "options": {
+        "A": "Refuse the interpreter so the test results remain fully standardised.",
+        "B": "Delay the assessment until the client becomes fluent in English.",
+        "C": "Proceed in English only because that is how the instrument was normed.",
+        "D": "Use family members as interpreters to reduce the risk of misunderstanding.",
+        "E": "Use a qualified interpreter where needed and choose instruments appropriate to the client's language background."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Assessment should be fair and accessible, which may require an interpreter and cautious test selection.",
+      "distractor_explanations": {
+        "A": "Excluding interpretation can make the assessment invalid or unfair.",
+        "B": "Assessment should not be postponed unnecessarily if suitable adaptations are available.",
+        "C": "English-only testing may be inappropriate when language barriers are material.",
+        "D": "Family interpreters can compromise accuracy, privacy, and clinical neutrality."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Risk and urgency",
+      "question": "A client reports that they have a firearm at home, have been drinking heavily, and are angry after a relationship breakup. They say they are \"not sure what I might do tonight\". What is the priority?",
+      "options": {
+        "A": "End the session once the client says they do not want hospitalisation.",
+        "B": "Focus on substance use first and ignore the weapon access until later.",
+        "C": "Assume the client is only venting because they have not named a specific target.",
+        "D": "Take a note and reassess at the next session if the client survives the night.",
+        "E": "Conduct immediate high-risk management, including emergency escalation and supervision."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Access to means, intoxication, and uncertainty about imminent behaviour converge to create an acute high-risk presentation.",
+      "distractor_explanations": {
+        "A": "Client refusal does not remove the clinician's duty to respond to imminent risk.",
+        "B": "Substance use may be relevant, but it is not the immediate priority in this scenario.",
+        "C": "The absence of a named target does not reduce the seriousness of the threat.",
+        "D": "Delaying action is unsafe when the risk is immediate."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Collateral and test interpretation",
+      "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
+      "options": {
+        "A": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "B": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "C": "Delay testing until all informants agree on the reason for referral.",
+        "D": "Rely on the parent report because they are the legal guardian.",
+        "E": "Gather collateral information from multiple sources and interpret results in context."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
+      "distractor_explanations": {
+        "A": "A single self-report tool is not enough for a complex developmental concern.",
+        "B": "A school report alone is not sufficient to conclude the underlying cause.",
+        "C": "Perfect agreement is not required before proceeding with assessment.",
+        "D": "Legal guardianship does not make one informant sufficient for a fair assessment."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Assessment fairness",
+      "question": "A recently arrived refugee client has limited English and asks whether they can bring an interpreter to a cognitive screening appointment. The psychologist is worried this could affect test validity. What is the best response?",
+      "options": {
+        "A": "Use a qualified interpreter where needed and choose instruments appropriate to the client's language background.",
+        "B": "Delay the assessment until the client becomes fluent in English.",
+        "C": "Use family members as interpreters to reduce the risk of misunderstanding.",
+        "D": "Refuse the interpreter so the test results remain fully standardised.",
+        "E": "Proceed in English only because that is how the instrument was normed."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Assessment should be fair and accessible, which may require an interpreter and cautious test selection.",
+      "distractor_explanations": {
+        "B": "Assessment should not be postponed unnecessarily if suitable adaptations are available.",
+        "C": "Family interpreters can compromise accuracy, privacy, and clinical neutrality.",
+        "D": "Excluding interpretation can make the assessment invalid or unfair.",
+        "E": "English-only testing may be inappropriate when language barriers are material."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Suicide risk assessment",
+      "question": "A 27-year-old client describes poor sleep, low mood, and says they feel like a burden. They deny a current plan but admit having thought about not waking up. Which assessment action is most appropriate next?",
+      "options": {
+        "A": "Conduct a structured suicide risk assessment including intent, means, and protective factors.",
+        "B": "Refer the client elsewhere without discussing risk in the current session.",
+        "C": "Document the symptoms and schedule the next routine appointment.",
+        "D": "Tell the client to contact emergency services if their thoughts worsen and end the session.",
+        "E": "Focus only on depression severity and avoid asking more about suicide."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Suicidal ideation requires a structured risk assessment, even when there is no current plan.",
+      "distractor_explanations": {
+        "B": "Referral alone does not discharge the current duty of care.",
+        "C": "Routine scheduling without risk assessment is insufficient.",
+        "D": "Advice may be part of management, but it is not a substitute for assessment.",
+        "E": "Avoiding direct suicide questions can miss important risk details."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Risk and urgency",
+      "question": "A client reports that they have a firearm at home, have been drinking heavily, and are angry after a relationship breakup. They say they are \"not sure what I might do tonight\". What is the priority?",
+      "options": {
+        "A": "End the session once the client says they do not want hospitalisation.",
+        "B": "Take a note and reassess at the next session if the client survives the night.",
+        "C": "Conduct immediate high-risk management, including emergency escalation and supervision.",
+        "D": "Focus on substance use first and ignore the weapon access until later.",
+        "E": "Assume the client is only venting because they have not named a specific target."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Access to means, intoxication, and uncertainty about imminent behaviour converge to create an acute high-risk presentation.",
+      "distractor_explanations": {
+        "A": "Client refusal does not remove the clinician's duty to respond to imminent risk.",
+        "B": "Delaying action is unsafe when the risk is immediate.",
+        "D": "Substance use may be relevant, but it is not the immediate priority in this scenario.",
+        "E": "The absence of a named target does not reduce the seriousness of the threat."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Assessment fairness",
+      "question": "A recently arrived refugee client has limited English and asks whether they can bring an interpreter to a cognitive screening appointment. The psychologist is worried this could affect test validity. What is the best response?",
+      "options": {
+        "A": "Use family members as interpreters to reduce the risk of misunderstanding.",
+        "B": "Refuse the interpreter so the test results remain fully standardised.",
+        "C": "Use a qualified interpreter where needed and choose instruments appropriate to the client's language background.",
+        "D": "Proceed in English only because that is how the instrument was normed.",
+        "E": "Delay the assessment until the client becomes fluent in English."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Assessment should be fair and accessible, which may require an interpreter and cautious test selection.",
+      "distractor_explanations": {
+        "A": "Family interpreters can compromise accuracy, privacy, and clinical neutrality.",
+        "B": "Excluding interpretation can make the assessment invalid or unfair.",
+        "D": "English-only testing may be inappropriate when language barriers are material.",
+        "E": "Assessment should not be postponed unnecessarily if suitable adaptations are available."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.3 — Informed consent",
+        "APS Guidelines for working with people who have intellectual disabilities"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Risk and urgency",
+      "question": "A client reports that they have a firearm at home, have been drinking heavily, and are angry after a relationship breakup. They say they are \"not sure what I might do tonight\". What is the priority?",
+      "options": {
+        "A": "Conduct immediate high-risk management, including emergency escalation and supervision.",
+        "B": "Take a note and reassess at the next session if the client survives the night.",
+        "C": "Focus on substance use first and ignore the weapon access until later.",
+        "D": "Assume the client is only venting because they have not named a specific target.",
+        "E": "End the session once the client says they do not want hospitalisation."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Access to means, intoxication, and uncertainty about imminent behaviour converge to create an acute high-risk presentation.",
+      "distractor_explanations": {
+        "B": "Delaying action is unsafe when the risk is immediate.",
+        "C": "Substance use may be relevant, but it is not the immediate priority in this scenario.",
+        "D": "The absence of a named target does not reduce the seriousness of the threat.",
+        "E": "Client refusal does not remove the clinician's duty to respond to imminent risk."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Suicide risk assessment",
+      "question": "A 27-year-old client describes poor sleep, low mood, and says they feel like a burden. They deny a current plan but admit having thought about not waking up. Which assessment action is most appropriate next?",
+      "options": {
+        "A": "Conduct a structured suicide risk assessment including intent, means, and protective factors.",
+        "B": "Focus only on depression severity and avoid asking more about suicide.",
+        "C": "Document the symptoms and schedule the next routine appointment.",
+        "D": "Tell the client to contact emergency services if their thoughts worsen and end the session.",
+        "E": "Refer the client elsewhere without discussing risk in the current session."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Suicidal ideation requires a structured risk assessment, even when there is no current plan.",
+      "distractor_explanations": {
+        "B": "Avoiding direct suicide questions can miss important risk details.",
+        "C": "Routine scheduling without risk assessment is insufficient.",
+        "D": "Advice may be part of management, but it is not a substitute for assessment.",
+        "E": "Referral alone does not discharge the current duty of care."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "AHPRA Guidelines for registered health practitioners (2014)"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Collateral and test interpretation",
+      "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
+      "options": {
+        "A": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "B": "Rely on the parent report because they are the legal guardian.",
+        "C": "Gather collateral information from multiple sources and interpret results in context.",
+        "D": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "E": "Delay testing until all informants agree on the reason for referral."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
+      "distractor_explanations": {
+        "A": "A single self-report tool is not enough for a complex developmental concern.",
+        "B": "Legal guardianship does not make one informant sufficient for a fair assessment.",
+        "D": "A school report alone is not sufficient to conclude the underlying cause.",
+        "E": "Perfect agreement is not required before proceeding with assessment."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "challenging",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Collateral and test interpretation",
+      "question": "A 15-year-old is referred for learning and attention concerns. The parent says the school is exaggerating the issue, while the teacher reports significant behaviour problems and missed assignments. What should guide the assessment plan?",
+      "options": {
+        "A": "Conclude it is behavioural rather than cognitive based on the school report alone.",
+        "B": "Rely on the parent report because they are the legal guardian.",
+        "C": "Use only a self-report symptom checklist to avoid bias from the school.",
+        "D": "Gather collateral information from multiple sources and interpret results in context.",
+        "E": "Delay testing until all informants agree on the reason for referral."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "A balanced assessment should integrate multiple sources because single-informant data can be biased or incomplete.",
+      "distractor_explanations": {
+        "A": "A school report alone is not sufficient to conclude the underlying cause.",
+        "B": "Legal guardianship does not make one informant sufficient for a fair assessment.",
+        "C": "A single self-report tool is not enough for a complex developmental concern.",
+        "E": "Perfect agreement is not required before proceeding with assessment."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle A.4 — Justice",
+        "Psychology Board of Australia Code of Conduct (2020), Section 6 — Clinical records"
+      ],
+      "difficulty_seed": "advanced",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}
