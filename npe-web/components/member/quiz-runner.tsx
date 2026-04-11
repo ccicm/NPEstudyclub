@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Bot } from "lucide-react";
 import {
   clearQuizProgressAction,
@@ -49,6 +49,110 @@ type ReviewPair = {
 
 
 const PAGE_SIZE = 5;
+
+// ── Confetti ────────────────────────────────────────────────────────────────
+const CONFETTI_COLOURS = [
+  "#7c3aed", "#3b82f6", "#10b981", "#f59e0b",
+  "#ec4899", "#ef4444", "#06b6d4", "#84cc16",
+];
+
+type Piece = { id: number; x: number; colour: string; delay: number; dur: number; size: number; shape: "rect" | "circle" };
+
+function Confetti({ active }: { active: boolean }) {
+  const pieces = useMemo<Piece[]>(() => {
+    if (!active) return [];
+    return Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      colour: CONFETTI_COLOURS[i % CONFETTI_COLOURS.length],
+      delay: Math.random() * 0.8,
+      dur: 1.8 + Math.random() * 1.2,
+      size: 6 + Math.random() * 8,
+      shape: Math.random() > 0.5 ? "rect" : "circle",
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  if (!active) return null;
+
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      <style>{`
+        @keyframes confettiFall {
+          0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+      {pieces.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            position: "absolute",
+            left: `${p.x}%`,
+            top: 0,
+            width: p.shape === "circle" ? p.size : p.size * 0.6,
+            height: p.shape === "circle" ? p.size : p.size * 1.4,
+            borderRadius: p.shape === "circle" ? "50%" : "2px",
+            backgroundColor: p.colour,
+            animation: `confettiFall ${p.dur}s ${p.delay}s ease-in both`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Score tier ───────────────────────────────────────────────────────────────
+function scoreTier(percent: number): { emoji: string; label: string; colour: string } {
+  if (percent === 100) return { emoji: "🧠", label: "Perfect score!", colour: "text-violet-600" };
+  if (percent >= 90)  return { emoji: "⚡", label: "Outstanding!", colour: "text-blue-600" };
+  if (percent >= 70)  return { emoji: "✅", label: "Passed!", colour: "text-emerald-600" };
+  if (percent >= 50)  return { emoji: "📚", label: "Nearly there", colour: "text-amber-600" };
+  return { emoji: "💪", label: "Keep grinding", colour: "text-rose-600" };
+}
+
+// ── Animated score ring ───────────────────────────────────────────────────────
+function ScoreRing({ percent }: { percent: number }) {
+  const ref = useRef<SVGCircleElement>(null);
+  const r = 40;
+  const circ = 2 * Math.PI * r;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.strokeDashoffset = String(circ);
+    requestAnimationFrame(() => {
+      el.style.transition = "stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)";
+      el.style.strokeDashoffset = String(circ * (1 - percent / 100));
+    });
+  }, [percent, circ]);
+
+  const ringColour =
+    percent >= 70 ? "#10b981" : percent >= 50 ? "#f59e0b" : "#ef4444";
+
+  return (
+    <svg width="110" height="110" viewBox="0 0 110 110" className="shrink-0">
+      <circle cx="55" cy="55" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-muted/30" />
+      <circle
+        ref={ref}
+        cx="55" cy="55" r={r}
+        fill="none"
+        stroke={ringColour}
+        strokeWidth="10"
+        strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ}
+        transform="rotate(-90 55 55)"
+      />
+      <text x="55" y="51" textAnchor="middle" fill={ringColour} fontSize="18" fontWeight="700">
+        {percent}%
+      </text>
+      <text x="55" y="67" textAnchor="middle" fill="currentColor" fontSize="10" opacity="0.5">
+        score
+      </text>
+    </svg>
+  );
+}
 
 function getTimeEstimate(deliveryMode: string | null | undefined, questionCount: number): string {
   if (deliveryMode === "fortnightly") return "3.5 hours";
@@ -314,17 +418,24 @@ export function QuizRunner({
     const ratedCount = reviewQueue.filter((pair) => Boolean(feedbackVotes[pair.question.id])).length;
     const allRated = reviewQueue.length > 0 && ratedCount === reviewQueue.length;
 
+    const tier = scoreTier(percent);
+    const passed = percent >= 70;
+
     return (
       <div className="space-y-4">
+        <Confetti active={passed} />
         <div className="rounded-2xl border bg-card p-6">
-          <h1 className="text-3xl">Results</h1>
-          <p className="mt-2 text-2xl font-semibold">
-            {score} / {questions.length}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {percent}% · {percent >= 70 ? "Pass" : "Needs review"}
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">Domain: {quiz.domain || "General"}</p>
+          <div className="flex items-center gap-5">
+            <ScoreRing percent={percent} />
+            <div>
+              <p className="text-3xl">{tier.emoji}</p>
+              <h1 className={`text-2xl font-bold ${tier.colour}`}>{tier.label}</h1>
+              <p className="mt-1 text-lg font-semibold">
+                {score} / {questions.length}
+              </p>
+              <p className="text-sm text-muted-foreground">{quiz.domain || "General"}</p>
+            </div>
+          </div>
           <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
             <Bot className="h-4 w-4" />
             These explanations were written by AI. Rate each one below to improve future questions.
