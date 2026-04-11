@@ -28,8 +28,7 @@ export default function PrivacyPage() {
       <section className="mt-8 space-y-3 text-sm text-muted-foreground">
         <h2 className="text-xl text-foreground">Storage and security</h2>
         <p>
-          Data is stored in Supabase with row-level security controls and encrypted transport over HTTPS. Access to
-          admin-only data is restricted.
+          Data is stored on secure infrastructure with encrypted connections. Access to admin-only data is restricted.
         </p>
       </section>
 

@@ -76,6 +76,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Member error states now use consistent user-safe wording across resources, community, quizzes, and study plan flows
 - Auth sign-in/sign-up/reset/callback flows now map backend errors to user-safe messages instead of raw provider text
 - Community thread-detail restriction message now clearly covers both posting and replying
+- Privacy and callback fallback wording now use plain language (no technical implementation terms)
 - Resource search placeholder simplified to "Search resources…"
 - Resource file action copy standardised to "View file"
 - Add-resource form now shows category-specific helper text when conditional metadata fields appear

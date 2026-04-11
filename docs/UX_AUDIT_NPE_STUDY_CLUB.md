@@ -25,6 +25,7 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Member error messages now use consistent user-safe wording across resources, community, quizzes, and study plan flows.
 	- Auth sign-in/sign-up/reset/callback flows now map backend errors to user-safe messages.
 	- Community thread-detail restriction message now clearly covers both posting and replying.
+	- Privacy and callback fallback wording now use plain language with no technical implementation terms.
 	- Dashboard account card label softened to "Member access".
 	- Quiz list now includes a consistent AI-generated disclosure callout.
 	- Quiz runner now includes AI-generated disclosure copy in intro and results.

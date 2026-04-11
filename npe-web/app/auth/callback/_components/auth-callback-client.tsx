@@ -81,7 +81,7 @@ export function AuthCallbackClient() {
 
         setState({
           status: "error",
-          message: "No auth callback params found. Request a fresh sign-in link and open it in the same browser.",
+          message: "This sign-in link is incomplete or expired. Request a new link and open it in the same browser.",
         });
       } catch (error) {
         setState({
