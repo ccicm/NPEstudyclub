@@ -33,12 +33,13 @@ In `.env.local`:
 - Optional: Run `supabase/012_content_reports.sql` to enable community post/reply reporting scaffold
 - If `/resources` shows `42501 permission denied for table users`, run `supabase/013_resources_policy_hard_reset.sql`
 - Optional: Run `supabase/014_clinical_safeguarding_moderation.sql` for moderator notes, redaction markers, and posting restrictions
+- **Run `supabase/015_quiz_progress.sql`** to enable quiz save/resume feature (required for pagination and mid-quiz exit)
 - Verify core tables created:
    - Membership/auth flow: `approved_users`, `access_requests`
    - Resources: `resources`, `user_progress`, `comments`
    - Community: `forum_threads`, `forum_replies`, `forum_upvotes`
    - Sessions: `sessions`, `key_references`
-   - Quizzes: `quizzes`, `quiz_questions`, `quiz_results`
+   - Quizzes: `quizzes`, `quiz_questions`, `quiz_results`, `quiz_progress`
    - Study plan: `study_plans`, `study_plan_weeks`, `study_log`
 
 **Storage:**
@@ -120,6 +121,8 @@ Once DNS propagates and SSL is active:
 - [ ] Community posting, replies, and upvotes work
 - [ ] Moderator note/redaction/posting-restriction controls work in thread detail (admin account)
 - [ ] Quiz attempt saves to history
+- [ ] Quiz save/resume: start a quiz, click "Save & exit", return to quiz, "Resume" button appears with correct position
+- [ ] Exam sim tile locks after completion; "Next sim available [date]" shows
 - [ ] Study plan onboarding and log-time flow work
 
 ## 6.1 Storage Privacy Verification (Required)

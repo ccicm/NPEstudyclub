@@ -1,6 +1,6 @@
 # NPE Study Club — Master Plan
 
-Last updated: 2026-04-10 (session update)
+Last updated: 2026-04-11 (session update)
 
 This document is the single source of truth for all active and planned work. It supersedes `NEXT_AGENT_HANDOFF.md`, `REFACTOR_STATUS.md`, `RESOURCE_SETUP_TOMORROW.md`, and `QUESTION_GENERATOR_PLAN.md` (kept in repo for reference). Any new agent session should read this file first.
 
@@ -12,19 +12,21 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 ---
 
-## Delivery Status Snapshot (2026-04-10)
+## Delivery Status Snapshot (2026-04-11)
 
 - **Core implementation status:** P1 and P2 are complete in code. P3 UX items 3.1-3.3 are complete in code; operational verification (3.4) and bulk onboarding execution (3.5) remain pending production run.
 - **Quiz moderation status:** Quiz review flow redesign is implemented in UI and min-vote escalation guards are implemented in SQL/migration files; production rollout verification is still pending migration execution.
-- **UX/copy status:** Request-status rendering, technical-copy simplification, and the main UX P2/P3 copy cleanup items are implemented; remaining follow-ups are narrowed to residual taxonomy/channel checks and any final copy consistency review.
+- **UX/copy status:** Request-status rendering, technical-copy simplification, and main UX P2/P3 copy cleanup items are implemented. New UX audit completed 2026-04-11 — see UX Audit section below for outstanding items.
 - **Storage/resource status:** Upload pipeline is implemented with fallback/diagnostics. Production verification from upload through visibility and signed URL open is still pending from a live production session.
-- **Migration CI status:** In progress. GitHub Action + migration file are committed, but rollout is blocked by connection endpoint/secret mismatch. This is deferred for tonight and resumes next session with pooler URL verification.
-- **Clinical safeguarding status:** Started in code (guidelines, disclaimer banner, report scaffold, initial moderator controls). Remaining moderator controls and production migration execution are pending.
-- **Generator polish status:** Started. Repetition audit baseline completed and initial variation fixes applied; diversity/rotation hardening remains in progress.
+- **Migration CI status:** In progress. GitHub Action + migration file are committed, but rollout is blocked by connection endpoint/secret mismatch. Resumes next session with pooler URL verification.
+- **Clinical safeguarding status:** Started in code (guidelines, disclaimer banner, report scaffold, moderator controls). Production migration execution pending.
+- **Generator polish status:** Started. Repetition audit baseline completed and initial variation fixes applied; domain template bank expansion remains in progress.
+- **Quiz taxonomy status:** ✅ Complete. `lib/npe-taxonomy.ts` created as canonical domain source. All quiz/study-plan components migrated away from legacy `resource-options` EXAM_PREP_DOMAINS.
+- **Quiz UX status:** ✅ Significantly upgraded this session. Pagination, save/resume, difficulty badges, domain colour-coding, confetti/score ring on results, mode+status filters on browser, exam sim cooldown enforcement, tile completion states, quiz history stat cards, dashboard quiz activity section rebuilt.
 
 ---
 
-## Current State (as of 2026-04-10)
+## Current State (as of 2026-04-11)
 
 **Working in production:**
 - Auth flow: password-first member sign-in, email confirm/reset
@@ -32,8 +34,11 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 - Member-gated RLS policies (tightened to require approved status)
 - Dashboard with resource progress, quiz performance, upcoming sessions, key references
 - Study plan: onboarding, weekly timeline generation, study-time logging (hours, topics, quiz insight, notes)
-- Quizzes: browser, quiz-taking flow, upload (5-option A–E), quiz history, explanation voting
+- Quizzes: browser (mode/domain/status filters, exam sim cooldown), quiz-taking flow (paginated, save/resume, time estimates), upload (5-option A–E), quiz history (stat cards, domain colour, score colour), explanation voting
+- Quiz results: animated score ring, confetti, score tier labels, domain performance bars
 - NPE quiz pipeline: seeded JSON question sets, weekday daily availability, delayed moderator review threads
+- Taxonomy: `lib/npe-taxonomy.ts` as canonical domain source; all quiz/study-plan components use it
+- Quiz progress persistence: `quiz_progress` table + save/resume flow (migration 015)
 - Schedule calendar: exam window markers, ad-hoc sessions
 - Community: channels, thread detail, nested replies, upvotes
 - Resource library: filtering, completion tracking, deep-link support (`/resources?id=...`), signed URL generation
@@ -447,21 +452,20 @@ Progress update (2026-04-10):
 
 ## UX Audit — NPE Study Club
 
-This is the next refactor block after current storage/safeguarding verification work is stable.
+Full audit and refactor spec at `docs/UX_AUDIT_NPE_STUDY_CLUB.md`.
+Second targeted audit completed 2026-04-11 — see updated doc for new findings.
 
-**Source:** `docs/UX_AUDIT_NPE_STUDY_CLUB.md`
-
-### Priority Order
+### Original UX Audit (2026-04-10) — Status
 
 **P1 — Critical**
 - [done] Condition `/auth/request-status` on auth + approval state.
 - [done] Remove organiser-only text from the public request-status page.
-- [in progress] Strip developer-facing error strings from production UI; keep diagnostics internal.
+- [done] Strip developer-facing error strings from production UI; keep diagnostics internal.
 
 **P2 — High**
 - [done] Standardise file actions to `View` or `Download`.
 - [done] Remove the stale Profile progress section.
-- [in progress] Make empty states more inviting and linked.
+- [done] Make empty states more inviting and linked.
 - [done] Simplify the resource search placeholder.
 
 **P3 — Medium**
@@ -472,9 +476,31 @@ This is the next refactor block after current storage/safeguarding verification 
 - [done] Clarify admin approval copy/helper text.
 
 **P4 — Low**
-- Replace dashboard hero subtitle with more useful copy.
+- [pending] Replace dashboard hero subtitle with more useful copy / add "Take today's quiz" CTA to hero.
 - Convert admin reviewed items into a minimal table.
-- Remove or soften the dashboard `ACCOUNT` label.
+- [done] Remove or soften the dashboard `ACCOUNT` label.
+
+### New UX Audit (2026-04-11) — Outstanding Items
+
+**P1 — Blocks core user journey**
+- [ ] Dashboard hero: add "Take today's quiz" CTA (currently only "Open resources" and "Open study plan").
+- [ ] Move exam countdown into the hero section — currently below the fold.
+- [ ] AI disclaimer copy: rewrite "Your feedback tunes the model." → community QA framing (3 locations: intro, results, review).
+- [ ] "View related resources" button on results: change to `Study ${weakestDomain} resources →`.
+- [ ] Quiz tile: make the whole card clickable (`<Link>` wrapper), not just the "Start →" button.
+
+**P2 — Significant friction**
+- [ ] Quiz tile score label: "72% avg" → "Your score: 72%".
+- [ ] "Thumb up" / "Thumb down" text buttons → `ThumbsUp`/`ThumbsDown` lucide icons.
+- [ ] Dashboard "Member access" card: remove — replace with "Jump back in" widget (today's quiz, week focus, days to exam).
+- [ ] Dashboard "Upcoming Sessions" empty state: rewrite to explain sessions are admin-added, not user-added.
+- [ ] Results actions: one filled primary CTA (context-sensitive), rest as ghost links.
+
+**P3 — Polish**
+- [ ] Quiz Browser publishing note: swap `Bot` icon → `CalendarClock` (already done in this session ✅).
+- [ ] Question page transitions: 150ms fade between pages.
+- [ ] Exam sim pagination: replace dot nav with "Page X of Y" + optional minimap for 150Q.
+- [ ] Mobile nav: add `overflow-x-auto` to pill container to prevent wrapping.
 
 ---
 
@@ -492,6 +518,11 @@ These are acknowledged but not scheduled. Do not start without a specific decisi
 | AI-assisted content generation | Deferred — requires paid API; only revisit if local generator stalls |
 | Signed URL latency (resources) | As library grows, per-resource signed URL generation will slow; consider lazy generation or caching |
 | Admin email check centralisation | `lib/admin-access.ts` already exists; member layout re-parses env on every render — consolidate |
+| Exam sim server-side cooldown guard | UI enforces 30-day cooldown but quiz runner page doesn't; a determined user could start a new sim from the URL. Add server-side check in quiz/[id]/page.tsx |
+| Profile page improvements | Render layer underdeveloped — quiz domain performance, resource progress, community activity, account settings all pending (see archived NPE_FEATURE_SPEC.2026-04-09.md §Issue 3) |
+| Schedule: study plan weeks on calendar | Render personal study blocks on schedule calendar (see archived NPE_FEATURE_SPEC.2026-04-09.md §Issue 2) |
+| Schedule: .ics calendar export | iCal download for study plan + sessions (see archived NPE_FEATURE_SPEC.2026-04-09.md §Issue 2) |
+| Landing page: quick links section | AHPRA NPE info, APS resources, registration checklist (see archived NPE_FEATURE_SPEC.2026-04-09.md §Issue 1) |
 
 ---
 
@@ -513,6 +544,9 @@ Before each deploy, verify:
 - [ ] New-user onboarding card appears as first content block for users without a study plan
 - [ ] Community guidelines page accessible from forum header and thread creation form
 - [ ] Thread creation form shows clinical safeguarding banner
+- [ ] Migration 015 (quiz_progress) applied in production
+- [ ] Quiz browser: Daily/Weekly/Exam sim filter renders correctly and exam sim cooldown locks correctly after attempt
+- [ ] Quiz history: stat cards render, domain pills colour-coded, quiz titles are clickable links, scores colour-coded
 
 ---
 

@@ -74,3 +74,50 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 ## Intended Next Step
 
 Use this audit as the next non-quiz refactor block after current production verification and safeguarding work are stable.
+
+---
+
+## Second Audit — 2026-04-11
+
+A targeted audit was conducted against the full app after the quiz taxonomy migration and UX overhaul. New findings below.
+
+### What improved since first audit
+- Quiz browser: domain colour filter pills, mode/status filters, tile completion states, exam sim cooldown.
+- Quiz results: score ring animation, confetti on pass, tier labels, domain performance bars.
+- Quiz history: stat cards, domain colour pills, score colour-coding, clickable titles.
+- Dashboard quiz activity: progress bars, recent attempts list, stat pills.
+- Taxonomy: unified `lib/npe-taxonomy.ts` — all quiz/study-plan components now consistent.
+- Publishing note: CalendarClock icon, exam sim monthly cadence noted.
+
+### Outstanding — P1 (blocks core user journey)
+
+- **Dashboard hero CTA mismatch:** Primary buttons are "Open resources" and "Open study plan" but this is a quiz platform. "Take today's quiz" is not surfaced in the hero at all. Add a quiz shortcut to the hero, remove or demote the "Open resources" button.
+- **Exam countdown below the fold:** Arguably the most motivating element on the page is card 3–4 depending on onboarding state. Move into the hero or the first card below it.
+- **AI disclaimer framing:** "AI-generated. Your feedback tunes the model." appears in 3 places (intro, results, review) and frames the user as a data labeller. Rewrite to: "Questions are AI-generated and reviewed by the study group. If something looks off, you can flag it for discussion."
+- **"View related resources" button:** Doesn't tell the user which domain. Change to `Study ${weakestDomain} resources →`.
+- **Quiz tile not wholly clickable:** Only the "Start →" button navigates. The card itself should be a link.
+
+### Outstanding — P2 (significant friction)
+
+- **Score label ambiguity:** "72% avg" on tiles reads as community average. Rename to "Your score: 72%".
+- **"Thumb up" / "Thumb down" text buttons:** Replace with `ThumbsUp`/`ThumbsDown` from lucide-react.
+- **Dashboard "Member access" card:** Shows email + "Signed in and approved" — zero value. Remove. Replace with "Jump back in" widget: today's quiz link, current week domain focus, days to exam.
+- **Dashboard "Upcoming Sessions" empty state:** "Visit Schedule to add one" is wrong — sessions are admin-added. Rewrite: "No upcoming sessions yet — sessions are added by the study group admin."
+- **Results action buttons:** Flat row of 4 equal-weight buttons. One should be the primary CTA (Retake if failed, Browse if passed), rest as ghost.
+
+### Outstanding — P3 (polish)
+
+- **Page transitions:** 150ms fade between quiz pages.
+- **Exam sim pagination for 150Q:** Dot nav meaningless at 30 pages. Replace with "Page X of Y" + collapsible minimap grid.
+- **Mobile nav wrapping:** Pill nav wraps on small screens. Add `overflow-x-auto` to container as immediate fix.
+
+### Not yet started — from archived specs
+
+The following items from `docs/archive/NPE_FEATURE_SPEC.2026-04-09.md` and `docs/archive/UX_REFACTOR_SPEC_v2.2026-04-09.md` have not been touched:
+
+- **Profile page** (§Issue 3): render layer underdeveloped — quiz domain performance, resource progress, community activity, account settings all missing.
+- **Schedule: study plan weeks on calendar** (§Issue 2): personal study blocks not visible on schedule.
+- **Schedule: session type filter** (§Issue 2): implementation guide exists in `P2_IMPLEMENTATION_GUIDE.2026-04-09.md` but status unclear — verify in code.
+- **Schedule: .ics calendar export** (§Issue 2): not implemented.
+- **Landing page: quick links section** (§Issue 1): not implemented.
+- **Landing page: "how it works" jargon fix** (§Issue 1): status unclear — verify `approved_users` text is gone from public page.
