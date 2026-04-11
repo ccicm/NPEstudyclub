@@ -484,3 +484,55 @@ export async function createQuizAction(formData: FormData) {
   revalidatePath("/quizzes/add");
   redirect("/quizzes?created=1");
 }
+
+// ---------------------------------------------------------------------------
+// Quiz progress — pause / save / resume
+// ---------------------------------------------------------------------------
+
+export async function saveQuizProgressAction(input: {
+  quizId: string;
+  answers: Record<string, number>; // question_id → selected option index
+  currentPage: number;
+}) {
+  if (!input.quizId) return { ok: false as const, error: "invalid_input" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { ok: false as const, error: "not_authenticated" as const };
+
+  const { error } = await supabase.from("quiz_progress").upsert(
+    {
+      user_id: user.id,
+      quiz_id: input.quizId,
+      answers: input.answers,
+      current_page: input.currentPage,
+      saved_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id,quiz_id" },
+  );
+
+  if (error) return { ok: false as const, error: "save_failed" as const };
+  return { ok: true as const };
+}
+
+export async function clearQuizProgressAction(input: { quizId: string }) {
+  if (!input.quizId) return { ok: false as const, error: "invalid_input" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { ok: false as const, error: "not_authenticated" as const };
+
+  await supabase
+    .from("quiz_progress")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("quiz_id", input.quizId);
+
+  return { ok: true as const };
+}

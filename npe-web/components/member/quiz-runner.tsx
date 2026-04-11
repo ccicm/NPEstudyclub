@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Bot } from "lucide-react";
 import {
+  clearQuizProgressAction,
   flagQuestionForReviewAction,
+  saveQuizProgressAction,
   saveQuizResultAction,
   submitQuizOverallFeedbackAction,
   voteExplanationAction,
@@ -57,17 +59,33 @@ function domainColour(label: string | null | undefined) {
   return DOMAIN_COLOURS[key] ?? { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border' };
 }
 
+const PAGE_SIZE = 5;
+
+function getTimeEstimate(deliveryMode: string | null | undefined, questionCount: number): string {
+  if (deliveryMode === "fortnightly") return "3.5 hours";
+  if (deliveryMode === "targeted") return "~20 min";
+  if (deliveryMode === "daily") return "~10 min";
+  return `~${questionCount} min`;
+}
+
 export function QuizRunner({
   quiz,
   questions,
+  savedProgress,
 }: {
-  quiz: { id: string; title: string; domain: string | null; description: string | null };
+  quiz: { id: string; title: string; domain: string | null; description: string | null; delivery_mode?: string | null };
   questions: QuizQuestion[];
+  savedProgress?: { answers: Record<string, number>; currentPage: number } | null;
 }) {
   const [stage, setStage] = useState<Stage>("intro");
-  const [index, setIndex] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(savedProgress?.currentPage ?? 0);
+  // selectedAnswers: question_id → chosen option index (mutable until submit)
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>(
+    savedProgress?.answers ?? {},
+  );
+  // answers: locked in on submit, used by the review section
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [reviewIndex, setReviewIndex] = useState(0);
   const [reviewWrongOnly, setReviewWrongOnly] = useState(true);
   const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
@@ -85,7 +103,9 @@ export function QuizRunner({
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const current = questions[index];
+  const totalPages = Math.ceil(questions.length / PAGE_SIZE);
+  const pageQuestions = questions.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+  const answeredCount = Object.keys(selectedAnswers).length;
 
   const score = useMemo(() => {
     return answers.reduce((sum, answer) => (answer.selected === answer.correct ? sum + 1 : sum), 0);
@@ -148,15 +168,39 @@ export function QuizRunner({
     return wrongOnly.length > 0 ? wrongOnly : pairs;
   }, [answers, questions, reviewWrongOnly]);
 
-  const submitResult = (finalAnswers: AnswerRecord[]) => {
-    const finalScore = finalAnswers.reduce((sum, answer) => (answer.selected === answer.correct ? sum + 1 : sum), 0);
+  const handleSubmit = () => {
+    const finalAnswers: AnswerRecord[] = questions.map((q) => ({
+      question_id: q.id,
+      selected: selectedAnswers[q.id] ?? -1,
+      correct: q.correct_index,
+    }));
+    setAnswers(finalAnswers);
+    setReviewWrongOnly(true);
+    setReviewIndex(0);
+    setStage("results");
+    const finalScore = finalAnswers.filter((a) => a.selected === a.correct).length;
     startTransition(async () => {
-      await saveQuizResultAction({
+      await Promise.all([
+        saveQuizResultAction({
+          quizId: quiz.id,
+          score: finalScore,
+          totalQuestions: questions.length,
+          answers: finalAnswers,
+        }),
+        clearQuizProgressAction({ quizId: quiz.id }),
+      ]);
+    });
+  };
+
+  const handleSaveExit = () => {
+    setSaveStatus("saving");
+    startTransition(async () => {
+      await saveQuizProgressAction({
         quizId: quiz.id,
-        score: finalScore,
-        totalQuestions: questions.length,
-        answers: finalAnswers,
+        answers: selectedAnswers,
+        currentPage,
       });
+      setSaveStatus("saved");
     });
   };
 
@@ -228,6 +272,8 @@ export function QuizRunner({
   }
 
   if (stage === "intro") {
+    const isResume = Boolean(savedProgress && Object.keys(savedProgress.answers).length > 0);
+    const timeEstimate = getTimeEstimate(quiz.delivery_mode, questions.length);
     return (
       <div className="rounded-2xl border bg-card p-6">
         <h1 className="text-3xl">{quiz.title}</h1>
@@ -237,14 +283,36 @@ export function QuizRunner({
           <Bot className="h-4 w-4" />
           AI-generated. Your feedback tunes the model.
         </p>
-        <p className="mt-4 text-sm">{questions.length} questions · ~{questions.length} mins</p>
-        <button
-          type="button"
-          onClick={() => setStage("question")}
-          className="mt-5 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-        >
-          Start quiz
-        </button>
+        <p className="mt-4 text-sm">
+          {questions.length} questions · {timeEstimate}
+        </p>
+        {isResume ? (
+          <p className="mt-2 text-xs text-amber-700">
+            You have a saved attempt — {Object.keys(savedProgress!.answers).length} of {questions.length} answered.
+          </p>
+        ) : null}
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setStage("question")}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            {isResume ? "Resume" : "Start quiz"}
+          </button>
+          {isResume ? (
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentPage(0);
+                setSelectedAnswers({});
+                setStage("question");
+              }}
+              className="rounded-md border px-4 py-2 text-sm"
+            >
+              Start fresh
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   }
@@ -278,9 +346,8 @@ export function QuizRunner({
               type="button"
               className="rounded-md border px-3 py-2"
               onClick={() => {
-                setStage("question");
-                setIndex(0);
-                setSelectedIndex(null);
+                setCurrentPage(0);
+                setSelectedAnswers({});
                 setAnswers([]);
                 setReviewIndex(0);
                 setReviewWrongOnly(true);
@@ -297,6 +364,8 @@ export function QuizRunner({
                 });
                 setOverallFeedbackSubmitted(false);
                 setFeedbackMessage(null);
+                setSaveStatus("idle");
+                setStage("question");
               }}
             >
               Retake
@@ -624,57 +693,128 @@ export function QuizRunner({
     );
   }
 
+  // ── Question stage (paginated) ──────────────────────────────────────────
+  const isLastPage = currentPage === totalPages - 1;
+  const showPageDots = totalPages <= 12;
+
   return (
-    <div className="rounded-2xl border bg-card p-6">
-      <p className="text-sm text-muted-foreground">
-        Q{index + 1} of {questions.length}
-      </p>
-      <h1 className="mt-3 text-2xl leading-tight">{current.question_text}</h1>
-
-      <div className="mt-4 grid gap-2">
-        {current.options.map((option, optionIndex) => {
-          const selected = selectedIndex === optionIndex;
-
-          return (
+    <div className="space-y-4">
+      {/* Progress bar + save */}
+      <div className="rounded-2xl border bg-card px-5 py-3">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>Page {currentPage + 1} of {totalPages}</span>
+          <span>{answeredCount} / {questions.length} answered</span>
+        </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-1.5 rounded-full bg-primary transition-all"
+            style={{ width: `${questions.length > 0 ? (answeredCount / questions.length) * 100 : 0}%` }}
+          />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          {saveStatus === "saved" ? (
+            <>
+              <span className="text-xs text-emerald-600">Progress saved.</span>
+              <Link href="/quizzes" className="text-xs underline text-muted-foreground">Back to quizzes</Link>
+            </>
+          ) : (
             <button
-              key={`${current.id}-${option.label}`}
               type="button"
-              onClick={() => setSelectedIndex(optionIndex)}
-              className={`rounded-md border px-3 py-2 text-left text-sm ${selected ? "border-primary bg-primary/5" : "bg-background"}`}
+              onClick={handleSaveExit}
+              disabled={isPending || saveStatus === "saving"}
+              className="rounded-md border px-3 py-1 text-xs disabled:opacity-50"
             >
-              <span className="font-semibold">{option.label}.</span> {option.text}
+              {saveStatus === "saving" ? "Saving…" : "Save & Exit"}
             </button>
-          );
-        })}
+          )}
+        </div>
       </div>
 
-      <div className="mt-4">
+      {/* Questions on this page */}
+      {pageQuestions.map((question, qIdx) => {
+        const globalIdx = currentPage * PAGE_SIZE + qIdx;
+        const selected = selectedAnswers[question.id];
+        return (
+          <div key={question.id} className="rounded-2xl border bg-card p-6">
+            <p className="text-xs text-muted-foreground">Q{globalIdx + 1} of {questions.length}</p>
+            <p className="mt-3 text-base leading-snug font-medium">{question.question_text}</p>
+            <div className="mt-4 grid gap-2">
+              {question.options.map((option, optIdx) => (
+                <button
+                  key={`${question.id}-${option.label}`}
+                  type="button"
+                  onClick={() =>
+                    setSelectedAnswers((prev) => ({ ...prev, [question.id]: optIdx }))
+                  }
+                  className={`rounded-md border px-3 py-2 text-left text-sm ${
+                    selected === optIdx ? "border-primary bg-primary/5" : "bg-background"
+                  }`}
+                >
+                  <span className="font-semibold">{option.label}.</span> {option.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Page navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-sm">
         <button
           type="button"
-          disabled={selectedIndex === null}
-          onClick={() => {
-            const nextAnswers = [
-              ...answers,
-              { question_id: current.id, selected: selectedIndex ?? 0, correct: current.correct_index },
-            ];
-
-            if (index + 1 === questions.length) {
-              setAnswers(nextAnswers);
-              setReviewWrongOnly(true);
-              setReviewIndex(0);
-              setStage("results");
-              submitResult(nextAnswers);
-              return;
-            }
-
-            setAnswers(nextAnswers);
-            setIndex((value) => value + 1);
-            setSelectedIndex(null);
-          }}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+          onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+          disabled={currentPage === 0}
+          className="rounded-md border px-3 py-2 disabled:opacity-40"
         >
-          {index + 1 === questions.length ? "Submit quiz" : "Next question"}
+          ← Previous
         </button>
+
+        {showPageDots ? (
+          <div className="flex flex-wrap gap-1">
+            {Array.from({ length: totalPages }, (_, i) => {
+              const pageAnswered = questions
+                .slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE)
+                .every((q) => selectedAnswers[q.id] !== undefined);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setCurrentPage(i)}
+                  className={`h-7 w-7 rounded text-xs font-medium ${
+                    i === currentPage
+                      ? "bg-primary text-primary-foreground"
+                      : pageAnswered
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "border bg-background text-muted-foreground"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">Page {currentPage + 1} / {totalPages}</span>
+        )}
+
+        {isLastPage ? (
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={answeredCount === 0}
+            className="rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            Submit quiz
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+            className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground"
+          >
+            Next →
+          </button>
+        )}
       </div>
     </div>
   );

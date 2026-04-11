@@ -91,6 +91,24 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     questionsData = (withOptionalFields.data as QuizQuestionRow[] | null) ?? [];
   }
 
+  // Load any saved in-progress state for this user+quiz.
+  let savedProgress: { answers: Record<string, number>; currentPage: number } | null = null;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: progress } = await supabase
+      .from("quiz_progress")
+      .select("answers,current_page")
+      .eq("user_id", user.id)
+      .eq("quiz_id", id)
+      .maybeSingle();
+    if (progress && progress.answers && typeof progress.answers === "object") {
+      savedProgress = {
+        answers: progress.answers as Record<string, number>,
+        currentPage: Number(progress.current_page ?? 0),
+      };
+    }
+  }
+
   const preparedQuestions = questionsData.map((question) => ({
     id: question.id,
     question_text: question.question_text,
@@ -112,5 +130,11 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     difficulty_seed: typeof question.difficulty_seed === "string" ? question.difficulty_seed : null,
   }));
 
-  return <QuizRunner quiz={quiz} questions={preparedQuestions} />;
+  return (
+    <QuizRunner
+      quiz={quiz}
+      questions={preparedQuestions}
+      savedProgress={savedProgress}
+    />
+  );
 }
