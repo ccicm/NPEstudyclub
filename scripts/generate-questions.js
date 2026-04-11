@@ -256,6 +256,12 @@ function makeQuestion(template, domain, domainLabel, mode, dateSeed, index) {
     throw new Error(`Could not place correct answer for domain ${domain}, question ${index}`);
   }
 
+  const difficultyPoolByMode = {
+    daily: ['standard', 'standard', 'challenging', 'challenging', 'advanced'],
+    targeted: ['challenging', 'challenging', 'advanced', 'advanced', 'standard'],
+    fortnightly: ['challenging', 'challenging', 'advanced', 'advanced', 'advanced', 'standard'],
+  };
+
   return validateQuestion(
     {
       domain,
@@ -267,10 +273,17 @@ function makeQuestion(template, domain, domainLabel, mode, dateSeed, index) {
       correct_explanation: built.correct_explanation({ rng, variantRng }),
       distractor_explanations: remappedDistractors,
       citations: template.citations,
-      difficulty_seed: pick(rng, ['standard', 'standard', 'standard', 'challenging', 'challenging', 'advanced']),
+      difficulty_seed: pick(rng, difficultyPoolByMode[mode] || difficultyPoolByMode.daily),
     },
     index,
   );
+}
+
+function normalizeStem(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function validateQuestion(q, index) {
@@ -846,6 +859,7 @@ async function generateForDomain(domainSpec, mode, offset, dateSeed, recentHisto
   const recentlyUsed = new Set();
   const recentlySeenSubdomains = recentHistoryByDomain.get(domainSpec.domain) || new Set();
   const questions = [];
+  const usedStems = new Set();
   for (let index = 0; index < domainSpec.count; index += 1) {
     if (recentlyUsed.size === bank.length) {
       recentlyUsed.clear();
@@ -867,11 +881,50 @@ async function generateForDomain(domainSpec, mode, offset, dateSeed, recentHisto
       guard += 1;
     }
 
-    const template = bank[templateIndex];
-    recentlyUsed.add(templateIndex);
-    recentlySeenSubdomains.add(String(template.subdomain || '').toLowerCase());
+    let acceptedQuestion = null;
+    let variantAttempt = 0;
+
+    while (variantAttempt < 12) {
+      const template = bank[templateIndex];
+      const candidate = makeQuestion(
+        template,
+        domainSpec.domain,
+        domainSpec.domain_label,
+        mode,
+        dateSeed,
+        offset + index + variantAttempt * 997,
+      );
+
+      const stemKey = normalizeStem(candidate.question);
+      if (!usedStems.has(stemKey)) {
+        acceptedQuestion = candidate;
+        usedStems.add(stemKey);
+        recentlyUsed.add(templateIndex);
+        recentlySeenSubdomains.add(String(template.subdomain || '').toLowerCase());
+        break;
+      }
+
+      templateIndex = Math.floor(templateRng() * bank.length);
+      variantAttempt += 1;
+    }
+
+    if (!acceptedQuestion) {
+      const fallbackTemplate = bank[templateIndex];
+      acceptedQuestion = makeQuestion(
+        fallbackTemplate,
+        domainSpec.domain,
+        domainSpec.domain_label,
+        mode,
+        dateSeed,
+        offset + index + 9913,
+      );
+      usedStems.add(normalizeStem(acceptedQuestion.question));
+      recentlyUsed.add(templateIndex);
+      recentlySeenSubdomains.add(String(fallbackTemplate.subdomain || '').toLowerCase());
+    }
+
     console.log(`Generating question ${index + 1}/${domainSpec.count} for Domain ${domainSpec.domain}: ${domainSpec.domain_label}...`);
-    questions.push(makeQuestion(template, domainSpec.domain, domainSpec.domain_label, mode, dateSeed, offset + index));
+    questions.push(acceptedQuestion);
   }
 
   return questions;

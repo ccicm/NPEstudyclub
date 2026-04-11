@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Bot } from "lucide-react";
-import { flagQuestionForReviewAction, saveQuizResultAction, voteExplanationAction } from "@/app/(member)/quizzes/actions";
+import {
+  flagQuestionForReviewAction,
+  saveQuizResultAction,
+  submitQuizOverallFeedbackAction,
+  voteExplanationAction,
+} from "@/app/(member)/quizzes/actions";
 
 type QuizQuestion = {
   id: string;
@@ -43,12 +48,19 @@ export function QuizRunner({
   const [stage, setStage] = useState<Stage>("intro");
   const [index, setIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [revealed, setRevealed] = useState(false);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [reviewIndex, setReviewIndex] = useState(0);
   const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
   const [checkedSources, setCheckedSources] = useState<Record<string, boolean>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Record<string, boolean>>({});
+  const [overallFeedback, setOverallFeedback] = useState({
+    difficultyScore: 3,
+    varietyScore: 3,
+    clarityScore: 3,
+    relevanceScore: 3,
+    comment: "",
+  });
+  const [overallFeedbackSubmitted, setOverallFeedbackSubmitted] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -59,6 +71,33 @@ export function QuizRunner({
   }, [answers]);
 
   const percent = questions.length ? Math.round((score / questions.length) * 100) : 0;
+
+  const domainPerformance = useMemo(() => {
+    const byId = new Map(questions.map((question) => [question.id, question]));
+    const stats = new Map<string, { correct: number; total: number }>();
+
+    for (const answer of answers) {
+      const question = byId.get(answer.question_id);
+      const domain = question?.domain_label || question?.subdomain || "General";
+      const currentStats = stats.get(domain) || { correct: 0, total: 0 };
+      currentStats.total += 1;
+      if (answer.selected === answer.correct) {
+        currentStats.correct += 1;
+      }
+      stats.set(domain, currentStats);
+    }
+
+    return Array.from(stats.entries())
+      .map(([domain, values]) => ({
+        domain,
+        correct: values.correct,
+        total: values.total,
+        percent: values.total > 0 ? Math.round((values.correct / values.total) * 100) : 0,
+      }))
+      .sort((a, b) => a.percent - b.percent);
+  }, [answers, questions]);
+
+  const weakestDomain = domainPerformance[0]?.domain || quiz.domain || "";
 
   const submitResult = (finalAnswers: AnswerRecord[]) => {
     const finalScore = finalAnswers.reduce((sum, answer) => (answer.selected === answer.correct ? sum + 1 : sum), 0);
@@ -102,6 +141,28 @@ export function QuizRunner({
 
       setFlaggedQuestions((previous) => ({ ...previous, [questionId]: true }));
       setFeedbackMessage("Thanks. This question has been flagged for review.");
+    });
+  };
+
+  const submitOverallFeedback = () => {
+    setFeedbackMessage(null);
+    startTransition(async () => {
+      const result = await submitQuizOverallFeedbackAction({
+        quizId: quiz.id,
+        difficultyScore: overallFeedback.difficultyScore,
+        varietyScore: overallFeedback.varietyScore,
+        clarityScore: overallFeedback.clarityScore,
+        relevanceScore: overallFeedback.relevanceScore,
+        comment: overallFeedback.comment,
+      });
+
+      if (!result.ok) {
+        setFeedbackMessage("Could not save overall feedback right now.");
+        return;
+      }
+
+      setOverallFeedbackSubmitted(true);
+      setFeedbackMessage("Thanks. Your overall feedback has been recorded.");
     });
   };
 
@@ -167,12 +228,19 @@ export function QuizRunner({
                 setStage("question");
                 setIndex(0);
                 setSelectedIndex(null);
-                setRevealed(false);
                 setAnswers([]);
                 setReviewIndex(0);
                 setFeedbackVotes({});
                 setCheckedSources({});
                 setFlaggedQuestions({});
+                setOverallFeedback({
+                  difficultyScore: 3,
+                  varietyScore: 3,
+                  clarityScore: 3,
+                  relevanceScore: 3,
+                  comment: "",
+                });
+                setOverallFeedbackSubmitted(false);
                 setFeedbackMessage(null);
               }}
             >
@@ -181,7 +249,7 @@ export function QuizRunner({
             <Link href="/quizzes" className="rounded-md border px-3 py-2">
               Browse more quizzes
             </Link>
-            <Link href={`/resources?domain=${encodeURIComponent(quiz.domain || "")}`} className="rounded-md border px-3 py-2">
+            <Link href={`/resources?domain=${encodeURIComponent(weakestDomain)}`} className="rounded-md border px-3 py-2">
               View related resources
             </Link>
             <Link href="/quizzes/results" className="rounded-md border px-3 py-2">
@@ -189,6 +257,19 @@ export function QuizRunner({
             </Link>
           </div>
           {isPending ? <p className="mt-3 text-xs text-muted-foreground">Saving result...</p> : null}
+
+          {domainPerformance.length > 0 ? (
+            <div className="mt-4 rounded-lg border bg-background p-3 text-sm">
+              <p className="font-medium">Domain performance</p>
+              <div className="mt-2 space-y-1 text-muted-foreground">
+                {domainPerformance.map((item) => (
+                  <p key={item.domain}>
+                    {item.domain} · {item.percent}% ({item.correct}/{item.total})
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="rounded-2xl border bg-card p-6">
@@ -347,12 +428,71 @@ export function QuizRunner({
                   Next
                 </button>
               ) : (
-                <Link href="/quizzes" className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground">
-                  Done
-                </Link>
+                <button
+                  type="button"
+                  onClick={submitOverallFeedback}
+                  disabled={overallFeedbackSubmitted}
+                  className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground disabled:opacity-60"
+                >
+                  {overallFeedbackSubmitted ? "Feedback submitted" : "Submit overall feedback"}
+                </button>
               )}
             </div>
           </div>
+
+          {allRated ? (
+            <div className="rounded-2xl border bg-card p-6">
+              <h3 className="text-lg font-semibold">Overall AI Quiz Feedback</h3>
+              <p className="mt-1 text-xs text-muted-foreground">Optional but highly useful for tuning quality.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {[
+                  ["difficultyScore", "Difficulty"],
+                  ["varietyScore", "Variety"],
+                  ["clarityScore", "Clarity"],
+                  ["relevanceScore", "Relevance"],
+                ].map(([field, label]) => (
+                  <label key={field} className="grid gap-1 text-sm">
+                    <span>{label} (1-5)</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={5}
+                      value={overallFeedback[field as keyof typeof overallFeedback] as number}
+                      onChange={(event) =>
+                        setOverallFeedback((prev) => ({
+                          ...prev,
+                          [field]: Math.max(1, Math.min(5, Number(event.target.value) || 1)),
+                        }))
+                      }
+                      className="h-10 rounded-md border bg-background px-3"
+                    />
+                  </label>
+                ))}
+              </div>
+              <label className="mt-3 grid gap-1 text-sm">
+                <span>Comment (optional)</span>
+                <textarea
+                  value={overallFeedback.comment}
+                  onChange={(event) => setOverallFeedback((prev) => ({ ...prev, comment: event.target.value }))}
+                  rows={3}
+                  className="rounded-md border bg-background px-3 py-2"
+                />
+              </label>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={submitOverallFeedback}
+                  disabled={overallFeedbackSubmitted}
+                  className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+                >
+                  {overallFeedbackSubmitted ? "Submitted" : "Submit"}
+                </button>
+                <Link href="/quizzes" className="rounded-md border px-3 py-2 text-sm">
+                  Done
+                </Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -368,27 +508,13 @@ export function QuizRunner({
       <div className="mt-4 grid gap-2">
         {current.options.map((option, optionIndex) => {
           const selected = selectedIndex === optionIndex;
-          const correct = revealed && optionIndex === current.correct_index;
-          const selectedWrong = revealed && selected && optionIndex !== current.correct_index;
 
           return (
             <button
               key={`${current.id}-${option.label}`}
               type="button"
-              onClick={() => {
-                if (!revealed) {
-                  setSelectedIndex(optionIndex);
-                }
-              }}
-              className={`rounded-md border px-3 py-2 text-left text-sm ${
-                correct
-                  ? "border-green-600 bg-green-50"
-                  : selectedWrong
-                    ? "border-red-600 bg-red-50"
-                    : selected
-                      ? "border-primary bg-primary/5"
-                      : "bg-background"
-              }`}
+              onClick={() => setSelectedIndex(optionIndex)}
+              className={`rounded-md border px-3 py-2 text-left text-sm ${selected ? "border-primary bg-primary/5" : "bg-background"}`}
             >
               <span className="font-semibold">{option.label}.</span> {option.text}
             </button>
@@ -396,51 +522,32 @@ export function QuizRunner({
         })}
       </div>
 
-      {!revealed ? (
+      <div className="mt-4">
         <button
           type="button"
           disabled={selectedIndex === null}
-          onClick={() => setRevealed(true)}
-          className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
-        >
-          Check answer
-        </button>
-      ) : (
-        <div className="mt-4 space-y-3">
-          {selectedIndex !== current.correct_index ? (
-            <p className="text-sm text-muted-foreground">
-              Correct answer: {current.options[current.correct_index]?.label}. {current.options[current.correct_index]?.text}
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">Correct.</p>
-          )}
-          {current.explanation ? <p className="text-sm text-muted-foreground">{current.explanation}</p> : null}
-          <button
-            type="button"
-            onClick={() => {
-              const nextAnswers = [
-                ...answers,
-                { question_id: current.id, selected: selectedIndex ?? 0, correct: current.correct_index },
-              ];
+          onClick={() => {
+            const nextAnswers = [
+              ...answers,
+              { question_id: current.id, selected: selectedIndex ?? 0, correct: current.correct_index },
+            ];
 
-              if (index + 1 === questions.length) {
-                setAnswers(nextAnswers);
-                setStage("results");
-                submitResult(nextAnswers);
-                return;
-              }
-
+            if (index + 1 === questions.length) {
               setAnswers(nextAnswers);
-              setIndex((value) => value + 1);
-              setSelectedIndex(null);
-              setRevealed(false);
-            }}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-          >
-            {index + 1 === questions.length ? "View results" : "Next question"}
-          </button>
-        </div>
-      )}
+              setStage("results");
+              submitResult(nextAnswers);
+              return;
+            }
+
+            setAnswers(nextAnswers);
+            setIndex((value) => value + 1);
+            setSelectedIndex(null);
+          }}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+        >
+          {index + 1 === questions.length ? "Submit quiz" : "Next question"}
+        </button>
+      </div>
     </div>
   );
 }

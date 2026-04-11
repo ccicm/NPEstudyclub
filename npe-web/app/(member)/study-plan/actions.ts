@@ -75,6 +75,39 @@ async function loadDomainPerformance(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
 ): Promise<Map<string, number>> {
+  const fromQuestionPerformance = new Map<string, number>();
+
+  const { data: performanceRows, error: performanceError } = await supabase
+    .from("user_performance")
+    .select("domain_label,attempts,correct_responses")
+    .eq("user_id", userId);
+
+  if (!performanceError && performanceRows?.length) {
+    const totals = new Map<string, { correct: number; attempts: number }>();
+
+    performanceRows.forEach((row) => {
+      const key = normalizeDomain(row.domain_label);
+      if (!key) {
+        return;
+      }
+
+      const current = totals.get(key) ?? { correct: 0, attempts: 0 };
+      current.correct += Number(row.correct_responses || 0);
+      current.attempts += Number(row.attempts || 0);
+      totals.set(key, current);
+    });
+
+    totals.forEach((value, domain) => {
+      if (value.attempts > 0) {
+        fromQuestionPerformance.set(domain, (value.correct / value.attempts) * 100);
+      }
+    });
+
+    if (fromQuestionPerformance.size > 0) {
+      return fromQuestionPerformance;
+    }
+  }
+
   const { data } = await supabase
     .from("quiz_results")
     .select("score,total_questions,quizzes(domain)")

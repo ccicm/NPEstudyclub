@@ -47,9 +47,73 @@ export async function saveQuizResultAction(input: {
     answers: input.answers,
   });
 
+  const optionLabels = ["A", "B", "C", "D", "E"] as const;
+  const responseRows = input.answers
+    .map((answer) => ({
+      user_id: user.id,
+      quiz_id: input.quizId,
+      question_id: answer.question_id,
+      selected_answer: optionLabels[answer.selected],
+      set_id: input.quizId,
+    }))
+    .filter((row) => Boolean(row.selected_answer));
+
+  if (responseRows.length > 0) {
+    await supabase.from("user_responses").insert(responseRows);
+  }
+
   revalidatePath("/quizzes");
   revalidatePath("/quizzes/results");
   revalidatePath("/profile");
+}
+
+export async function submitQuizOverallFeedbackAction(input: {
+  quizId: string;
+  difficultyScore: number;
+  varietyScore: number;
+  clarityScore: number;
+  relevanceScore: number;
+  comment?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false as const, error: "not_authenticated" as const };
+  }
+
+  const scores = [input.difficultyScore, input.varietyScore, input.clarityScore, input.relevanceScore];
+  if (!input.quizId || scores.some((score) => !Number.isInteger(score) || score < 1 || score > 5)) {
+    return { ok: false as const, error: "invalid_input" as const };
+  }
+
+  const { error } = await supabase.from("quiz_overall_feedback").upsert(
+    {
+      quiz_id: input.quizId,
+      user_id: user.id,
+      difficulty_score: input.difficultyScore,
+      variety_score: input.varietyScore,
+      clarity_score: input.clarityScore,
+      relevance_score: input.relevanceScore,
+      comment: (input.comment || "").trim() || null,
+    },
+    { onConflict: "quiz_id,user_id" },
+  );
+
+  if (error) {
+    const classified = classifyError(error.message || "");
+    if (classified) {
+      return { ok: false as const, error: classified };
+    }
+    return { ok: false as const, error: "save_feedback" as const };
+  }
+
+  revalidatePath("/quizzes/results");
+  revalidatePath("/profile");
+
+  return { ok: true as const };
 }
 
 export async function voteExplanationAction(input: {
