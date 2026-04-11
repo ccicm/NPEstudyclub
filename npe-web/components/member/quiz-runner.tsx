@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Bot } from "lucide-react";
-import { saveQuizResultAction, voteExplanationAction } from "@/app/(member)/quizzes/actions";
+import { flagQuestionForReviewAction, saveQuizResultAction, voteExplanationAction } from "@/app/(member)/quizzes/actions";
 
 type QuizQuestion = {
   id: string;
@@ -48,6 +48,7 @@ export function QuizRunner({
   const [reviewIndex, setReviewIndex] = useState(0);
   const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
   const [checkedSources, setCheckedSources] = useState<Record<string, boolean>>({});
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Record<string, boolean>>({});
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -82,6 +83,25 @@ export function QuizRunner({
         return;
       }
       setFeedbackMessage("Thanks. Your explanation feedback has been recorded.");
+    });
+  };
+
+  const submitFlagForReview = (questionId: string, checkedSource: boolean) => {
+    setFeedbackMessage(null);
+
+    startTransition(async () => {
+      const result = await flagQuestionForReviewAction({
+        questionId,
+        reason: checkedSource ? "member_checked_source" : "member_disagrees_with_explanation",
+      });
+
+      if (!result.ok) {
+        setFeedbackMessage("Could not flag this question right now.");
+        return;
+      }
+
+      setFlaggedQuestions((previous) => ({ ...previous, [questionId]: true }));
+      setFeedbackMessage("Thanks. This question has been flagged for review.");
     });
   };
 
@@ -152,6 +172,7 @@ export function QuizRunner({
                 setReviewIndex(0);
                 setFeedbackVotes({});
                 setCheckedSources({});
+                setFlaggedQuestions({});
                 setFeedbackMessage(null);
               }}
             >
@@ -275,6 +296,16 @@ export function QuizRunner({
                   <Link href="/community" className="mt-2 inline-block text-xs underline">
                     Open community review board
                   </Link>
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={() => submitFlagForReview(reviewQuestion.id, Boolean(checkedSources[reviewQuestion.id]))}
+                      disabled={Boolean(flaggedQuestions[reviewQuestion.id])}
+                      className="rounded-md border px-2 py-1 text-xs disabled:opacity-60"
+                    >
+                      {flaggedQuestions[reviewQuestion.id] ? "Flagged for review" : "Flag for review"}
+                    </button>
+                  </div>
 
                   <div className="mt-3 rounded-md border bg-white/70 p-2 text-xs text-amber-950">
                     <p className="font-medium">Incorrect option review</p>

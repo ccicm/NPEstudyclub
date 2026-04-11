@@ -92,6 +92,49 @@ export async function voteExplanationAction(input: {
   return { ok: true as const };
 }
 
+export async function flagQuestionForReviewAction(input: {
+  questionId: string;
+  reason?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false as const, error: "not_authenticated" as const };
+  }
+
+  if (!input.questionId) {
+    return { ok: false as const, error: "invalid_input" as const };
+  }
+
+  const reason = (input.reason || "").trim();
+
+  const { error } = await supabase.from("question_flags").upsert(
+    {
+      user_id: user.id,
+      question_id: input.questionId,
+      reason: reason || null,
+    },
+    { onConflict: "user_id,question_id" },
+  );
+
+  if (error) {
+    const classified = classifyError(error.message || "");
+    if (classified) {
+      return { ok: false as const, error: classified };
+    }
+    return { ok: false as const, error: "save_flag" as const };
+  }
+
+  revalidatePath("/quizzes");
+  revalidatePath("/quizzes/results");
+  revalidatePath("/community");
+
+  return { ok: true as const };
+}
+
 export async function createQuizAction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const category = String(formData.get("category") || "").trim();

@@ -2,6 +2,45 @@ import { notFound } from "next/navigation";
 import { QuizRunner } from "@/components/member/quiz-runner";
 import { createClient } from "@/lib/supabase/server";
 
+type Citation = {
+  source: string;
+  clause?: string | null;
+  external_url?: string | null;
+  resource_id?: string | null;
+};
+
+function normalizeCitations(value: unknown): Citation[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        return { source: item };
+      }
+
+      if (item && typeof item === "object" && typeof (item as { source?: unknown }).source === "string") {
+        const citation = item as {
+          source: string;
+          clause?: unknown;
+          external_url?: unknown;
+          resource_id?: unknown;
+        };
+
+        return {
+          source: citation.source,
+          clause: typeof citation.clause === "string" ? citation.clause : null,
+          external_url: typeof citation.external_url === "string" ? citation.external_url : null,
+          resource_id: typeof citation.resource_id === "string" ? citation.resource_id : null,
+        };
+      }
+
+      return null;
+    })
+    .filter((citation): citation is Citation => Boolean(citation));
+}
+
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -63,14 +102,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     domain_number: question.domain_number ?? null,
     domain_label: question.domain_label ?? null,
     subdomain: question.subdomain ?? null,
-    citations: Array.isArray(question.citations)
-      ? (question.citations as Array<{
-          source: string;
-          clause?: string | null;
-          external_url?: string | null;
-          resource_id?: string | null;
-        }>).filter((citation) => citation && typeof citation.source === "string")
-      : [],
+    citations: normalizeCitations(question.citations),
     wrong_answer_rationales:
       question.wrong_answer_rationales && typeof question.wrong_answer_rationales === "object"
         ? (question.wrong_answer_rationales as Record<string, string>)
