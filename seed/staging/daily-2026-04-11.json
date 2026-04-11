@@ -1,0 +1,120 @@
+{
+  "set_id": "daily-2026-04-11",
+  "mode": "daily",
+  "generated_at": "2026-04-11T04:07:50.721Z",
+  "question_count": 4,
+  "questions": [
+    {
+      "domain": 1,
+      "domain_label": "Ethics",
+      "subdomain": "Duty of care and boundaries",
+      "question": "A provisional psychologist in a community health service notices a client has become increasingly hopeless and mentioned giving away possessions. The client ends the session before a formal risk review can be completed. What is the most appropriate next step?",
+      "options": {
+        "A": "Send a text asking the client to confirm they are safe and stop there.",
+        "B": "Document the presentation and assume the client will rebook if needed.",
+        "C": "Initiate urgent follow-up using the clinic risk pathway and supervisor review.",
+        "D": "Wait until the next booked session so the client can settle.",
+        "E": "Contact the police immediately without any further assessment."
+      },
+      "correct_answer": "C",
+      "correct_explanation": "Hopelessness plus possible preparatory behaviour requires active follow-up. A provisional psychologist should use the risk pathway, seek supervision, and take reasonable steps promptly.",
+      "distractor_explanations": {
+        "A": "A text alone is not an adequate risk management response.",
+        "B": "Documentation is necessary but not a substitute for active risk management.",
+        "D": "Delaying follow-up may miss a potentially acute risk window.",
+        "E": "Police contact is not the automatic first step unless immediate danger is clearly present."
+      },
+      "citations": [
+        "APS Code of Ethics (2007, amended 2023), Principle B.1 — Propriety",
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 2,
+      "domain_label": "Assessment",
+      "subdomain": "Risk and urgency",
+      "question": "A client reports that they have a firearm at home, have been drinking heavily, and are angry after a relationship breakup. They say they are \"not sure what I might do tonight\". What is the priority?",
+      "options": {
+        "A": "Take a note and reassess at the next session if the client survives the night.",
+        "B": "Focus on substance use first and ignore the weapon access until later.",
+        "C": "End the session once the client says they do not want hospitalisation.",
+        "D": "Assume the client is only venting because they have not named a specific target.",
+        "E": "Conduct immediate high-risk management, including emergency escalation and supervision."
+      },
+      "correct_answer": "E",
+      "correct_explanation": "Access to means, intoxication, and uncertainty about imminent behaviour converge to create an acute high-risk presentation.",
+      "distractor_explanations": {
+        "A": "Delaying action is unsafe when the risk is immediate.",
+        "B": "Substance use may be relevant, but it is not the immediate priority in this scenario.",
+        "C": "Client refusal does not remove the clinician's duty to respond to imminent risk.",
+        "D": "The absence of a named target does not reduce the seriousness of the threat."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 4 — Providing good care",
+        "Health Practitioner Regulation National Law, Section 140 — Mandatory notifications"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 3,
+      "domain_label": "Interventions",
+      "subdomain": "Group therapy",
+      "question": "A provisional psychologist is co-facilitating a skills group. One participant starts giving detailed advice about another participant's personal situation. What is the best facilitator response?",
+      "options": {
+        "A": "Redirect to group rules, protect boundaries, and reinforce respectful participation.",
+        "B": "Ignore it because the group will self-correct over time.",
+        "C": "Allow the discussion because peer support is always therapeutic.",
+        "D": "Share the other participant's notes so the group can understand the context.",
+        "E": "Ask the participant to leave without any explanation."
+      },
+      "correct_answer": "A",
+      "correct_explanation": "Facilitators should maintain a safe and respectful group frame and reinforce boundaries.",
+      "distractor_explanations": {
+        "B": "Ignoring boundary issues can destabilise the group.",
+        "C": "Peer support is useful, but uncontained advice can become harmful.",
+        "D": "Sharing another member's notes breaches privacy and trust.",
+        "E": "Removal may be disproportionate unless the disruption is serious and repeated."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 7 — Collaboration and teamwork",
+        "APS Code of Ethics (2007, amended 2023), Principle A.1 — General Respect"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    },
+    {
+      "domain": 4,
+      "domain_label": "Communication",
+      "subdomain": "Court and medicolegal communication",
+      "question": "A psychologist receives a subpoena for records and is unsure whether they can refuse because the notes contain sensitive third-party information. What is the most appropriate first step?",
+      "options": {
+        "A": "Ignore the subpoena unless the client asks about it.",
+        "B": "Destroy the notes before the hearing date.",
+        "C": "Release everything immediately without checking the scope.",
+        "D": "Seek legal/supervisory advice and review what must be disclosed under the order.",
+        "E": "Refuse to comply because third-party material is always protected."
+      },
+      "correct_answer": "D",
+      "correct_explanation": "A subpoena requires careful review of scope and legal obligations.",
+      "distractor_explanations": {
+        "A": "Ignoring a subpoena can create legal risk.",
+        "B": "Destroying records is inappropriate and potentially unlawful.",
+        "C": "Disclosure should be limited to the scope of the order and lawful exceptions.",
+        "E": "Third-party material may need careful handling, but it does not automatically nullify the subpoena."
+      },
+      "citations": [
+        "Psychology Board of Australia Code of Conduct (2020), Section 8 — Conflicts, financial and other business dealings",
+        "APS Code of Ethics (2007, amended 2023), Principle C.1 — Integrity"
+      ],
+      "difficulty_seed": "standard",
+      "difficulty_score": null,
+      "flagged": false
+    }
+  ]
+}
