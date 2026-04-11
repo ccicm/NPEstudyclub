@@ -1,5 +1,4 @@
 import { QuizzesBrowser } from "@/components/member/quizzes-browser";
-import { getFortnightlyBeginMessage } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function QuizzesPage({
@@ -19,8 +18,6 @@ export default async function QuizzesPage({
     .select("id,title,category,domain,author_name,is_curated,created_at,delivery_mode,published_at")
     .order("created_at", { ascending: false })
     .limit(200);
-
-  const fortnightlyMessage = getFortnightlyBeginMessage();
 
   const quizIds = (quizzes ?? []).map((quiz) => quiz.id);
 
@@ -68,7 +65,6 @@ export default async function QuizzesPage({
       quizzes={preparedQuizzes}
       created={params.created === "1"}
       noticeMessage={null}
-      fortnightlyMessage={fortnightlyMessage}
     />
   );
 }
