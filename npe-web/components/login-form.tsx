@@ -16,6 +16,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+function mapLoginError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("invalid login credentials")) {
+    return "Email or password is incorrect.";
+  }
+  if (message.includes("email not confirmed") || message.includes("not confirmed")) {
+    return "Please confirm your email before signing in.";
+  }
+  if (message.includes("too many") || message.includes("rate limit")) {
+    return "Too many attempts right now. Please wait a moment and try again.";
+  }
+
+  return "We could not sign you in right now. Please try again.";
+}
+
 export function LoginForm({
   className,
   ...props
@@ -42,7 +58,7 @@ export function LoginForm({
       if (error) throw error;
       router.push("/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(mapLoginError(error));
     } finally {
       setIsLoading(false);
     }

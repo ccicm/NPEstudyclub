@@ -6,19 +6,13 @@ async function ErrorContent({
 }: {
   searchParams: Promise<{ error: string }>;
 }) {
-  const params = await searchParams;
+  await searchParams;
 
   return (
     <>
-      {params?.error ? (
-        <p className="text-sm text-muted-foreground">
-          Code error: {params.error}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          An unspecified error occurred.
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground">
+        We could not complete that sign-in step. Please request a fresh link and try again.
+      </p>
     </>
   );
 }

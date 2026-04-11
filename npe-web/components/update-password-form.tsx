@@ -15,6 +15,22 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+function mapUpdatePasswordError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("same password") || message.includes("should be different")) {
+    return "Choose a different password and try again.";
+  }
+  if (message.includes("weak") || (message.includes("password") && message.includes("least"))) {
+    return "Choose a stronger password and try again.";
+  }
+  if (message.includes("expired") || message.includes("invalid token") || message.includes("token")) {
+    return "Your reset link has expired. Request a new one and try again.";
+  }
+
+  return "We could not update your password right now. Please try again.";
+}
+
 export function UpdatePasswordForm({
   className,
   ...props
@@ -35,7 +51,7 @@ export function UpdatePasswordForm({
       if (error) throw error;
       router.push("/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(mapUpdatePasswordError(error));
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +61,7 @@ export function UpdatePasswordForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+          <CardTitle className="text-2xl">Reset your password</CardTitle>
           <CardDescription>
             Please enter your new password below.
           </CardDescription>

@@ -9,7 +9,7 @@ export default function AuthCallbackPage() {
       fallback={
         <main className="mx-auto flex min-h-svh w-full max-w-xl items-center px-6 py-10">
           <div className="w-full rounded-2xl border bg-card p-8">
-            <h1 className="text-2xl">Auth callback</h1>
+            <h1 className="text-2xl">Sign-in update</h1>
             <p className="mt-3 text-sm text-muted-foreground">Signing you in...</p>
           </div>
         </main>

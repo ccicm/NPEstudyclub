@@ -9,6 +9,19 @@ type CallbackState =
   | { status: "loading"; message: string }
   | { status: "error"; message: string };
 
+function mapCallbackError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("expired") || message.includes("invalid") || message.includes("token")) {
+    return "This sign-in link is no longer valid. Request a new link and try again.";
+  }
+  if (message.includes("too many") || message.includes("rate limit")) {
+    return "Too many attempts right now. Please wait a moment and request a new link.";
+  }
+
+  return "We could not complete sign-in right now. Request a fresh sign-in link and try again.";
+}
+
 export function AuthCallbackClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,7 +51,7 @@ export function AuthCallbackClient() {
           });
 
           if (error) {
-            setState({ status: "error", message: error.message });
+            setState({ status: "error", message: mapCallbackError(error) });
             return;
           }
 
@@ -54,11 +67,11 @@ export function AuthCallbackClient() {
               setState({
                 status: "error",
                 message:
-                  "This sign-in link used PKCE and was opened without the original browser storage. Request a fresh link and open it in the same browser/device, or use the newest email after this update.",
+                  "This sign-in link was opened in a different browser or app. Request a new link and open it in the same browser where you started sign-in.",
               });
               return;
             }
-            setState({ status: "error", message: error.message });
+            setState({ status: "error", message: mapCallbackError(error) });
             return;
           }
 
@@ -73,7 +86,7 @@ export function AuthCallbackClient() {
       } catch (error) {
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "Unexpected sign-in callback error.",
+          message: mapCallbackError(error),
         });
       }
     };
@@ -84,7 +97,7 @@ export function AuthCallbackClient() {
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-xl items-center px-6 py-10">
       <div className="w-full rounded-2xl border bg-card p-8">
-        <h1 className="text-2xl">Auth callback</h1>
+        <h1 className="text-2xl">Sign-in update</h1>
         <p className="mt-3 text-sm text-muted-foreground">{state.message}</p>
         {state.status === "error" ? (
           <div className="mt-4 space-y-2 text-sm">

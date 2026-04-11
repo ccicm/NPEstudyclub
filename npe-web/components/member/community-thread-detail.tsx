@@ -126,7 +126,7 @@ export function CommunityThreadDetail({
 
       {errorCode === "posting_restricted" ? (
         <p className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          You cannot post right now. If this seems wrong, contact a moderator.
+          You cannot post or reply right now. If this seems wrong, contact a moderator.
         </p>
       ) : null}
 

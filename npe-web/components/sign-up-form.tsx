@@ -16,6 +16,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+function mapSignUpError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("already registered") || message.includes("already been registered") || message.includes("user already")) {
+    return "This email is already registered. Try signing in instead.";
+  }
+  if (message.includes("password") && message.includes("weak")) {
+    return "Choose a stronger password and try again.";
+  }
+  if (message.includes("too many") || message.includes("rate limit")) {
+    return "Too many attempts right now. Please wait a moment and try again.";
+  }
+
+  return "We could not create your password right now. Please try again.";
+}
+
 export function SignUpForm({
   className,
   ...props
@@ -37,7 +53,7 @@ export function SignUpForm({
     setError(null);
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match");
+      setError("Passwords do not match.");
       setIsLoading(false);
       return;
     }
@@ -53,7 +69,7 @@ export function SignUpForm({
       if (error) throw error;
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(mapSignUpError(error));
     } finally {
       setIsLoading(false);
     }
