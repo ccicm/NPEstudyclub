@@ -1,16 +1,6 @@
 import { QuizzesBrowser } from "@/components/member/quizzes-browser";
-import { getDailyQuizAvailabilityMessage, getFortnightlyBeginMessage, isDailyQuizLive } from "@/lib/quiz-availability";
+import { getFortnightlyBeginMessage } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
-
-function getAestDateKey(input: string | Date) {
-  const date = typeof input === "string" ? new Date(input) : input;
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Brisbane",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
 
 export default async function QuizzesPage({
   searchParams,
@@ -30,8 +20,6 @@ export default async function QuizzesPage({
     .order("created_at", { ascending: false })
     .limit(200);
 
-  const dailyQuizLive = isDailyQuizLive();
-  const availabilityMessage = getDailyQuizAvailabilityMessage();
   const fortnightlyMessage = getFortnightlyBeginMessage();
 
   const quizIds = (quizzes ?? []).map((quiz) => quiz.id);
@@ -62,25 +50,7 @@ export default async function QuizzesPage({
     resultsByQuiz.set(result.quiz_id, current);
   });
 
-  const preparedQuizzes = (quizzes ?? [])
-    .filter((quiz) => {
-      if (quiz.delivery_mode !== "daily") {
-        return true;
-      }
-
-      if (dailyQuizLive) {
-        return true;
-      }
-
-      const publishedOrCreatedAt = quiz.published_at ?? quiz.created_at;
-      if (!publishedOrCreatedAt) {
-        return false;
-      }
-
-      // Keep historical dailies visible when today's daily window is closed.
-      return getAestDateKey(publishedOrCreatedAt) < getAestDateKey(new Date());
-    })
-    .map((quiz) => {
+  const preparedQuizzes = (quizzes ?? []).map((quiz) => {
     const attempts = resultsByQuiz.get(quiz.id) ?? [];
     const average = attempts.length
       ? Math.round(attempts.reduce((sum, value) => sum + value, 0) / attempts.length)
@@ -97,7 +67,7 @@ export default async function QuizzesPage({
     <QuizzesBrowser
       quizzes={preparedQuizzes}
       created={params.created === "1"}
-      noticeMessage={availabilityMessage}
+      noticeMessage={null}
       fortnightlyMessage={fortnightlyMessage}
     />
   );

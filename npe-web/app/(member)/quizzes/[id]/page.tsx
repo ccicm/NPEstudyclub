@@ -1,17 +1,6 @@
 import { notFound } from "next/navigation";
 import { QuizRunner } from "@/components/member/quiz-runner";
-import { getDailyQuizAvailabilityMessage, isDailyQuizLive } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
-
-function getAestDateKey(input: string | Date) {
-  const date = typeof input === "string" ? new Date(input) : input;
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Brisbane",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -36,21 +25,6 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   if (!quiz) {
     notFound();
-  }
-
-  const publishedOrNow = quiz.published_at ?? new Date().toISOString();
-  const isHistoricalDaily = getAestDateKey(publishedOrNow) < getAestDateKey(new Date());
-
-  if (quiz.delivery_mode === "daily" && !isDailyQuizLive() && !isHistoricalDaily) {
-    return (
-      <div className="rounded-2xl border bg-card p-6">
-        <h1 className="text-3xl">{quiz.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{quiz.domain || "General"}</p>
-        <p className="mt-4 text-sm text-muted-foreground">
-          {getDailyQuizAvailabilityMessage() || "Daily quizzes are temporarily unavailable."}
-        </p>
-      </div>
-    );
   }
 
   let questionsData: QuizQuestionRow[] = [];
