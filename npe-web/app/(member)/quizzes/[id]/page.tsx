@@ -57,7 +57,8 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     domain_label?: string | null;
     subdomain?: string | null;
     citations?: unknown;
-    wrong_answer_rationales?: unknown;
+    distractor_explanations?: unknown; // DB column name (mapped to wrong_answer_rationales for the runner)
+    difficulty_seed?: string | null;
   };
 
   const { data: quiz } = await supabase
@@ -74,7 +75,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   const withOptionalFields = await supabase
     .from("quiz_questions")
-    .select("id,question_text,options,correct_index,explanation,display_order,domain_number,domain_label,subdomain,citations,wrong_answer_rationales")
+    .select("id,question_text,options,correct_index,explanation,display_order,domain_number,domain_label,subdomain,citations,distractor_explanations,difficulty_seed")
     .eq("quiz_id", id)
     .order("display_order", { ascending: true });
 
@@ -105,9 +106,10 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     subdomain: question.subdomain ?? null,
     citations: normalizeCitations(question.citations),
     wrong_answer_rationales:
-      question.wrong_answer_rationales && typeof question.wrong_answer_rationales === "object"
-        ? (question.wrong_answer_rationales as Record<string, string>)
+      question.distractor_explanations && typeof question.distractor_explanations === "object"
+        ? (question.distractor_explanations as Record<string, string>)
         : null,
+    difficulty_seed: typeof question.difficulty_seed === "string" ? question.difficulty_seed : null,
   }));
 
   return <QuizRunner quiz={quiz} questions={preparedQuestions} />;

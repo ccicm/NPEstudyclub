@@ -256,24 +256,19 @@ function makeQuestion(template, domain, domainLabel, mode, dateSeed, index) {
     throw new Error(`Could not place correct answer for domain ${domain}, question ${index}`);
   }
 
-  const difficultyPoolByMode = {
-    daily: ['standard', 'standard', 'challenging', 'challenging', 'advanced'],
-    targeted: ['challenging', 'challenging', 'advanced', 'advanced', 'standard'],
-    fortnightly: ['challenging', 'challenging', 'advanced', 'advanced', 'advanced', 'standard'],
-  };
-
-  return validateQuestion(
+    return validateQuestion(
     {
       domain,
       domain_label: domainLabel,
       subdomain: template.subdomain,
+      topic_tags: template.topic_tags || [],
       question: built.question({ rng, variantRng }),
       options: remappedOptions,
       correct_answer: relocatedCorrect.label,
       correct_explanation: built.correct_explanation({ rng, variantRng }),
       distractor_explanations: remappedDistractors,
       citations: template.citations,
-      difficulty_seed: pick(rng, difficultyPoolByMode[mode] || difficultyPoolByMode.daily),
+      difficulty_seed: template.difficulty || 'standard',
     },
     index,
   );
@@ -317,15 +312,35 @@ function validateQuestion(q, index) {
     }
   }
 
+  // Enforce that every distractor has a specific, non-empty rationale.
+  const incorrectLabels = ['A', 'B', 'C', 'D', 'E'].filter((label) => label !== q.correct_answer);
+  for (const label of incorrectLabels) {
+    const rationale = q.distractor_explanations[label];
+    if (!rationale || String(rationale).trim() === '') {
+      throw new Error(
+        `Question ${index}: distractor_explanation for option ${label} is empty. ` +
+        `Every distractor must have a specific rationale explaining why it is wrong.`,
+      );
+    }
+  }
+
   q.difficulty_score = null;
   q.flagged = false;
+  q.topic_tags = Array.isArray(q.topic_tags) ? q.topic_tags : [];
   return q;
 }
 
-function template(subdomain, citations, question, answer, distractors, explanation, distractorExplanations) {
+// difficulty: 'standard' | 'challenging' | 'advanced'
+// topicTags: string[] — fine-grained topic labels for study-plan mapping (e.g. ['boundaries', 'dual relationships'])
+function template(subdomain, citations, question, answer, distractors, explanation, distractorExplanations, difficulty = 'standard', topicTags = []) {
+  if (!['standard', 'challenging', 'advanced'].includes(difficulty)) {
+    throw new Error(`template("${subdomain}"): difficulty must be standard|challenging|advanced, got "${difficulty}"`);
+  }
   return {
     subdomain,
     citations,
+    difficulty,
+    topic_tags: topicTags,
     build: ({ rng, variantRng }) => ({
       question,
       options: {
@@ -845,6 +860,7 @@ function toLegacyQuestionRow(question, quizId, displayOrder) {
     distractor_explanations: question.distractor_explanations,
     citations: Array.isArray(question.citations) ? question.citations : [],
     difficulty_seed: String(question.difficulty_seed || 'standard'),
+    topic_tags: Array.isArray(question.topic_tags) ? question.topic_tags : [],
     display_order: displayOrder,
   };
 }

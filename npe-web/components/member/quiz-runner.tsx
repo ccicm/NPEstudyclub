@@ -26,6 +26,7 @@ type QuizQuestion = {
     resource_id?: string | null;
   }> | null;
   wrong_answer_rationales?: Record<string, string> | null;
+  difficulty_seed?: string | null;
 };
 
 type Stage = "intro" | "question" | "results";
@@ -353,6 +354,21 @@ export function QuizRunner({
                   {reviewQuestion.domain_label ? ` · ${reviewQuestion.domain_label}` : ""}
                   {reviewQuestion.subdomain ? ` · ${reviewQuestion.subdomain}` : ""}
                 </p>
+              ) : null}
+              {reviewQuestion.difficulty_seed ? (
+                <span className={`mt-1 inline-block rounded px-2 py-0.5 text-xs font-medium ${
+                  reviewQuestion.difficulty_seed === 'advanced'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : reviewQuestion.difficulty_seed === 'challenging'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : 'bg-sky-50 text-sky-700 border border-sky-200'
+                }`}>
+                  {reviewQuestion.difficulty_seed === 'advanced'
+                    ? 'Complex'
+                    : reviewQuestion.difficulty_seed === 'challenging'
+                    ? 'Applied'
+                    : 'Foundational'}
+                </span>
               ) : null}
               <p className="mt-2 text-sm">{reviewQuestion.question_text}</p>
 
