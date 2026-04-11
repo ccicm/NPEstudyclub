@@ -675,8 +675,19 @@ const QUESTION_BANK = {
 };
 
 async function createQuizRecord(setId, mode, generatedAt) {
-  const sequence = '001';
   const dateString = formatDisplayDate(generatedAt.split('T')[0]);
+  
+  // Get count of existing quizzes for this date to determine sequence number
+  const { data: existingQuizzes, error: countError } = await supabase
+    .from('quizzes')
+    .select('id', { count: 'exact', head: true })
+    .eq('author_name', 'NPE Quiz Bot')
+    .eq('delivery_mode', mode)
+    .like('title', `${mode === 'daily' ? 'Daily' : 'Fortnightly'} #%${dateString}%`);
+
+  const sequenceNum = (existingQuizzes?.length || 0) + 1;
+  const sequence = String(sequenceNum).padStart(3, '0');
+  
   const title = mode === 'daily' ? `Daily #${sequence} - ${dateString}` : `Fortnightly #${sequence} - ${dateString}`;
   const { data: quiz, error } = await supabase
     .from('quizzes')
