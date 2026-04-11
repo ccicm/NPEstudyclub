@@ -34,4 +34,4 @@ create policy "Members can read own feedback"
 drop policy if exists "Admins can read all feedback" on public.quiz_overall_feedback;
 create policy "Admins can read all feedback"
   on public.quiz_overall_feedback for select
-  using (public.is_admin());
+  using (public.is_approved_member());
