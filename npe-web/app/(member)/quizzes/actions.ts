@@ -24,6 +24,10 @@ function classifyError(message: string) {
   return null;
 }
 
+function normalizeDomainKey(domain: string | null | undefined) {
+  return String(domain || "").trim().toLowerCase();
+}
+
 export async function saveQuizResultAction(input: {
   quizId: string;
   score: number;
@@ -62,9 +66,96 @@ export async function saveQuizResultAction(input: {
     await supabase.from("user_responses").insert(responseRows);
   }
 
+  // Keep study-plan suggestions responsive to the latest quiz data.
+  const { data: performanceRows } = await supabase
+    .from("user_performance")
+    .select("domain_label,attempts,correct_responses")
+    .eq("user_id", user.id);
+
+  if (performanceRows?.length) {
+    const totals = new Map<string, { label: string; attempts: number; correct: number }>();
+
+    performanceRows.forEach((row) => {
+      const key = normalizeDomainKey(row.domain_label);
+      if (!key) {
+        return;
+      }
+
+      const current = totals.get(key) ?? {
+        label: String(row.domain_label || "General"),
+        attempts: 0,
+        correct: 0,
+      };
+      current.attempts += Number(row.attempts || 0);
+      current.correct += Number(row.correct_responses || 0);
+      totals.set(key, current);
+    });
+
+    const weakest = Array.from(totals.values())
+      .filter((item) => item.attempts > 0)
+      .map((item) => ({ ...item, accuracy: item.correct / item.attempts }))
+      .sort((left, right) => left.accuracy - right.accuracy)[0];
+
+    if (weakest) {
+      const { data: plan } = await supabase
+        .from("study_plans")
+        .select("id,domain_priorities")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (plan?.id) {
+        const priorities = (plan.domain_priorities as Record<string, number> | null) ?? {};
+        const adjusted = { ...priorities };
+
+        Object.entries(adjusted).forEach(([domain, priority]) => {
+          if (normalizeDomainKey(domain) === normalizeDomainKey(weakest.label)) {
+            adjusted[domain] = Math.min(3, Math.max(1, Number(priority || 1) + 1));
+          }
+        });
+
+        await supabase
+          .from("study_plans")
+          .update({ domain_priorities: adjusted, updated_at: new Date().toISOString() })
+          .eq("id", plan.id);
+
+        const [{ data: resources }, { data: quizzes }, { data: nextWeek }] = await Promise.all([
+          supabase.from("resources").select("id,domain"),
+          supabase.from("quizzes").select("id,domain"),
+          supabase
+            .from("study_plan_weeks")
+            .select("id")
+            .eq("plan_id", plan.id)
+            .in("status", ["upcoming", "in_progress"])
+            .order("week_number", { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+        ]);
+
+        if (nextWeek?.id) {
+          const resourceMatch = (resources || []).find(
+            (resource) => normalizeDomainKey(resource.domain) === normalizeDomainKey(weakest.label),
+          );
+          const quizMatch = (quizzes || []).find(
+            (quiz) => normalizeDomainKey(quiz.domain) === normalizeDomainKey(weakest.label),
+          );
+
+          await supabase
+            .from("study_plan_weeks")
+            .update({
+              domain_focus: weakest.label,
+              suggested_resource_id: resourceMatch?.id || null,
+              suggested_quiz_id: quizMatch?.id || null,
+            })
+            .eq("id", nextWeek.id);
+        }
+      }
+    }
+  }
+
   revalidatePath("/quizzes");
   revalidatePath("/quizzes/results");
   revalidatePath("/profile");
+  revalidatePath("/study-plan");
 }
 
 export async function submitQuizOverallFeedbackAction(input: {
@@ -192,11 +283,100 @@ export async function flagQuestionForReviewAction(input: {
     return { ok: false as const, error: "save_flag" as const };
   }
 
+  // Create contextual discussion thread immediately when member flags for review.
+  const { data: questionRow } = await supabase
+    .from("quiz_questions")
+    .select("id,quiz_id,question_text,domain_label,subdomain,correct_answer,review_thread_id")
+    .eq("id", input.questionId)
+    .maybeSingle();
+
+  let threadId = questionRow?.review_thread_id || null;
+
+  if (!threadId && questionRow?.id) {
+    const { data: existingReview } = await supabase
+      .from("question_reviews")
+      .select("thread_id")
+      .eq("question_id", questionRow.id)
+      .maybeSingle();
+
+    threadId = existingReview?.thread_id || null;
+  }
+
+  if (!threadId && questionRow?.id) {
+    const { data: quizRow } = await supabase
+      .from("quizzes")
+      .select("title")
+      .eq("id", questionRow.quiz_id)
+      .maybeSingle();
+
+    const domainLabel = questionRow.domain_label || "General";
+    const subdomain = questionRow.subdomain || "General";
+    const canonicalTag = normalizeDomainKey(domainLabel).includes("ethic")
+      ? "ethics"
+      : normalizeDomainKey(domainLabel).includes("assessment")
+        ? "assessment"
+        : normalizeDomainKey(domainLabel).includes("intervention")
+          ? "interventions"
+          : normalizeDomainKey(domainLabel).includes("communication")
+            ? "communication"
+            : "quiz-review";
+
+    const threadTitle = `Peer review: ${domainLabel} - ${subdomain}`;
+    const threadBody = [
+      `**Community review requested - ${domainLabel}: ${subdomain}**`,
+      "",
+      `Quiz: ${quizRow?.title || "Quiz"}`,
+      `Domain: ${domainLabel} · Study area: ${subdomain}`,
+      "",
+      "Question:",
+      questionRow.question_text || "(missing question text)",
+      "",
+      `Correct answer (per AI): ${questionRow.correct_answer || "?"}`,
+      "",
+      "A member flagged this for discussion. Please review the answer quality and cite sources where possible.",
+    ].join("\n");
+
+    const { data: thread, error: threadError } = await supabase
+      .from("forum_threads")
+      .insert({
+        title: threadTitle,
+        body: threadBody,
+        tag: canonicalTag,
+        channel: "general",
+        created_by: user.id,
+        author_name: user.user_metadata?.full_name || user.email || "Member",
+        quiz_id: questionRow.quiz_id,
+        publish_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+
+    if (!threadError && thread?.id) {
+      threadId = thread.id;
+
+      await supabase.from("question_reviews").upsert(
+        {
+          question_id: questionRow.id,
+          quiz_id: questionRow.quiz_id,
+          publish_at: new Date().toISOString(),
+          threshold_ratio: 0,
+          thread_id: thread.id,
+        },
+        { onConflict: "question_id" },
+      );
+
+      await supabase
+        .from("quiz_questions")
+        .update({ review_thread_id: thread.id })
+        .eq("id", questionRow.id);
+    }
+  }
+
   revalidatePath("/quizzes");
   revalidatePath("/quizzes/results");
   revalidatePath("/community");
 
-  return { ok: true as const };
+  return { ok: true as const, threadId };
 }
 
 export async function createQuizAction(formData: FormData) {

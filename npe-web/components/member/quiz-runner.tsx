@@ -38,6 +38,11 @@ type AnswerRecord = {
 
 type FeedbackVote = "up" | "down";
 
+type ReviewPair = {
+  question: QuizQuestion;
+  answer: AnswerRecord;
+};
+
 export function QuizRunner({
   quiz,
   questions,
@@ -50,9 +55,11 @@ export function QuizRunner({
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewWrongOnly, setReviewWrongOnly] = useState(true);
   const [feedbackVotes, setFeedbackVotes] = useState<Record<string, FeedbackVote>>({});
   const [checkedSources, setCheckedSources] = useState<Record<string, boolean>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Record<string, boolean>>({});
+  const [discussionThreadByQuestion, setDiscussionThreadByQuestion] = useState<Record<string, string>>({});
   const [overallFeedback, setOverallFeedback] = useState({
     difficultyScore: 3,
     varietyScore: 3,
@@ -99,6 +106,26 @@ export function QuizRunner({
 
   const weakestDomain = domainPerformance[0]?.domain || quiz.domain || "";
 
+  const reviewQueue = useMemo<ReviewPair[]>(() => {
+    const byId = new Map(questions.map((question) => [question.id, question]));
+    const pairs = answers
+      .map((answer) => {
+        const question = byId.get(answer.question_id);
+        if (!question) {
+          return null;
+        }
+        return { question, answer };
+      })
+      .filter((pair): pair is ReviewPair => Boolean(pair));
+
+    if (!reviewWrongOnly) {
+      return pairs;
+    }
+
+    const wrongOnly = pairs.filter((pair) => pair.answer.selected !== pair.answer.correct);
+    return wrongOnly.length ? wrongOnly : pairs;
+  }, [answers, questions, reviewWrongOnly]);
+
   const submitResult = (finalAnswers: AnswerRecord[]) => {
     const finalScore = finalAnswers.reduce((sum, answer) => (answer.selected === answer.correct ? sum + 1 : sum), 0);
     startTransition(async () => {
@@ -140,7 +167,10 @@ export function QuizRunner({
       }
 
       setFlaggedQuestions((previous) => ({ ...previous, [questionId]: true }));
-      setFeedbackMessage("Thanks. This question has been flagged for review.");
+      if (result.threadId) {
+        setDiscussionThreadByQuestion((previous) => ({ ...previous, [questionId]: result.threadId }));
+      }
+      setFeedbackMessage("Thanks. This question has been flagged for discussion.");
     });
   };
 
@@ -198,11 +228,12 @@ export function QuizRunner({
   }
 
   if (stage === "results") {
-    const reviewQuestion = questions[reviewIndex];
-    const reviewAnswer = answers[reviewIndex];
+    const reviewPair = reviewQueue[Math.min(reviewIndex, Math.max(reviewQueue.length - 1, 0))];
+    const reviewQuestion = reviewPair?.question;
+    const reviewAnswer = reviewPair?.answer;
     const voted = reviewQuestion ? feedbackVotes[reviewQuestion.id] : undefined;
-    const ratedCount = questions.filter((question) => Boolean(feedbackVotes[question.id])).length;
-    const allRated = ratedCount === questions.length;
+    const ratedCount = reviewQueue.filter((pair) => Boolean(feedbackVotes[pair.question.id])).length;
+    const allRated = reviewQueue.length > 0 && ratedCount === reviewQueue.length;
 
     return (
       <div className="space-y-4">
@@ -230,9 +261,11 @@ export function QuizRunner({
                 setSelectedIndex(null);
                 setAnswers([]);
                 setReviewIndex(0);
+                setReviewWrongOnly(true);
                 setFeedbackVotes({});
                 setCheckedSources({});
                 setFlaggedQuestions({});
+                setDiscussionThreadByQuestion({});
                 setOverallFeedback({
                   difficultyScore: 3,
                   varietyScore: 3,
@@ -275,8 +308,30 @@ export function QuizRunner({
         <div className="rounded-2xl border bg-card p-6">
           <h2 className="text-2xl">Question review</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Rate each explanation to unlock the next question.
+            Review focuses on questions you got wrong. Switch to all if needed.
           </p>
+          <div className="mt-3 flex items-center gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setReviewWrongOnly(true);
+                setReviewIndex(0);
+              }}
+              className={`rounded-md border px-2 py-1 ${reviewWrongOnly ? "bg-primary/10" : "bg-card"}`}
+            >
+              Wrong only
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setReviewWrongOnly(false);
+                setReviewIndex(0);
+              }}
+              className={`rounded-md border px-2 py-1 ${!reviewWrongOnly ? "bg-primary/10" : "bg-card"}`}
+            >
+              All questions
+            </button>
+          </div>
           {feedbackMessage ? <p className="mt-2 text-xs text-muted-foreground">{feedbackMessage}</p> : null}
 
           {reviewQuestion ? (
@@ -355,11 +410,11 @@ export function QuizRunner({
                 </button>
               </div>
 
-              {voted === "down" ? (
+              {reviewAnswer && reviewAnswer.selected !== reviewAnswer.correct ? (
                 <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
                   <p className="font-medium">Need a human review?</p>
                   <p className="mt-1 text-xs">
-                    If you have reviewed the explanation and sources and still disagree, open a community review thread.
+                    Review the rationale for each option, then flag this item for discussion if still needed.
                   </p>
                   <label className="mt-2 flex items-center gap-2 text-xs">
                     <input
@@ -374,9 +429,6 @@ export function QuizRunner({
                     />
                     I checked the source
                   </label>
-                  <Link href="/community" className="mt-2 inline-block text-xs underline">
-                    Open community review board
-                  </Link>
                   <div className="mt-2">
                     <button
                       type="button"
@@ -387,6 +439,18 @@ export function QuizRunner({
                       {flaggedQuestions[reviewQuestion.id] ? "Flagged for review" : "Flag for review"}
                     </button>
                   </div>
+                  {discussionThreadByQuestion[reviewQuestion.id] ? (
+                    <Link
+                      href={`/community/${discussionThreadByQuestion[reviewQuestion.id]}`}
+                      className="mt-2 inline-block text-xs underline"
+                    >
+                      Open flagged discussion
+                    </Link>
+                  ) : (
+                    <Link href="/community" className="mt-2 inline-block text-xs underline">
+                      Open community board
+                    </Link>
+                  )}
 
                   <div className="mt-3 rounded-md border bg-white/70 p-2 text-xs text-amber-950">
                     <p className="font-medium">Incorrect option review</p>
@@ -407,7 +471,7 @@ export function QuizRunner({
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-3 text-sm">
             <p>
-              {ratedCount} of {questions.length} rated
+              {ratedCount} of {reviewQueue.length} rated
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -421,8 +485,8 @@ export function QuizRunner({
               {!allRated ? (
                 <button
                   type="button"
-                  onClick={() => setReviewIndex((value) => Math.min(questions.length - 1, value + 1))}
-                  disabled={!voted || reviewIndex === questions.length - 1}
+                  onClick={() => setReviewIndex((value) => Math.min(reviewQueue.length - 1, value + 1))}
+                  disabled={!voted || reviewIndex === reviewQueue.length - 1}
                   className="rounded-md bg-primary px-3 py-2 font-semibold text-primary-foreground disabled:opacity-50"
                 >
                   Next
@@ -534,6 +598,8 @@ export function QuizRunner({
 
             if (index + 1 === questions.length) {
               setAnswers(nextAnswers);
+              setReviewWrongOnly(true);
+              setReviewIndex(0);
               setStage("results");
               submitResult(nextAnswers);
               return;
