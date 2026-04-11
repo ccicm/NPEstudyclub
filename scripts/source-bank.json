@@ -131,5 +131,38 @@
       "domains": ["Assessment", "Communication"],
       "notes": "Guidance for accessible and fair psychological practice with people who have intellectual disability."
     }
+    ,
+    {
+      "id": "advanced-ethics-boundary-crossing-1",
+      "citation": "APS Code of Ethics (2007, amended 2023), Principle B.6 — Professional Boundaries",
+      "url": "https://psychology.org.au/about-us/what-we-do/ethics-and-practice-standards/aps-code-of-ethics",
+      "domains": ["Ethics", "Assessment"],
+      "topic_tags": ["boundaries", "dual relationships", "risk management", "supervision"],
+      "difficulty": "high",
+      "stem": "A psychologist has been seeing a client for several months. The client, who is also a local business owner, offers the psychologist a significant discount on services at their store as a gesture of gratitude. The psychologist is considering accepting the offer. What is the most appropriate course of action?",
+      "options": [
+        {
+          "label": "A. Accept the discount to maintain rapport, but document the transaction.",
+          "is_correct": false,
+          "rationale": "Accepting gifts or discounts from clients can compromise professional boundaries and objectivity, even if documented."
+        },
+        {
+          "label": "B. Politely decline the offer and discuss professional boundaries with the client.",
+          "is_correct": true,
+          "rationale": "Declining the offer and addressing boundaries directly upholds ethical standards and prevents dual relationships."
+        },
+        {
+          "label": "C. Accept the discount but inform your supervisor for transparency.",
+          "is_correct": false,
+          "rationale": "Supervision is important, but accepting the discount still constitutes a boundary crossing and should be avoided."
+        },
+        {
+          "label": "D. Accept the discount only if the client insists, to avoid offending them.",
+          "is_correct": false,
+          "rationale": "Avoiding client discomfort is not a valid reason to cross professional boundaries; ethical obligations take precedence."
+        }
+      ],
+      "explanation": "This scenario tests knowledge of professional boundaries, dual relationships, and ethical decision-making. The correct response is to decline the offer and discuss boundaries, as accepting gifts or discounts can compromise objectivity and lead to ethical violations."
+    }
   ]
 }
