@@ -2,6 +2,16 @@ import { QuizzesBrowser } from "@/components/member/quizzes-browser";
 import { getDailyQuizAvailabilityMessage, getFortnightlyBeginMessage, isDailyQuizLive } from "@/lib/quiz-availability";
 import { createClient } from "@/lib/supabase/server";
 
+function getAestDateKey(input: string | Date) {
+  const date = typeof input === "string" ? new Date(input) : input;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Brisbane",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 export default async function QuizzesPage({
   searchParams,
 }: {
@@ -53,7 +63,23 @@ export default async function QuizzesPage({
   });
 
   const preparedQuizzes = (quizzes ?? [])
-    .filter((quiz) => quiz.delivery_mode !== "daily" || dailyQuizLive)
+    .filter((quiz) => {
+      if (quiz.delivery_mode !== "daily") {
+        return true;
+      }
+
+      if (dailyQuizLive) {
+        return true;
+      }
+
+      const publishedOrCreatedAt = quiz.published_at ?? quiz.created_at;
+      if (!publishedOrCreatedAt) {
+        return false;
+      }
+
+      // Keep historical dailies visible when today's daily window is closed.
+      return getAestDateKey(publishedOrCreatedAt) < getAestDateKey(new Date());
+    })
     .map((quiz) => {
     const attempts = resultsByQuiz.get(quiz.id) ?? [];
     const average = attempts.length
