@@ -122,8 +122,16 @@ export function QuizRunner({
       return pairs;
     }
 
-    const wrongOnly = pairs.filter((pair) => pair.answer.selected !== pair.answer.correct);
-    return wrongOnly.length ? wrongOnly : pairs;
+    // Only show wrong answers if any exist, otherwise show all
+    const wrongOnly = pairs.filter((pair) => {
+      // Defensive: handle undefined/null selected/correct
+      return (
+        typeof pair.answer.selected === 'number' &&
+        typeof pair.answer.correct === 'number' &&
+        pair.answer.selected !== pair.answer.correct
+      );
+    });
+    return wrongOnly.length > 0 ? wrongOnly : pairs;
   }, [answers, questions, reviewWrongOnly]);
 
   const submitResult = (finalAnswers: AnswerRecord[]) => {
@@ -457,11 +465,16 @@ export function QuizRunner({
                     <div className="mt-1 space-y-1">
                       {reviewQuestion.options
                         .filter((_, optionIndex) => optionIndex !== reviewQuestion.correct_index)
-                        .map((option) => (
-                          <p key={`${reviewQuestion.id}-${option.label}`}>
-                            {option.label}. {option.text} - {reviewQuestion.wrong_answer_rationales?.[option.label] || "Does not match the keyed answer for this question."}
-                          </p>
-                        ))}
+                        .map((option) => {
+                          const rationale = reviewQuestion.wrong_answer_rationales?.[option.label];
+                          return (
+                            <p key={`${reviewQuestion.id}-${option.label}`}>
+                              {option.label}. {option.text} - {rationale && rationale.trim() !== ''
+                                ? rationale
+                                : 'No specific rationale provided for this distractor. Please review the main explanation or flag for discussion.'}
+                            </p>
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
