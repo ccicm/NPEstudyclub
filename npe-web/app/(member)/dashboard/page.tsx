@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ExamCountdown } from "@/components/member/exam-countdown";
+import { domainColour } from "@/lib/npe-taxonomy";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -69,8 +70,9 @@ export default async function DashboardPage() {
     user
       ? supabase
           .from("quiz_results")
-          .select("score, total_questions, completed_at, quizzes(domain)")
+          .select("score, total_questions, completed_at, quizzes(id, title, domain)")
           .eq("user_id", user.id)
+          .order("completed_at", { ascending: false })
       : Promise.resolve({ data: [], error: null }),
   ]);
 
@@ -78,7 +80,7 @@ export default async function DashboardPage() {
     score: number;
     total_questions: number;
     completed_at: string;
-    quizzes: { domain?: string } | { domain?: string }[] | null;
+    quizzes: { id?: string; title?: string; domain?: string } | { id?: string; title?: string; domain?: string }[] | null;
   };
 
   const quizResults = (quizResultsRaw ?? []) as QuizResultWithDomain[];
@@ -88,9 +90,7 @@ export default async function DashboardPage() {
   const domainStats = quizAttempts.reduce((acc, result) => {
     const quizRelation = Array.isArray(result.quizzes) ? result.quizzes[0] : result.quizzes;
     const domain = quizRelation?.domain || "Other";
-    if (!acc[domain]) {
-      acc[domain] = [];
-    }
+    if (!acc[domain]) acc[domain] = [];
     acc[domain].push(result);
     return acc;
   }, {} as Record<string, typeof quizAttempts>);
@@ -114,6 +114,19 @@ export default async function DashboardPage() {
         }, 0) / quizCount,
       )
     : 0;
+
+  // 5 most recent attempts for the dashboard activity list
+  const recentAttempts = quizAttempts.slice(0, 5).map((result) => {
+    const quiz = Array.isArray(result.quizzes) ? result.quizzes[0] : result.quizzes;
+    const percent = result.total_questions > 0 ? Math.round((result.score / result.total_questions) * 100) : 0;
+    return {
+      quizId: quiz?.id ?? null,
+      title: quiz?.title ?? "Quiz",
+      domain: quiz?.domain ?? "General",
+      percent,
+      completedAt: result.completed_at,
+    };
+  });
 
   const fileTypeColor = (fileType: string | null) => {
     const type = (fileType || "").toLowerCase();
@@ -317,45 +330,97 @@ export default async function DashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border bg-card p-6">
-          <h2 className="text-2xl">Quiz Activity</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl">Quiz Activity</h2>
+            <Link href="/quizzes/results" className="text-sm underline text-muted-foreground">
+              Full history
+            </Link>
+          </div>
+
           {quizError ? (
             <p className="mt-2 text-sm text-muted-foreground">Quiz statistics will appear after quiz activity is available.</p>
-          ) : (
-            <p className="mt-2 text-sm">
-              {quizCount} quizzes taken · Average score: {avgQuizPercent}%
-            </p>
-          )}
-
-          {domainPerformance.length > 0 ? (
-            <div className="mt-4">
-              <p className="mb-3 text-sm font-semibold">By domain:</p>
-              <div className="grid gap-2">
-                {domainPerformance.map((domain) => {
-                  const getColor = (score: number) => {
-                    if (score >= 70) return "bg-green-100 text-green-700";
-                    if (score >= 50) return "bg-amber-100 text-amber-700";
-                    return "bg-red-100 text-red-700";
-                  };
-
-                  return (
-                    <div key={domain.domain} className={`rounded-lg px-3 py-2 text-sm font-semibold ${getColor(domain.avg)}`}>
-                      {domain.domain} · {domain.avg}% avg · {domain.count} attempts
-                    </div>
-                  );
-                })}
-              </div>
+          ) : !quizCount ? (
+            <div className="mt-3 rounded-xl border bg-muted/30 p-4">
+              <p className="text-sm text-muted-foreground">No quizzes taken yet.</p>
+              <Link href="/quizzes" className="mt-2 inline-block text-sm font-semibold underline">
+                Browse quizzes →
+              </Link>
             </div>
-          ) : null}
+          ) : (
+            <>
+              {/* Stat pills */}
+              <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full border bg-muted px-3 py-1 text-muted-foreground">
+                  {quizCount} taken
+                </span>
+                <span className={`rounded-full border px-3 py-1 font-semibold ${
+                  avgQuizPercent >= 70 ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : avgQuizPercent >= 50 ? "border-amber-200 bg-amber-50 text-amber-700"
+                  : "border-red-200 bg-red-50 text-red-700"
+                }`}>
+                  {avgQuizPercent}% avg
+                </span>
+                {domainPerformance.length > 0 ? (
+                  <>
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-700">
+                      Best: {domainPerformance[domainPerformance.length - 1].domain}
+                    </span>
+                    <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-red-700">
+                      Focus: {domainPerformance[0].domain}
+                    </span>
+                  </>
+                ) : null}
+              </div>
 
-          {!quizCount && !quizError ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              You haven&apos;t taken any quizzes yet. <Link href="/quizzes" className="underline">Browse quizzes</Link> to start.
-            </p>
-          ) : null}
+              {/* Domain progress bars */}
+              {domainPerformance.length > 0 ? (
+                <div className="mt-4 space-y-2">
+                  {domainPerformance.map((item) => {
+                    const dc = domainColour(item.domain);
+                    return (
+                      <div key={item.domain} className="flex items-center gap-2">
+                        <span className={`w-24 shrink-0 rounded border px-2 py-0.5 text-xs font-medium ${dc.bg} ${dc.text} ${dc.border}`}>
+                          {item.domain}
+                        </span>
+                        <div className="flex-1 overflow-hidden rounded-full bg-muted h-1.5">
+                          <div
+                            className={`h-1.5 rounded-full ${item.avg >= 70 ? "bg-emerald-500" : item.avg >= 50 ? "bg-amber-400" : "bg-red-400"}`}
+                            style={{ width: `${item.avg}%` }}
+                          />
+                        </div>
+                        <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{item.avg}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
 
-          <Link href="/quizzes/results" className="mt-3 inline-block text-sm underline">
-            View quiz history
-          </Link>
+              {/* Recent attempts */}
+              {recentAttempts.length > 0 ? (
+                <div className="mt-4">
+                  <p className="mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recent</p>
+                  <ul className="space-y-1">
+                    {recentAttempts.map((attempt, i) => (
+                      <li key={i} className="flex items-center justify-between gap-2 text-xs">
+                        <span className="truncate text-muted-foreground">
+                          {attempt.quizId
+                            ? <Link href={`/quizzes/${attempt.quizId}`} className="hover:underline">{attempt.title}</Link>
+                            : attempt.title}
+                        </span>
+                        <span className={`shrink-0 font-semibold ${
+                          attempt.percent >= 70 ? "text-emerald-600"
+                          : attempt.percent >= 50 ? "text-amber-600"
+                          : "text-red-500"
+                        }`}>
+                          {attempt.percent}%
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </>
+          )}
         </section>
 
         <section className="rounded-2xl border bg-card p-6">

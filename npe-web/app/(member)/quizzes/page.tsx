@@ -28,10 +28,10 @@ export default async function QuizzesPage({
     user && quizIds.length
       ? supabase
           .from("quiz_results")
-          .select("quiz_id,score,total_questions")
+          .select("quiz_id,score,total_questions,completed_at")
           .eq("user_id", user.id)
           .in("quiz_id", quizIds)
-      : Promise.resolve({ data: [] as Array<{ quiz_id: string; score: number; total_questions: number }> }),
+      : Promise.resolve({ data: [] as Array<{ quiz_id: string; score: number; total_questions: number; completed_at: string }> }),
   ]);
 
   const questionCountMap = new Map<string, number>();
@@ -40,11 +40,18 @@ export default async function QuizzesPage({
   });
 
   const resultsByQuiz = new Map<string, number[]>();
+  const lastAttemptMap = new Map<string, string>(); // quiz_id → most recent completed_at
+
   (resultsResult.data ?? []).forEach((result) => {
     const percentage = result.total_questions > 0 ? Math.round((result.score / result.total_questions) * 100) : 0;
     const current = resultsByQuiz.get(result.quiz_id) ?? [];
     current.push(percentage);
     resultsByQuiz.set(result.quiz_id, current);
+
+    const existing = lastAttemptMap.get(result.quiz_id);
+    if (!existing || result.completed_at > existing) {
+      lastAttemptMap.set(result.quiz_id, result.completed_at);
+    }
   });
 
   const preparedQuizzes = (quizzes ?? []).map((quiz) => {
@@ -57,8 +64,9 @@ export default async function QuizzesPage({
       ...quiz,
       question_count: questionCountMap.get(quiz.id) ?? 0,
       average_score: average,
+      last_attempted_at: lastAttemptMap.get(quiz.id) ?? null,
     };
-    });
+  });
 
   return (
     <QuizzesBrowser
