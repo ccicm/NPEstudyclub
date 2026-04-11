@@ -14,31 +14,32 @@ function normalizeCitations(value: unknown): Citation[] {
     return [];
   }
 
-  return value
-    .map((item) => {
-      if (typeof item === "string") {
-        return { source: item };
-      }
+  const citations: Citation[] = [];
 
-      if (item && typeof item === "object" && typeof (item as { source?: unknown }).source === "string") {
-        const citation = item as {
-          source: string;
-          clause?: unknown;
-          external_url?: unknown;
-          resource_id?: unknown;
-        };
+  for (const item of value) {
+    if (typeof item === "string") {
+      citations.push({ source: item });
+      continue;
+    }
 
-        return {
-          source: citation.source,
-          clause: typeof citation.clause === "string" ? citation.clause : null,
-          external_url: typeof citation.external_url === "string" ? citation.external_url : null,
-          resource_id: typeof citation.resource_id === "string" ? citation.resource_id : null,
-        };
-      }
+    if (item && typeof item === "object" && typeof (item as { source?: unknown }).source === "string") {
+      const citation = item as {
+        source: string;
+        clause?: unknown;
+        external_url?: unknown;
+        resource_id?: unknown;
+      };
 
-      return null;
-    })
-    .filter((citation): citation is Citation => Boolean(citation));
+      citations.push({
+        source: citation.source,
+        clause: typeof citation.clause === "string" ? citation.clause : null,
+        external_url: typeof citation.external_url === "string" ? citation.external_url : null,
+        resource_id: typeof citation.resource_id === "string" ? citation.resource_id : null,
+      });
+    }
+  }
+
+  return citations;
 }
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
