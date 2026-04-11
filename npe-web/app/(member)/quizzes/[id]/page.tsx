@@ -13,6 +13,9 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     correct_index: number;
     explanation: string | null;
     display_order: number;
+    domain_number?: number | null;
+    domain_label?: string | null;
+    subdomain?: string | null;
     citations?: unknown;
     wrong_answer_rationales?: unknown;
   };
@@ -31,7 +34,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   const withOptionalFields = await supabase
     .from("quiz_questions")
-    .select("id,question_text,options,correct_index,explanation,display_order,citations,wrong_answer_rationales")
+    .select("id,question_text,options,correct_index,explanation,display_order,domain_number,domain_label,subdomain,citations,wrong_answer_rationales")
     .eq("quiz_id", id)
     .order("display_order", { ascending: true });
 
@@ -57,6 +60,9 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
       : [],
     correct_index: question.correct_index,
     explanation: question.explanation,
+    domain_number: question.domain_number ?? null,
+    domain_label: question.domain_label ?? null,
+    subdomain: question.subdomain ?? null,
     citations: Array.isArray(question.citations)
       ? (question.citations as Array<{
           source: string;

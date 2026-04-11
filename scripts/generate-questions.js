@@ -9,6 +9,9 @@ const path = require('path');
 const MODE = process.env.GENERATION_MODE || 'daily';
 const DRY_RUN = process.env.DRY_RUN === 'true';
 const DATE_SEED_OVERRIDE = (process.env.DATE_SEED || '').trim();
+const TARGET_DOMAIN = Number(process.env.TARGET_DOMAIN || '0');
+const TARGET_COUNT = Number(process.env.TARGET_COUNT || '12');
+const QUIZ_LABEL = (process.env.QUIZ_LABEL || '').trim();
 const TEMPLATE_LOOKBACK_DAYS = Number(process.env.TEMPLATE_LOOKBACK_DAYS || '5');
 const STAGING_DIR = path.join(__dirname, '../seed/staging');
 const DAILY_DIR = path.join(__dirname, '../seed/daily');
@@ -36,6 +39,33 @@ const DOMAIN_DISTRIBUTION = {
     { domain: 4, domain_label: 'Communication', count: 30 },
   ],
 };
+
+const DOMAIN_LABEL_BY_NUMBER = {
+  1: 'Ethics',
+  2: 'Assessment',
+  3: 'Interventions',
+  4: 'Communication',
+};
+
+function getDistribution(mode) {
+  if (mode === 'targeted') {
+    if (!Number.isInteger(TARGET_DOMAIN) || TARGET_DOMAIN < 1 || TARGET_DOMAIN > 4) {
+      throw new Error('TARGET_DOMAIN must be set to 1, 2, 3, or 4 when GENERATION_MODE=targeted.');
+    }
+
+    if (!Number.isInteger(TARGET_COUNT) || TARGET_COUNT < 1) {
+      throw new Error('TARGET_COUNT must be a positive integer when GENERATION_MODE=targeted.');
+    }
+
+    return [{
+      domain: TARGET_DOMAIN,
+      domain_label: DOMAIN_LABEL_BY_NUMBER[TARGET_DOMAIN],
+      count: TARGET_COUNT,
+    }];
+  }
+
+  return DOMAIN_DISTRIBUTION[mode];
+}
 
 function getAestDateSeed(now = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -674,32 +704,60 @@ const QUESTION_BANK = {
   ],
 };
 
-async function createQuizRecord(setId, mode, generatedAt) {
+function getQuizTitlePrefix(mode, domainLabel) {
+  if (QUIZ_LABEL) {
+    return QUIZ_LABEL;
+  }
+
+  if (mode === 'daily') {
+    return 'Daily';
+  }
+
+  if (mode === 'fortnightly') {
+    return 'Exam';
+  }
+
+  if (mode === 'targeted') {
+    return `Weekly ${domainLabel || 'Domain'}`;
+  }
+
+  return 'Quiz';
+}
+
+async function createQuizRecord(setId, mode, generatedAt, domainLabel) {
   const dateString = formatDisplayDate(generatedAt.split('T')[0]);
-  
+  const titlePrefix = getQuizTitlePrefix(mode, domainLabel);
+
   // Get count of existing quizzes for this date to determine sequence number
-  const { data: existingQuizzes, error: countError } = await supabase
+  const { count, error: countError } = await supabase
     .from('quizzes')
     .select('id', { count: 'exact', head: true })
     .eq('author_name', 'NPE Quiz Bot')
     .eq('delivery_mode', mode)
-    .like('title', `${mode === 'daily' ? 'Daily' : 'Fortnightly'} #%${dateString}%`);
+    .like('title', `${titlePrefix} #%`);
 
-  const sequenceNum = (existingQuizzes?.length || 0) + 1;
+  if (countError) {
+    throw new Error(`Quiz count failed: ${countError.message}`);
+  }
+
+  const sequenceNum = (count || 0) + 1;
   const sequence = String(sequenceNum).padStart(3, '0');
-  
-  const title = mode === 'daily' ? `Daily #${sequence} - ${dateString}` : `Fortnightly #${sequence} - ${dateString}`;
+
+  const title = `${titlePrefix} #${sequence} - ${dateString}`;
   const { data: quiz, error } = await supabase
     .from('quizzes')
     .insert({
       title,
       delivery_mode: mode,
       category: 'Exam Prep',
-      domain: 'Mixed',
+      domain: domainLabel || 'Mixed',
       description: `Auto-generated ${mode} NPE set created from ${setId}`,
       created_by: null,
       author_name: 'NPE Quiz Bot',
       is_curated: true,
+      is_published: true,
+      seed_source: setId,
+      seed_version: process.env.SEED_VERSION || 'seed-v1',
       published_at: generatedAt,
     })
     .select('id')
@@ -761,10 +819,19 @@ function toLegacyQuestionRow(question, quizId, displayOrder) {
 
   return {
     quiz_id: quizId,
+    domain_number: Number(question.domain),
+    domain_label: String(question.domain_label || ''),
+    subdomain: String(question.subdomain || ''),
     question_text: String(question.question || '').trim(),
     options,
+    options_map: question.options,
+    correct_answer: String(question.correct_answer || ''),
     correct_index: correctIndex,
     explanation: String(question.correct_explanation || '').trim(),
+    correct_explanation: String(question.correct_explanation || '').trim(),
+    distractor_explanations: question.distractor_explanations,
+    citations: Array.isArray(question.citations) ? question.citations : [],
+    difficulty_seed: String(question.difficulty_seed || 'standard'),
     display_order: displayOrder,
   };
 }
@@ -810,10 +877,10 @@ async function generateForDomain(domainSpec, mode, offset, dateSeed, recentHisto
   return questions;
 }
 
-async function insertToSupabase(questions, setId, mode, generatedAt) {
+async function insertToSupabase(questions, setId, mode, generatedAt, domainLabel) {
   console.log(`Inserting ${questions.length} questions into Supabase...`);
   await ensureSupabaseSchemaReady();
-  const quizId = await createQuizRecord(setId, mode, generatedAt);
+  const quizId = await createQuizRecord(setId, mode, generatedAt, domainLabel);
   const rows = questions.map((question, index) => toLegacyQuestionRow(question, quizId, index + 1));
   const { error } = await supabase.from('quiz_questions').insert(rows);
 
@@ -830,7 +897,7 @@ async function main() {
   console.log(`Dry run: ${DRY_RUN}`);
   console.log(`Date: ${new Date().toISOString()}\n`);
 
-  const distribution = DOMAIN_DISTRIBUTION[MODE];
+  const distribution = getDistribution(MODE);
   if (!distribution) {
     throw new Error(`Unknown mode: ${MODE}`);
   }
@@ -838,7 +905,8 @@ async function main() {
   const dateSeed = getDateSeed();
   const recentHistoryByDomain = loadRecentSubdomainHistory(MODE, dateSeed, TEMPLATE_LOOKBACK_DAYS);
   const generatedAt = `${dateSeed}T00:00:00Z`;
-  const setId = `${MODE}-${dateSeed}`;
+  const setId = MODE === 'targeted' ? `${MODE}-d${TARGET_DOMAIN}-${dateSeed}` : `${MODE}-${dateSeed}`;
+  const quizDomainLabel = MODE === 'targeted' ? DOMAIN_LABEL_BY_NUMBER[TARGET_DOMAIN] : 'Mixed';
 
   const allQuestions = [];
   let offset = 0;
@@ -875,7 +943,7 @@ async function main() {
     throw new Error('Supabase client not configured.');
   }
 
-  await insertToSupabase(allQuestions, setId, MODE, generatedAt);
+  await insertToSupabase(allQuestions, setId, MODE, generatedAt, quizDomainLabel);
   console.log('\nDone.');
 }
 

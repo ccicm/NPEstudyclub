@@ -20,13 +20,14 @@ if (!supabaseUrl || !serviceRoleKey) {
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 async function deleteOldQuizzes() {
-  console.log('🗑️  Deleting old auto-generated quizzes...');
+  console.log('🗑️  Deleting old auto-generated daily quizzes...');
   
   // First get the old quiz IDs
   const { data: oldQuizzes, error: fetchError } = await supabase
     .from('quizzes')
     .select('id')
-    .eq('author_name', 'NPE Quiz Bot');
+    .eq('author_name', 'NPE Quiz Bot')
+    .eq('delivery_mode', 'daily');
 
   if (fetchError) {
     console.error('❌ Failed to fetch old quizzes:', fetchError.message);
@@ -86,7 +87,8 @@ async function deleteOldQuizzes() {
   const { error: deleteQuizzesError } = await supabase
     .from('quizzes')
     .delete()
-    .eq('author_name', 'NPE Quiz Bot');
+    .eq('author_name', 'NPE Quiz Bot')
+    .eq('delivery_mode', 'daily');
 
   if (deleteQuizzesError) {
     console.error('❌ Failed to delete old quizzes:', deleteQuizzesError.message);

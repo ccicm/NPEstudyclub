@@ -11,6 +11,9 @@ type QuizQuestion = {
   options: Array<{ label: string; text: string }>;
   correct_index: number;
   explanation: string | null;
+  domain_number?: number | null;
+  domain_label?: string | null;
+  subdomain?: string | null;
   citations?: Array<{
     source: string;
     clause?: string | null;
@@ -179,6 +182,13 @@ export function QuizRunner({
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 Question {reviewIndex + 1} of {questions.length}
               </p>
+              {reviewQuestion.domain_label || reviewQuestion.subdomain ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {(reviewQuestion.domain_number ? `Domain ${reviewQuestion.domain_number}` : reviewQuestion.domain_label || "Domain")}
+                  {reviewQuestion.domain_label ? ` · ${reviewQuestion.domain_label}` : ""}
+                  {reviewQuestion.subdomain ? ` · ${reviewQuestion.subdomain}` : ""}
+                </p>
+              ) : null}
               <p className="mt-2 text-sm">{reviewQuestion.question_text}</p>
 
               <div className="mt-3 grid gap-2 rounded-lg border bg-card p-3 text-sm">

@@ -6,9 +6,11 @@
   "scripts": {
     "generate:daily": "GENERATION_MODE=daily node generate-questions.js",
     "generate:fortnightly": "GENERATION_MODE=fortnightly node generate-questions.js",
+    "generate:targeted": "GENERATION_MODE=targeted node generate-questions.js",
     "generate:daily:dry": "GENERATION_MODE=daily DRY_RUN=true node generate-questions.js",
     "generate:fortnightly:dry": "GENERATION_MODE=fortnightly DRY_RUN=true node generate-questions.js",
-    "audit:repetition": "node repetition-audit.js"
+    "audit:repetition": "node repetition-audit.js",
+    "seed:launch-pack": "node seed-launch-pack.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
