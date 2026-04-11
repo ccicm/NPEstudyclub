@@ -36,6 +36,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - Verify moderation behavior after migration: one downvote cannot escalate; ratio checks only run after minimum vote count.
 - Confirm migrations `001` through `011` have been applied in production (still pending from live production SQL access).
 - Confirm resource upload -> metadata row -> library visibility -> signed URL download flow in production (still pending from live production account/session).
+- Production verification runbook expanded with explicit browser flow, diagnostics triage, and evidence capture template (`docs/PRODUCTION_VERIFICATION_SQL_RUNBOOK.md`).
 - Prepare controlled bulk resource upload run after storage verification, then record batch outcomes and retry items.
 - Confirm study-plan save/regenerate/log flows for approved non-admin users in production (still pending in production).
 - Confirm storage privacy posture in production for study-library files:

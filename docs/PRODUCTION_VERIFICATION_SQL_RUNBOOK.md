@@ -126,3 +126,50 @@ order by ordinal_position;
 - uploaded row exists in public.resources with file_path and uploaded_by
 - app no longer shows 42501/table users banner in resources page
 - open file action returns a short-lived signed URL and opens file successfully
+
+## 10. Browser verification flow (required)
+
+Run this sequence in production immediately after SQL checks:
+
+1. Sign in with an approved member account.
+2. Open `/add` and upload:
+  - 1 PDF file
+  - 1 Word file (`.doc` or `.docx`)
+3. Confirm success banner appears after each upload.
+4. Open `/resources` and verify both files appear in the first page of results.
+5. Use `View file` on each item and confirm the file opens successfully.
+6. Confirm each item can be marked complete and remains stable after refresh.
+
+If step 2 redirects back to `/add` with error query params, capture the full URL including:
+- `error`
+- `db_code`
+- `db_hint`
+- `db_col`
+
+## 11. Resource visibility triage map
+
+Use this when upload or visibility fails.
+
+| Symptom | Likely cause | Action |
+|---|---|---|
+| Upload returns `error=not_authorized` or `db_hint=rls_policy` | approval/RLS mismatch | confirm approved member row and resources policies |
+| Upload returns `error=schema_not_ready` with `db_hint=missing_table` or `missing_column` | schema drift | re-check migrations 009/010/013 are applied |
+| Upload returns `error=save_failed` and row missing in SQL | insert/writeback failed | inspect SQL error code/hint and retry with fresh upload |
+| Upload says success but item not in `/resources` | read-path mismatch or policy gap | run sections 2/3/5 and verify `file_path` + `uploaded_by` on latest rows |
+| Item appears but `View file` fails | storage signing/read issue | confirm object exists at `file_path` and storage access path is configured |
+
+## 12. Evidence capture template
+
+Record this in status docs after each run:
+
+- Environment: production
+- Account email used:
+- Upload files tested: PDF + DOC/DOCX (names)
+- Upload result: success/failure
+- SQL latest rows check: pass/fail
+- Resources page visibility: pass/fail
+- View file action (PDF): pass/fail
+- View file action (DOC/DOCX): pass/fail
+- Completion toggle + refresh: pass/fail
+- Failure URL diagnostics (if any):
+- Follow-up action required:
