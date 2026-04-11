@@ -125,7 +125,7 @@ export default async function ProfilePage() {
             <button type="submit" className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">
               Update email
             </button>
-            <p className="text-xs text-muted-foreground">Supabase will send a confirmation link to your new email before it changes.</p>
+            <p className="text-xs text-muted-foreground">A confirmation link will be sent to your new email before the change is applied.</p>
           </form>
         </div>
 

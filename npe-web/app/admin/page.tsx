@@ -186,7 +186,7 @@ export default async function AdminPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">Admin</p>
         <h1 className="mt-2 text-3xl">User management</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Signed in as {user?.email || "preview mode"}. If this is your first login, approve your access request once,
+          Signed in as {user?.email || "limited access mode"}. If this is your first login, approve your access request once,
           then open the member area.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -209,9 +209,9 @@ export default async function AdminPage() {
 
       {!process.env.SUPABASE_SERVICE_ROLE_KEY ? (
         <section className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-900">
-          <p className="text-base font-semibold">Preview mode only</p>
+          <p className="text-base font-semibold">Limited access mode</p>
           <p className="mt-2 text-sm">
-            You do not need a Supabase service key to keep going. Use the button above to approve your own member
+            Full admin tools are not available in this environment. Use the button above to approve your own member
             access, then continue in the app.
           </p>
         </section>
@@ -232,7 +232,7 @@ export default async function AdminPage() {
 
         {!process.env.SUPABASE_SERVICE_ROLE_KEY ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            Settings are hidden until a service key is configured.
+            Settings are unavailable in this environment.
           </p>
         ) : (
           <>
@@ -318,7 +318,7 @@ export default async function AdminPage() {
 
         {!process.env.SUPABASE_SERVICE_ROLE_KEY ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            Pending requests are hidden until a service key is configured.
+            Pending requests are unavailable in this environment.
           </p>
         ) : !pendingRequests.length ? (
           <p className="mt-4 text-sm text-muted-foreground">No pending requests right now.</p>
@@ -380,7 +380,7 @@ export default async function AdminPage() {
         <h2 className="text-2xl">Recently reviewed</h2>
         {!process.env.SUPABASE_SERVICE_ROLE_KEY ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            Review history is hidden until a service key is configured.
+            Review history is unavailable in this environment.
           </p>
         ) : !recentRequests.length ? (
           <p className="mt-3 text-sm text-muted-foreground">No approvals or declines yet.</p>

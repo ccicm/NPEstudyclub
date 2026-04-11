@@ -50,7 +50,7 @@ export default async function MemberLayout({
         <MemberNav links={links} />
         {bypassed ? (
           <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-            Preview mode is active. Some actions (like saving a study plan) require a real email sign-in session.
+            Limited-access testing is active. Some actions (like saving a study plan) require a regular email sign-in session.
           </p>
         ) : null}
       </header>

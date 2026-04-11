@@ -199,7 +199,7 @@ export default async function DashboardPage() {
           </div>
           {bypassEnabled ? (
             <p className="mt-3 text-xs text-muted-foreground">
-              Preview mode is on. For normal member behavior, turn bypass off once sign-in is stable.
+              Limited-access testing is on. For normal member behavior, use regular sign-in once access is stable.
             </p>
           ) : null}
         </section>
