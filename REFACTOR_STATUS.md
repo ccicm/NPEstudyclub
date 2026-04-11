@@ -73,6 +73,7 @@ This file tracks implementation status only. `MASTER_PLAN.md` remains the source
 - P1 request-status state rendering is complete (state-based CTAs, organiser note removed)
 - User-facing technical copy cleanup is in progress across member/admin surfaces
 - Admin/member limited-access banners now use user-safe wording (replacing preview/service-key/bypass phrasing)
+- Member error states now use consistent user-safe wording across resources, community, quizzes, and study plan flows
 - Resource search placeholder simplified to "Search resources…"
 - Resource file action copy standardised to "View file"
 - Add-resource form now shows category-specific helper text when conditional metadata fields appear

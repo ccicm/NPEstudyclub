@@ -94,7 +94,7 @@ export function StudyPlanDashboard({
           : errorCode === "missing_priorities"
             ? "Please set at least one domain priority before saving."
             : errorCode === "schema_not_ready"
-              ? "Study plan setup is still being prepared. Please try again later."
+              ? "Study plan tools are temporarily unavailable. Please try again later."
               : errorCode === "not_authorized"
                 ? "Your account cannot update this plan right now. Please check your access."
                 : errorCode === "save_conflict"

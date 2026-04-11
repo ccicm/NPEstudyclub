@@ -80,7 +80,7 @@ export function QuizAddForm({
         : errorCode === "invalid_payload" || errorCode === "invalid_question"
           ? "The quiz data looks incomplete. Please check the form or CSV and try again."
           : errorCode === "schema_not_ready"
-            ? "Quiz setup is still being prepared. Please try again later."
+            ? "Quiz tools are temporarily unavailable. Please try again later."
             : errorCode === "not_authorized"
               ? "Your account cannot create quizzes right now. Please check your access."
               : "Unable to submit the quiz. Please try again.";

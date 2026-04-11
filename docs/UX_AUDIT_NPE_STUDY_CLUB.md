@@ -22,6 +22,7 @@ This audit covers onboarding, information architecture, copy, empty states, depe
 	- Request-access PSY-focused label/copy renamed to "AHPRA registration number" wording.
 	- Admin self-approval helper copy and button label clarified.
 	- Limited-access banners now use user-safe wording (replacing preview/service-key/bypass terminology).
+	- Member error messages now use consistent user-safe wording across resources, community, quizzes, and study plan flows.
 	- Dashboard account card label softened to "Member access".
 	- Quiz list now includes a consistent AI-generated disclosure callout.
 	- Quiz runner now includes AI-generated disclosure copy in intro and results.

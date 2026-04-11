@@ -65,7 +65,7 @@ export function CommunityHub({
     : errorCode === "missing_required"
       ? "Please add a title and body before publishing."
       : errorCode === "schema_not_ready"
-        ? "Community setup is still being prepared. Please try again later."
+        ? "Community is temporarily unavailable. Please try again later."
         : errorCode === "posting_restricted"
           ? "You cannot post right now. If this seems wrong, contact a moderator."
           : errorCode === "not_authorized"
