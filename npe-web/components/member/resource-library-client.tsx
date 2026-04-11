@@ -244,7 +244,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
       <input
         value={searchInput}
         onChange={(event) => debouncedSetQuery(event.target.value)}
-        placeholder="Search resources..."
+        placeholder="Search resources…"
         className="h-10 w-full rounded-md border bg-card px-3 text-sm"
       />
 
@@ -425,7 +425,7 @@ export function ResourceLibraryClient({ resources, loadErrorCode = null }: Props
                       onClick={() => openFile(resource.id)}
                       disabled={downloadPendingId === resource.id}
                     >
-                      {downloadPendingId === resource.id ? "Opening..." : "View file"}
+                      {downloadPendingId === resource.id ? "Opening..." : "View resource"}
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">No file attached</span>

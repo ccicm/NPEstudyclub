@@ -108,7 +108,7 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
               Upload another
             </Link>
             <Link href="/resources" className="underline">
-              View in Resources
+              View resources
             </Link>
           </div>
         </div>
@@ -153,6 +153,10 @@ export function AddResourceForm({ action, uploaded, errorCode }: Props) {
             </select>
           </label>
         </div>
+
+        <p className="mt-3 text-xs text-muted-foreground">
+          Choose a category to reveal the metadata fields that help members filter and find this resource later.
+        </p>
 
         {category === "Exam Prep" ? (
           <div className="mt-4 grid gap-4 rounded-xl border bg-muted/30 p-4 md:grid-cols-2">

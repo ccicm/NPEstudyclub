@@ -186,7 +186,7 @@ export default async function AdminPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">Admin</p>
         <h1 className="mt-2 text-3xl">User management</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Signed in as {user?.email || "preview mode"}. If this is your first login, approve your own access once,
+          Signed in as {user?.email || "preview mode"}. If this is your first login, approve your access request once,
           then open the member area.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -201,7 +201,7 @@ export default async function AdminPage() {
               type="submit"
               className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
             >
-              Approve my member access
+              Approve my access request
             </button>
           </form>
         </div>
@@ -358,10 +358,10 @@ export default async function AdminPage() {
 
                 <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                   <p>
-                    <span className="font-semibold text-foreground">AHPRA:</span> {request.ahpra_registration || "-"}
+                    <span className="font-semibold text-foreground">AHPRA registration number:</span> {request.ahpra_registration || "-"}
                   </p>
                   <p>
-                    <span className="font-semibold text-foreground">PSY number:</span> {request.psy_number || "-"}
+                    <span className="font-semibold text-foreground">Registration number:</span> {request.psy_number || "-"}
                   </p>
                   <p className="md:col-span-2">
                     <span className="font-semibold text-foreground">Relationship:</span> {request.relationship_note || "-"}

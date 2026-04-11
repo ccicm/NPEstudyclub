@@ -16,7 +16,7 @@ NPE Study Club is a private exam prep hub for a small, known cohort — approxim
 
 - **Core implementation status:** P1 and P2 are complete in code. P3 UX items 3.1-3.3 are complete in code; operational verification (3.4) and bulk onboarding execution (3.5) remain pending production run.
 - **Quiz moderation status:** Quiz review flow redesign is implemented in UI and min-vote escalation guards are implemented in SQL/migration files; production rollout verification is still pending migration execution.
-- **UX/copy status:** Request-status rendering, technical-copy simplification, and major UX P2/P3 cleanup items are implemented; remaining follow-ups are narrowed to residual taxonomy/channel and copy consistency checks.
+- **UX/copy status:** Request-status rendering, technical-copy simplification, and the main UX P2/P3 copy cleanup items are implemented; remaining follow-ups are narrowed to residual taxonomy/channel checks and any final copy consistency review.
 - **Storage/resource status:** Upload pipeline is implemented with fallback/diagnostics. Production verification from upload through visibility and signed URL open is still pending from a live production session.
 - **Migration CI status:** In progress. GitHub Action + migration file are committed, but rollout is blocked by connection endpoint/secret mismatch. This is deferred for tonight and resumes next session with pooler URL verification.
 - **Clinical safeguarding status:** Started in code (guidelines, disclaimer banner, report scaffold, initial moderator controls). Remaining moderator controls and production migration execution are pending.
@@ -459,17 +459,17 @@ This is the next refactor block after current storage/safeguarding verification 
 - [in progress] Strip developer-facing error strings from production UI; keep diagnostics internal.
 
 **P2 — High**
-- [pending] Standardise file actions to `View` or `Download`.
+- [done] Standardise file actions to `View` or `Download`.
 - [done] Remove the stale Profile progress section.
 - [in progress] Make empty states more inviting and linked.
-- [pending] Simplify the resource search placeholder.
+- [done] Simplify the resource search placeholder.
 
 **P3 — Medium**
 - [done] Add schedule dependency prompts when no plan exists.
-- [pending] Add helper text for conditional upload metadata sections.
-- [pending] Rename PSY labels to AHPRA registration number.
+- [done] Add helper text for conditional upload metadata sections.
+- [done] Rename PSY labels to AHPRA registration number.
 - [pending] Rename ambiguous community channel labels.
-- [pending] Clarify admin approval copy/helper text.
+- [done] Clarify admin approval copy/helper text.
 
 **P4 — Low**
 - Replace dashboard hero subtitle with more useful copy.
