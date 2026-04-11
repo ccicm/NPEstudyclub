@@ -44,6 +44,19 @@ type ReviewPair = {
   answer: AnswerRecord;
 };
 
+// Domain 1=Ethics, 2=Assessment, 3=Interventions, 4=Communication
+const DOMAIN_COLOURS: Record<string, { bg: string; text: string; border: string }> = {
+  ethics:        { bg: 'bg-purple-50',  text: 'text-purple-700',  border: 'border-purple-200'  },
+  assessment:    { bg: 'bg-blue-50',    text: 'text-blue-700',    border: 'border-blue-200'    },
+  interventions: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  communication: { bg: 'bg-orange-50',  text: 'text-orange-700',  border: 'border-orange-200'  },
+};
+
+function domainColour(label: string | null | undefined) {
+  const key = (label || '').toLowerCase().trim();
+  return DOMAIN_COLOURS[key] ?? { bg: 'bg-muted', text: 'text-muted-foreground', border: 'border-border' };
+}
+
 export function QuizRunner({
   quiz,
   questions,
@@ -303,12 +316,26 @@ export function QuizRunner({
           {domainPerformance.length > 0 ? (
             <div className="mt-4 rounded-lg border bg-background p-3 text-sm">
               <p className="font-medium">Domain performance</p>
-              <div className="mt-2 space-y-1 text-muted-foreground">
-                {domainPerformance.map((item) => (
-                  <p key={item.domain}>
-                    {item.domain} · {item.percent}% ({item.correct}/{item.total})
-                  </p>
-                ))}
+              <div className="mt-2 space-y-2">
+                {domainPerformance.map((item) => {
+                  const dc = domainColour(item.domain);
+                  return (
+                    <div key={item.domain} className="flex items-center gap-2">
+                      <span className={`shrink-0 rounded border px-2 py-0.5 text-xs font-medium ${dc.bg} ${dc.text} ${dc.border}`}>
+                        {item.domain}
+                      </span>
+                      <div className="flex-1 overflow-hidden rounded-full bg-muted h-1.5">
+                        <div
+                          className={`h-1.5 rounded-full ${item.percent >= 70 ? 'bg-emerald-500' : item.percent >= 50 ? 'bg-amber-400' : 'bg-red-400'}`}
+                          style={{ width: `${item.percent}%` }}
+                        />
+                      </div>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {item.percent}% ({item.correct}/{item.total})
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : null}
@@ -348,28 +375,34 @@ export function QuizRunner({
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 Question {reviewIndex + 1} of {questions.length}
               </p>
-              {reviewQuestion.domain_label || reviewQuestion.subdomain ? (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {(reviewQuestion.domain_number ? `Domain ${reviewQuestion.domain_number}` : reviewQuestion.domain_label || "Domain")}
-                  {reviewQuestion.domain_label ? ` · ${reviewQuestion.domain_label}` : ""}
-                  {reviewQuestion.subdomain ? ` · ${reviewQuestion.subdomain}` : ""}
-                </p>
-              ) : null}
-              {reviewQuestion.difficulty_seed ? (
-                <span className={`mt-1 inline-block rounded px-2 py-0.5 text-xs font-medium ${
-                  reviewQuestion.difficulty_seed === 'advanced'
-                    ? 'bg-red-50 text-red-700 border border-red-200'
-                    : reviewQuestion.difficulty_seed === 'challenging'
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                    : 'bg-sky-50 text-sky-700 border border-sky-200'
-                }`}>
-                  {reviewQuestion.difficulty_seed === 'advanced'
-                    ? 'Complex'
-                    : reviewQuestion.difficulty_seed === 'challenging'
-                    ? 'Applied'
-                    : 'Foundational'}
-                </span>
-              ) : null}
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                {reviewQuestion.domain_label ? (() => {
+                  const dc = domainColour(reviewQuestion.domain_label);
+                  return (
+                    <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${dc.bg} ${dc.text} ${dc.border}`}>
+                      {reviewQuestion.domain_number ? `D${reviewQuestion.domain_number} · ` : ''}{reviewQuestion.domain_label}
+                    </span>
+                  );
+                })() : null}
+                {reviewQuestion.subdomain ? (
+                  <span className="text-xs text-muted-foreground">{reviewQuestion.subdomain}</span>
+                ) : null}
+                {reviewQuestion.difficulty_seed ? (
+                  <span className={`inline-block rounded border px-2 py-0.5 text-xs font-medium ${
+                    reviewQuestion.difficulty_seed === 'advanced'
+                      ? 'bg-red-50 text-red-700 border-red-200'
+                      : reviewQuestion.difficulty_seed === 'challenging'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-sky-50 text-sky-700 border-sky-200'
+                  }`}>
+                    {reviewQuestion.difficulty_seed === 'advanced'
+                      ? 'Complex'
+                      : reviewQuestion.difficulty_seed === 'challenging'
+                      ? 'Applied'
+                      : 'Foundational'}
+                  </span>
+                ) : null}
+              </div>
               <p className="mt-2 text-sm">{reviewQuestion.question_text}</p>
 
               <div className="mt-3 grid gap-2 rounded-lg border bg-card p-3 text-sm">
